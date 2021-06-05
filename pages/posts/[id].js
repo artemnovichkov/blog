@@ -1,4 +1,4 @@
-import Layout from '../../components/layout'
+import Post from '../../components/post'
 import Date from '../../components/date'
 import Head from 'next/head'
 import { getAllPostIds, getPostData } from '../../lib/posts'
@@ -13,9 +13,9 @@ export async function getStaticProps({ params }) {
     }
 }
 
-export default function Post({ postData }) {
+export default function Article({ postData }) {
     return (
-        <Layout>
+        <Post>
             <Head>
             <title>{postData.title}</title>
             </Head>
@@ -26,7 +26,7 @@ export default function Post({ postData }) {
                 </div>
                 <div dangerouslySetInnerHTML={{__html: postData.htmlContent}} />
             </article>
-        </Layout>
+        </Post>
     )
 }
 
