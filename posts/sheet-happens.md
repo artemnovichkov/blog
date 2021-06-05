@@ -1,0 +1,386 @@
+---
+title: 'Sheet happens. Working with modal views in SwiftUI'
+date: '2021-04-14'
+---
+
+<p align="center"/>
+  <img src="/images/sheet/cover.png"/>
+</p>
+
+Developing pet projects is one of the best ways to learn new things. Since SwiftUI 1.0 I've been writing an app for saving and reading articles. I rewrote it twice from scratch, added and removed features based on my user experience, used new APIs, etc.
+
+I had a few interesting cases implementing modal views a.k.a. sheets in SwiftUI. The main goal of this article is to summarize my experience and use it as a reference for the future. I simplify code examples to focus on specific logic. Let's start with showing.
+
+> Note: Examples are written in Swift 5.3.2 and work on iOS 14.0 with Xcode 12.4 (12D4e).
+
+## Showing sheets
+
+There are two options for showing sheets. 
+
+The first one is based on `Binding<Bool>` value. It can be stored via `@State` property wrapper and good for sheets that need no external data:
+
+```swift
+struct ArticlesView: View {
+
+    @State var isSettingsViewPresented = false
+    
+    var body: some View {
+        Button("Show Settings") {
+            isSettingsViewPresented = true
+        }
+        .sheet(isPresented: $isSettingsViewPresented) {
+            SettingsView()
+        }
+    }
+}
+
+struct SettingsView: View {
+
+    var body: some View {
+        Text("Settings")
+    }
+}
+```
+
+The second one is based on `Binding<Item?>` value where the item is an optional Identifiable object. it's a good choice if we want to pass any data to sheets. For instance, a selected article for reading. Pay attention that the selected article is not optional in sheet content closure:
+
+```swift
+// A simple struct with article data
+
+struct Article: Identifiable {
+
+    let id: UUID
+    let title: String
+}
+
+struct ArticlesView: View {
+
+    @State var article: Article?
+    
+    var body: some View {
+        Button("Show Article") {
+            article = .init(id: .init(), title: "Awesome article")
+        }
+        .sheet(item: $article) { article in
+            ArticleDetailsView(article: article)
+        }
+    }
+}
+
+// A view for article showing
+
+struct ArticleDetailsView: View {
+
+    @State var article: Article
+    
+    var body: some View {
+        Text(article.title)
+    }
+}
+```
+
+**An interesting moments:**
+
+- if `id` of the selected article will be changed, the presented sheet will be dismissed and replaced with a new sheet;
+- if the selected article becomes nil at any moment, the sheet will be dismissed as well. 
+
+For both showing options we can optionally add `onDismiss` closure that executed when the sheet dismisses:
+
+```swift
+struct ArticlesView: View {
+
+    @State var article: Article?
+    
+    var body: some View {
+        Button("Show Article") {
+            article = .init(id: .init(), title: "Awesome article")
+        }
+        .sheet(item: $article, onDismiss: onDismiss) { article in
+            ArticleDetailsView(article: article)
+        }
+    }
+       
+    private func onDismiss() {
+        print("dismisses")
+    }
+}
+```
+
+By default, we can dismiss sheets via swipe gestures. But what if we want to dismiss sheets based on another user action or app logic?
+
+## Dismissing sheets
+
+There are two options to dismiss sheets too. If we use `Binding<Bool>`, we can pass it to a sheet via `@Binding` property wrapper and update its value. Bindings allow to change values in parent views:
+
+```swift
+// in ArticlesView
+
+.sheet(isPresented: $isSettingsViewPresented) {
+    SettingsView(isSettingsViewPresented: $isSettingsViewPresented)
+}
+
+struct SettingsView: View {
+    
+    @Binding var isSettingsViewPresented: Bool
+    
+    var body: some View {
+        ZStack {
+            Text("Settings")
+            VStack {
+                Spacer()
+                Button("Dismiss") {
+                    isSettingsViewPresented = false
+                }
+            }
+        }
+    }
+}
+```
+
+Another option is more universal and based on `presentationMode` environment:
+
+```swift
+struct SettingsView: View {
+    
+    @Environment(\.presentationMode) var presentationMode
+    
+    var body: some View {
+        ZStack {
+            Text("Settings")
+            VStack {
+                Spacer()
+                Button("Dismiss") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+        }
+    }
+}
+```
+
+This environment indicates whether a view is currently presented by another view.
+
+## Sheets and ForEach
+
+The app with only one article is a bit useless, so let's create List and make articles rows via `ForEach`:
+
+```swift
+struct ArticlesView: View {
+
+    let articles: [Article] = [.init(id: .init(), title: "Awesome article"),
+                               .init(id: .init(), title: "Another awesome article")]
+    @State var isArticleDetailsViewPresented: Bool = false
+    
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(articles) { article in
+                    Text(article.title)
+                        .onTapGesture {
+                            isArticleDetailsViewPresented = true
+                        }
+                        .sheet(isPresented: $isArticleDetailsViewPresented) {
+                            ArticleDetailsView(article: article)
+                        }
+                }
+            }
+            .navigationTitle("Articles")
+        }
+    }
+}
+```
+
+Here we use `Binding<Bool>` for sheet state and update its value on tap action. Because we have the articles in enumeration, we can pass it to `ArticleDetailsView`. Everything looks fine, the app builds successfully. But `ArticleDetailsView` presents only with `"Awesome article"` title for the first article. Ok, remember this case and try to update sheets logic in the next article section after another example.
+
+## Multiple sheets
+
+Previously we used one sheet for the selected article. In my app, I show different views according to the internet connection. If the internet is available, I show `SafariView` with the url of the selected article, and WebArchiveView with saved web archive data.
+
+At first, we update our models:
+
+```swift
+struct Article: Identifiable {
+
+    let id: UUID
+    let title: String
+    let url: URL
+}
+
+extension URL: Identifiable {
+    
+    public var id: String {
+        absoluteString
+    }
+}
+
+extension String: Identifiable {
+    
+    public var id: String {
+        self
+    }
+}
+```
+
+URL and String types must conform `Identifiable` protocol for using in sheet bindings.
+
+Next, we update ArticlesView with multiple sheets. To simplify the example let's show different views based on Bool state:
+
+```swift
+struct ArticlesView: View {
+
+    let article: Article = .init(id: .init(),
+                                 title: "Sheet happens",
+                                 url: URL(string: "https://blog.artemnovichkov.com/editor/sheet-happens")!)
+    
+    @State var url: URL?
+    @State var title: String?
+    @State var isOn = true
+    
+    var body: some View {
+        HStack {
+            Button("Show Article") {
+                if isOn {
+                    url = article.url
+                }
+                else {
+                    title = article.title
+                }
+            }
+            .sheet(item: $url) { url in
+                SafariView(url: url)
+            }
+            .sheet(item: $title) { title in
+                WebArchiveView(title: title)
+            }
+            Toggle("", isOn: $isOn)
+        }
+        .padding()
+    }
+}
+```
+
+Finally, we add views with different states and body content:
+
+```swift
+struct SafariView: View {
+    
+    @State var url: URL
+    
+    var body: some View {
+        Text("Content of " + url.absoluteString)
+    }
+}
+
+struct WebArchiveView: View {
+    
+    @State var title: String
+    
+    var body: some View {
+        Text("Web archive data of \(title) article")
+    }
+}
+```
+
+Here we have another strange behavior — only `WebArchiveView` will be shown. It's a known issue in SwiftUI, but don't give up, let's fix it!
+
+## Fixing multiple sheets
+
+We create `Sheet` enum with cases for every sheet. It must conform `Identifiable` as well:
+
+```swift
+enum Sheet: Identifiable {
+    
+    case url(URL)
+    case webArchive(String)
+    
+    var id: String {
+        switch self {
+        case .url(let url):
+            return url.id
+        case .webArchive(let title):
+            return title.id
+        }
+    }
+}
+```
+
+In `ArticlesView` we replace states with only one with `Sheet` value and use one `sheet` modifier:
+
+```swift
+struct ArticlesView: View {
+
+    let article: Article = .init(id: .init(),
+                                 title: "Sheet happens",
+                                 url: URL(string: "https://blog.artemnovichkov.com/editor/sheet-happens")!)
+    
+    @State var sheet: Sheet?
+    @State var isOn = true
+    
+    var body: some View {
+        HStack {
+            Button("Show Article") {
+                if isOn {
+                    sheet = .url(article.url)
+                }
+                else {
+                    sheet = .webArchive(article.title)
+                }
+            }
+            .sheet(item: $sheet) { sheet in
+                switch sheet {
+                case .url(let url):
+                    SafariView(url: url)
+                case .webArchive(let title):
+                    WebArchiveView(title: title)
+                }
+            }
+            Toggle("", isOn: $isOn)
+        }
+        .padding()
+    }
+}
+```
+
+Now, with sheet state, both views will be presented 🎉
+
+If we want to reuse these sheets in another view, we can conform `View` protocol and return related views in body:
+
+```swift
+enum Sheet: View, Identifiable {
+    
+    case url(URL)
+    case webArchive(String)
+    
+    var id: String {
+        switch self {
+        case .url(let url):
+            return url.id
+        case .webArchive(let title):
+            return title.id
+        }
+    }
+    
+    var body: some View {
+        switch self {
+        case .url(let url):
+            SafariView(url: url)
+        case .webArchive(let title):
+            WebArchiveView(title: title)
+        }
+    }
+}
+
+// in ArticlesView
+
+.sheet(item: $sheet) { $0 }
+```
+
+The final code for the example is available [here](https://github.com/artemnovichkov/sheet).
+
+## Updates for iOS & iPadOS 14.5 Beta 3
+
+According to [release notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-14_5-beta-release-notes), we can now apply multiple `sheet(isPresented:onDismiss:content:)` and f`ullScreenCover(item:onDismiss:content:)` modifiers in the same view hierarchy. (74246633). But if we need to support previous versions (oh, come on, of course we need 😀), we can use the way described above.
+
+## Conclusion
+
+As we can see, SwiftUI has a simple and declarative way for showing sheets with bindings magic. But in real apps with different layouts we must use it wisely and know edge cases of its behavior. Feel free to ping on Twitter, ask your questions related to this article, highlight grammar mistakes , or share your cases. Thanks for reading!
