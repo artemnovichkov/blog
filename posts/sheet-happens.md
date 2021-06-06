@@ -4,7 +4,7 @@ date: '2021-04-14'
 ---
 
 <p align="center"/>
-  <img src="/images/sheet/cover.png"/>
+  <img src="/images/sheet-happens/cover.png"/>
 </p>
 
 Developing pet projects is one of the best ways to learn new things. Since SwiftUI 1.0 I've been writing an app for saving and reading articles. I rewrote it twice from scratch, added and removed features based on my user experience, used new APIs, etc.

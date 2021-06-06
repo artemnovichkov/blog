@@ -4,7 +4,7 @@ date: '2021-02-21'
 ---
 
 <p align="center"/>
-  <img src="/images/extensions/cover.png"/>
+  <img src="/images/developing-xcode-extensions-tips-and-tricks/cover.png"/>
 </p>
 
 You all see these [beautiful](https://twitter.com/mecid/status/1359468427396714504) [code](https://twitter.com/twannl/status/1359823904609603584) [screenshots](https://twitter.com/mkj_is/status/1361204092320632836) on Twitter. I often use [Carbon](https://carbon.now.sh) for my tweets, but Raycast team released ray.so that looks prettier and has options for customization via query parameters. I decided to write an Xcode Source Extension for it. Here is my journey, enjoy the reading!
@@ -14,7 +14,7 @@ You all see these [beautiful](https://twitter.com/mecid/status/13594684273967145
 Extensions can be installed only within main apps, and it's a good chance to use SwiftUI for macOS development. My app contains options for sharing: colors, background, dark mode, and paddings. Finally, the app looks like this:
 
 <p align="center"/>
-  <img src="/images/extensions/rayso-preview.png"/>
+  <img src="/images/developing-xcode-extensions-tips-and-tricks/rayso-preview.png"/>
 </p>
 
 All selected options are saved to UserDefaults and shared to the extension via app groups. The app is based on SwiftUI App template, and it is very limited for configuration. For instance, it is very hard to disable the fullscreen toolbar button. 
@@ -68,7 +68,7 @@ Finally, when the extension gets selected code, it opens special URL with saved 
 To use any installed extensions, select Editor menu in Xcode, and all extensions with commands will appear at the bottom:
 
 <p align="center"/>
-  <img src="/images/extensions/extension-using.png"/>
+  <img src="/images/developing-xcode-extensions-tips-and-tricks/extension-using.png"/>
 </p>
 
 ## Bonus: Key bindings

@@ -4,7 +4,7 @@ date: '2021-05-20'
 ---
 
 <p align="center"/>
-  <img src="/images/custom-popups/cover.png"/>
+  <img src="/images/custom-popups-in-swiftui/cover.png"/>
 </p>
 
 Two months ago my friend [@iamnalimov](https://twitter.com/iamnalimov) and I published jstnmbr app on [ProductHunt](https://www.producthunt.com/posts/jstnmbr). The idea of the app is very simple — count everything: books, push-ups, glasses of water. Of course, I choose SwiftUI for implementation. In this article, I want to highlight the key moments of implementing custom popups. It won't be in the tutorial format, we'll add a specific layout, but I hope it helps you in using overlays, geometry readers, and modifiers in your projects. If you have any questions or ideas on how to improve it, ping me on [Twitter](http://twitter.com/iosartem).
@@ -14,7 +14,7 @@ Two months ago my friend [@iamnalimov](https://twitter.com/iamnalimov) and I pub
 Let's start with the design. Popups may contain different content, but the appearance and behavior are the same. Superviews are covered with blur overlay, popups have the same background color, top left and right rounded corners, and ability to dismissing:
 
 <p align="center"/>
-  <img src="/images/custom-popups/design.png"/>
+  <img src="/images/custom-popups-in-swiftui/design.png"/>
 </p>
 
 We want to implement a familiar API interface for presenting like alerts or action sheets:
@@ -91,7 +91,7 @@ We're ready to show popups, but we don't have any yet 😅. Let's make a basic P
 Let's create a simple view named NamePopupView  that knows nothing about popup logic:
 
 <p align="center"/>
-  <img src="/images/custom-popups/popup-1.png"/>
+  <img src="/images/custom-popups-in-swiftui/popup-1.png"/>
 </p>
 
 The app may show different popups, so we create a reusable `BottomPopupView` to show different content:
@@ -155,7 +155,7 @@ extension View {
 All is now ready, and here is the result:
 
 <p align="center"/>
-  <img src="/images/custom-popups/popup-2.png"/>
+  <img src="/images/custom-popups-in-swiftui/popup-2.png"/>
 </p>
 
 Insets for Safe Area have added automatically, but we want to overlay superviews at the bottom too. To read and use Safe Area insets, we add `GeometryReader`:
@@ -176,13 +176,13 @@ GeometryReader { geometry in
 To pin our popup at the bottom, we add `.edgesIgnoringSafeArea` modifier. According to the content, we add a bottom padding with the bottom inset before `.background` modifier. With this logic background color will appear as expected.
 
 <p align="center"/>
-  <img src="/images/custom-popups/popup-3.png"/>
+  <img src="/images/custom-popups-in-swiftui/popup-3.png"/>
 </p>
 
 Since iOS 14 we even have an automatic keyboard avoidance:
 
 <p align="center"/>
-  <img src="/images/custom-popups/popup-4.png"/>
+  <img src="/images/custom-popups-in-swiftui/popup-4.png"/>
 </p>
 
 ## Animations
@@ -198,7 +198,7 @@ GeometryReader { geometry in
 ```
 
 <p align="center"/>
-  <img src="/images/custom-popups/final.gif"/>
+  <img src="/images/custom-popups-in-swiftui/final.gif"/>
 </p>
 
 ## Source Code

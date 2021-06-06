@@ -4,7 +4,7 @@ date: '2021-04-25'
 ---
 
 <p align="center"/>
-  <img src="/images/offline/cover.png"/>
+  <img src="/images/swiftui-offline/cover.png"/>
 </p>
 
 I continue developing an app for saving and reading articles. In my [previous post](https://blog.artemnovichkov.com/sheet-happens), I covered interesting cases of using sheets in SwiftUI. Now I want to describe my journey with offline mode.
@@ -90,7 +90,7 @@ Remember zero frame of the web view? Because of it, we have an unknown error her
 > Error Domain=WKErrorDomain Code=1 "An unknown error occurred" UserInfo={NSLocalizedDescription=An unknown error occurred}
 
 <p align="center"/>
-  <img src="https://media.giphy.com/media/S5n7Wkhhw5A2IrfKER/giphy.gif"/>
+  <img width="100%" src="https://media.giphy.com/media/S5n7Wkhhw5A2IrfKER/giphy.gif"/>
 </p>
 
 To fix it, we can get a `contentSize` and set it to config's rect:
@@ -215,5 +215,5 @@ I don't mind it (yet 😅), but I'm planning to add features for clearing saved 
 If you want to play with examples and test your URLs, an example project with all three saving options is available [here](https://github.com/artemnovichkov/sheet).
 
 <p align="center"/>
-  <img src="/images/offline/example-preview.png"/>
+  <img src="/images/swiftui-offline/example-preview.png"/>
 </p>

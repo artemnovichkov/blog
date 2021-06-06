@@ -4,7 +4,7 @@ date: '2021-02-13'
 ---
 
 <p align="center"/>
-  <img src="/images/environment/cover.png"/>
+  <img src="/images/custom-environment-value-for-share-actions/cover.png"/>
 </p>
 
 SwiftUI has a lot of modern and useful features. One of my favourite is @Environment property wrapper. It allows you to get system-wide settings, for instance, current locale or color scheme. Since iOS 14.0 you can useopenURL value to open URLs from apps easily.
