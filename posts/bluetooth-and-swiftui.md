@@ -15,7 +15,9 @@ Last year I bought [BEKANT](https://www.ikea.com/us/en/p/bekant-desk-sit-stand-w
 
 I'm an iOS developer who learns SwiftUI and Combine, so I decided to write my own app 🧑🏻‍💻. It's a proof of concept, but in the future, I can add more features like a watchOS companion app, Siri support, widgets, etc. At the end of the article, you can find a link to a Github repo with source code. Here is a final demo:
 
-<iframe width="560" height="315" src="https://youtu.be/qMGvnPOIhJM" frameborder="0" allowfullscreen></iframe>
+<div class="container">
+  <iframe src="//www.youtube.com/embed/qMGvnPOIhJM" frameborder="0" allowfullscreen class="video"></iframe>
+</div>
 
 ## Bluetooth: Delegates -> Combine
 
