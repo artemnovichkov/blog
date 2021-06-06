@@ -1,7 +1,6 @@
 import Head from 'next/head'
-import Link from 'next/link'
 import Home, { siteTitle } from '../components/home'
-import Date from '../components/date'
+import PostPreview from '../components/post-preview'
 import utilStyles from '../styles/utils.module.css'
 import { getSortedPostsData } from '../lib/posts'
 
@@ -25,15 +24,9 @@ export default function Main({ allPostsData }) {
       </section>
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
           <ul className={utilStyles.list}>
-          {allPostsData.map(({ id, date, title }) => (
-            <li className={utilStyles.listItem} key={id}>
-              <Link href={`posts/${id}`}>
-                <a>{title}</a>
-              </Link>
-              <br />
-              <small className={utilStyles.lightText}>
-                <Date dateString={date}/>
-              </small>
+          {allPostsData.map((postData) => (
+            <li className={utilStyles.listItem} key={postData.id}>
+              <PostPreview postData={postData}/>
             </li>
           ))}
           </ul>
