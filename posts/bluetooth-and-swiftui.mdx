@@ -1,17 +1,17 @@
 ---
-title: 'Bluetooth and SwiftUI. Developing app for RGB stripe control'
+title: Bluetooth and SwiftUI. Developing app for RGB stripe control
+image: /images/bluetooth-and-swiftui/cover.png
 date: '2021-05-31'
 ---
 
-<p align="center"/>
-  <img src="/images/bluetooth-and-swiftui/cover.png"/>
-</p>
-
 Last year I bought [BEKANT](https://www.ikea.com/us/en/p/bekant-desk-sit-stand-white-s49022538/) desk. It looks minimalistic and... boring, so I wanted to add some RGB lightning. I chose a cheap no-name [RGB stripe](https://aliexpress.ru/item/32801604250.html) with a controller that works with IR and Bluetooth as well. The seller recommends using [HappyLighting](https://apps.apple.com/ru/app/id1145694075) app. It works well enough, supports default styles like pulsating and strobe effects, syncs with music and surround sound. But the interface is a bit strange:
 
-<p align="center"/>
-  <img src="/images/bluetooth-and-swiftui/happy-lighting.png"/>
-</p>
+<Image
+  alt={`Bluetooth and SwiftUI`}
+  src={`/images/bluetooth-and-swiftui/happy-lighting.png`}
+  width={1170}
+  height={2532}
+/>
 
 I'm an iOS developer who learns SwiftUI and Combine, so I decided to write my own app 🧑🏻‍💻. It's a proof of concept, but in the future, I can add more features like a watchOS companion app, Siri support, widgets, etc. At the end of the article, you can find a link to a Github repo with source code. Here is a final demo:
 
@@ -167,9 +167,12 @@ ColorPicker("Change stripe color",
 
 I used it in UIKit projects a few times, you can just show it on any user action. But in SwiftUI it shows a default interface with no customization.
 
-<p align="center"/>
-  <img src="/images/bluetooth-and-swiftui/color-stripe.png"/>
-</p>
+<Image
+  alt={`Bluetooth and SwiftUI`}
+  src={`/images/bluetooth-and-swiftui/color-stripe.png`}
+  width={1170}
+  height={2532}
+/>
 
 There are two options for selection binding — `Color` and `CGColor`. I choose the second one because it is easy to get color components from it.
 

@@ -2,18 +2,17 @@ import Head from 'next/head'
 import Home, { siteTitle } from '../components/home'
 import PostPreview from '../components/post-preview'
 import utilStyles from '../styles/utils.module.css'
-import { getSortedPostsData } from '../lib/posts'
+import { getAllNodes } from "next-mdx/server"
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPostsData()
   return {
     props: {
-      allPostsData
-    }
+      posts: await getAllNodes("post"),
+    },
   }
 }
 
-export default function Main({ allPostsData }) {
+export default function Main({ posts }) {
   return (
     <Home>
       <Head>
@@ -24,9 +23,9 @@ export default function Main({ allPostsData }) {
       </section>
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
           <ul className={utilStyles.list}>
-          {allPostsData.map((postData) => (
-            <li className={utilStyles.listItem} key={postData.id}>
-              <PostPreview postData={postData}/>
+          {posts.map((post) => (
+            <li className={utilStyles.listItem} key={post.slug}>
+              <PostPreview post={post}/>
             </li>
           ))}
           </ul>
