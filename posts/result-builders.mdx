@@ -38,9 +38,12 @@ struct ContentView: View {
 
 When we tap on the button, `ActionSheet` is presented with buttons from the array in the initializer. The syntax for action buttons, especially with defined actions, looks a bit complicated. Let's improve it with a custom result builder.
 
-<p align="center"/>
-  <img src="/images/result-builders/initial-preview.png"/>
-</p>
+<Image
+  alt={`Initial preview`}
+  src={`/images/result-builders/initial-preview.png`}
+  width={946}
+  height={1764}
+/>
 
 ## Basics
 
@@ -130,7 +133,7 @@ else {
 
 We have an error:
 
-> Cannot pass array of type '[ActionSheet.Button]' (aka 'Array<Alert.Button>') as variadic arguments of type 'ActionSheet.Button' (aka 'Alert.Button')
+> Cannot pass array of type '[ActionSheet.Button]' (aka 'Array\<Alert.Button\>') as variadic arguments of type 'ActionSheet.Button' (aka 'Alert.Button')
 
 We can solve the error by defining a new protocol and implementing it by both a single `ActionSheet.Button` and a collection of `ButtonsConvertible`:
 

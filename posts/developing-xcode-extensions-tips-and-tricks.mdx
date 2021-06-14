@@ -10,9 +10,12 @@ You all see these [beautiful](https://twitter.com/mecid/status/13594684273967145
 
 Extensions can be installed only within main apps, and it's a good chance to use SwiftUI for macOS development. My app contains options for sharing: colors, background, dark mode, and paddings. Finally, the app looks like this:
 
-<p align="center"/>
-  <img src="/images/developing-xcode-extensions-tips-and-tricks/rayso-preview.png"/>
-</p>
+<Image
+  alt={`RaySo extension preview`}
+  src={`/images/developing-xcode-extensions-tips-and-tricks/rayso-preview.png`}
+  width={1224}
+  height={760}
+/>
 
 All selected options are saved to UserDefaults and shared to the extension via app groups. The app is based on SwiftUI App template, and it is very limited for configuration. For instance, it is very hard to disable the fullscreen toolbar button. 
 
@@ -64,9 +67,12 @@ Finally, when the extension gets selected code, it opens special URL with saved 
 
 To use any installed extensions, select Editor menu in Xcode, and all extensions with commands will appear at the bottom:
 
-<p align="center"/>
-  <img src="/images/developing-xcode-extensions-tips-and-tricks/extension-using.png"/>
-</p>
+<Image
+  alt={`RaySo extension using`}
+  src={`/images/developing-xcode-extensions-tips-and-tricks/extension-using.png`}
+  width={2071}
+  height={1585}
+/>
 
 ## Bonus: Key bindings
 
