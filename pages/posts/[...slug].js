@@ -12,8 +12,9 @@ export default function Article({ post }) {
       Image,
     }
   })
-    return (
-        <Post>
+  return (
+    <>
+      <Post>
             <article>
                 <h1>{post.frontMatter.title}</h1>
                 <div>
@@ -22,6 +23,7 @@ export default function Article({ post }) {
                 {content}
             </article>
         </Post>
+    </>
     )
 }
 
