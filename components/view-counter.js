@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import useSWR from 'swr'
-import swr from 'swr'
 
 async function fetcher(...args) {
     const res = await fetch(...args)
@@ -8,17 +7,17 @@ async function fetcher(...args) {
 }
 
 export default function ViewCounter({ slug }) {
-    const { data } = useSWR(`/api/views/${slug}`, fetcher)
-    const views = new Number(data?.total)
+  const { data } = useSWR(`/api/views/${slug}`, fetcher)
+  const views = new Number(data?.total)
 
-    useEffect(() => {
-        const registerView = () =>
-          fetch(`/api/views/${slug}`, {
-            method: 'POST'
-          })
-    
-        registerView();
-      }, [slug])
+  useEffect(() => {
+    const registerView = () =>
+      fetch(`/api/views/${slug}`, {
+        method: 'POST'
+      });
 
-    return `${views > 0 ? views.toLocaleString() : 'no'} views`
+    registerView()
+  }, [slug])
+
+  return `${views > 0 ? views.toLocaleString() : '–––'} views`
 }
