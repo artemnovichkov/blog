@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import Home, { siteTitle } from '../components/home'
 import PostPreview from '../components/post-preview'
-import utilStyles from '../styles/utils.module.css'
 import { getAllNodes } from "next-mdx/server"
 
 export async function getStaticProps() {
@@ -13,18 +12,19 @@ export async function getStaticProps() {
 }
 
 export default function Main({ posts }) {
+  console.log(posts)
   return (
     <Home>
       <Head>
         <title>{siteTitle}</title>
       </Head>
-      <section className={utilStyles.headingMd}>
+      <section>
         <p>Bearded Swift developer from Siberia 👨🏻‍💻</p>
       </section>
-      <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-          <ul className={utilStyles.list}>
+      <section>
+          <ul>
           {posts.map((post) => (
-            <li className={utilStyles.listItem} key={post.slug}>
+            <li key={post.slug}>
               <PostPreview post={post}/>
             </li>
           ))}
