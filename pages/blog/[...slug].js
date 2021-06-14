@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { getMdxNode, getMdxPaths } from 'next-mdx/server'
 import { useHydrate } from 'next-mdx/client'
 import mdxPrism from 'mdx-prism'
+import readingTime from 'reading-time'
 
 export default function Article({ post }) {
   const content = useHydrate(post, {
@@ -17,6 +18,7 @@ export default function Article({ post }) {
         <h1>{post.frontMatter.title}</h1>
         <div>
           <Date dateString={post.frontMatter.date} />
+          <p>{ readingTime(post.content).text }</p>
         </div>
         <div>
         <Image 
