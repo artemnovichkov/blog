@@ -10,11 +10,11 @@ export default function PostPreview({ post }) {
                     priority
                     layout="fill"
                     objectFit="cover"
-                    src={post.frontMatter.image}
+                    src={post.frontMatter.cover}
                 />
             </div>
             <Link href={post.url}>
-            <a>{post.frontMatter.title}</a>
+                <a>{post.frontMatter.title}</a>
             </Link>
             <br />
             <small>
