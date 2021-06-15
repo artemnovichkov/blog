@@ -25,7 +25,6 @@ export default function Article({ post }) {
         <div>
         <Image 
             priority
-            placeholder="blur"
             alt={post.frontMatter.title}
             src={post.frontMatter.cover}
             width={1200}
