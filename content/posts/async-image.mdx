@@ -1,0 +1,181 @@
+---
+title: AsyncImage. Loading images in SwiftUI
+cover: /images/async-image/cover.png
+date: '2021-08-06'
+author:
+  - artem-novichkov
+---
+
+> Note: Examples are tested on iOS 15.0 with Xcode 13.0 beta (13A5154h).
+iOS 15.0 beta gives us new SwiftUI views, and one of them is `AsyncImage`. It loads and displays an image from the given URL.
+
+Let's start with a basic example:
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+
+    private let url = URL(string: "https://picsum.photos/200")
+
+    var body: some View {
+        AsyncImage(url: url)
+    }
+}
+```
+By default, it shows a gray background and replaces it with the loaded image:
+
+<Image
+  alt={`Empty and success states of AsyncImage`}
+  src={`/images/async-image/async-image.png`}
+  width={946}
+  height={882}
+/>
+
+Optionally we can change `scale` to use for the image. In the example below the image size will be reduced by half:
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+
+    private let url = URL(string: "https://picsum.photos/200")
+
+    var body: some View {
+        AsyncImage(url: url, scale: 2)
+    }
+}
+```
+
+To update the appearance of `AsyncImage`, we can use an initializer with content and placeholder view builders. Here we able to modify a final image and show a custom placeholder view:
+
+```SwiftLee
+import SwiftUI
+
+struct ContentView: View {
+
+    private let url = URL(string: "https://picsum.photos/200")
+
+    var body: some View {
+        AsyncImage(url: url) { image in
+            image
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+        } placeholder: {
+            Image(systemName: "photo")
+                .imageScale(.large)
+                .foregroundColor(.gray)
+        }
+        .ignoresSafeArea()
+    }
+}
+```
+
+<Image
+  alt={`Custom placeholder and resized image`}
+  src={`/images/async-image/custom-placeholder.png`}
+  width={946}
+  height={882}
+/>
+
+If we want to handle an error state, we can use another initializer with `AsyncImagePhase`. It's a simple enum with three cases: empty, success, and error.
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+
+    private let url = URL(string: "https://picsum.photos/200")
+
+    var body: some View {
+        AsyncImage(url: url, content: view)
+    }
+
+    @ViewBuilder
+    private func view(for phase: AsyncImagePhase) -> some View {
+        switch phase {
+        case .empty:
+            ProgressView()
+        case .success(let image):
+            image
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+        case .failure(let error):
+            VStack(spacing: 16) {
+                Image(systemName: "xmark.octagon.fill")
+                    .foregroundColor(.red)
+                Text(error.localizedDescription)
+                    .multilineTextAlignment(.center)
+            }
+        @unknown default:
+            Text("Unknown")
+                .foregroundColor(.gray)
+        }
+    }
+}
+```
+
+Here we show a spinner during loading, resized image if loading is successful, and an error message if something is wrong.
+
+<Image
+  alt={`Working with phases of AsyncImage`}
+  src={`/images/async-image/phases.png`}
+  width={1419}
+  height={882}
+/>
+
+To specify animations between phase changes, we can optionally add `Transition`:
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+
+    private let url = URL(string: "https://picsum.photos/200")
+    private let transaction: Transaction = .init(animation: .linear)
+
+    var body: some View {
+        AsyncImage(url: url,
+                   transaction: transaction,
+                   content: view)
+    }
+    ...
+}
+```
+
+And, of course, we can use `AsyncImage` inside `List` to show multiple images:
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+
+    private let url = URL(string: "https://picsum.photos/200")
+
+    var body: some View {
+        List {
+            ForEach(0..<10) { _ in
+                AsyncImage(url: url,
+                           content: view)
+                    .listRowInsets(.init(.zero))
+            }
+        }
+        .listStyle(.plain)
+    }
+    ...
+}
+```
+
+<Image
+  alt={`Finally, we can show List without separators `}
+  src={`/images/async-image/list.png`}
+  width={946}
+  height={1764}
+/>
+
+If you want to play with AsyncImage by yourself, check out [AsyncImageExample](https://github.com/artemnovichkov/AsyncImageExample) project on Github.
+
+## References
+
+- [AsyncImage Documentation](https://developer.apple.com/documentation/SwiftUI/AsyncImage) by Apple
+- [Transactions in SwiftUI](https://swiftwithmajid.com/2020/10/07/transactions-in-swiftui) by [Majid Jabrayilov](https://twitter.com/mecid)
