@@ -13,7 +13,7 @@
     "firebase-admin": "^9.9.0",
     "gray-matter": "4.0.3",
     "mdx-prism": "^0.3.3",
-    "next": "^10.2.3",
+    "next": "^11.0.0",
     "next-mdx": "^0.6.0",
     "postcss": "^8.3.3",
     "react": "17.0.2",
