@@ -65,7 +65,7 @@ view.keyboardLayoutGuide.setConstraints([buttonTop], activeWhenAwayFrom: .top)
 
 `buttonTop` constraint will be active only when the keyboard is away from the top. Finally, we add `buttonBottom` constraint to pin `loginButton` at the keyboard bottom:
 
-```
+```swift
 let buttonBottom = loginButton.topAnchor.constraint(equalToSystemSpacingBelow: view.keyboardLayoutGuide.bottomAnchor, multiplier: 1.0)
 buttonBottom.identifier = "buttonBottom"
 view.keyboardLayoutGuide.setConstraints([buttonBottom], activeWhenNearEdge: .top)

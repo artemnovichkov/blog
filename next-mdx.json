@@ -6,6 +6,7 @@
       "sortOrder": "desc"
     },
     "author": {
-      "contentPath": "content/authors"
+      "contentPath": "content/authors",
+      "basePath": "/authors"
     }
   }

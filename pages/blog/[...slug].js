@@ -1,11 +1,9 @@
 import Post from '../../components/post'
-import Date from '../../components/date'
+import PostMeta from '../../components/post-meta'
 import Image from 'next/image'
 import { getMdxNode, getMdxPaths } from 'next-mdx/server'
 import { useHydrate } from 'next-mdx/client'
 import mdxPrism from 'mdx-prism'
-import readingTime from 'reading-time'
-import ViewCounter from '../../components/view-counter'
 
 export default function Article({ post }) {
   const content = useHydrate(post, {
@@ -16,12 +14,8 @@ export default function Article({ post }) {
   return (
     <Post>
       <article>
-        <h1>{post.frontMatter.title}</h1>
-        <div>
-          <Date dateString={post.frontMatter.date} />
-          <p>{readingTime(post.content).text}</p>
-          <p><ViewCounter slug={post.slug} /></p>
-        </div>
+        <h1 className="text-3xl text-black dark:text-white mb-4">{post.frontMatter.title}</h1>
+        <PostMeta post={ post }/>
         <div>
         <Image 
             priority
