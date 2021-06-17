@@ -1,11 +1,10 @@
 import Image from 'next/image'
-import styles from '../styles/layout.module.css'
 
 const name = 'Artem Novichkov'
 
 export default function Home({ children }) {
   return (
-    <div className={styles.container}>
+    <div>
       <header>
         <Image
           priority

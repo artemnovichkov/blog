@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@next/mdx": "^10.2.3",
+    "@tailwindcss/typography": "^0.4.1",
     "date-fns": "^2.22.1",
     "firebase-admin": "^9.9.0",
     "gray-matter": "4.0.3",

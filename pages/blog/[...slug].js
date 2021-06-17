@@ -13,7 +13,7 @@ export default function Article({ post }) {
   })
   return (
     <Post>
-      <article>
+      <article className="prose">
         <h1 className="text-3xl text-black dark:text-white mb-4">{post.frontMatter.title}</h1>
         <PostMeta post={ post }/>
         <div>
