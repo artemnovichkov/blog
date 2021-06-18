@@ -12,10 +12,10 @@ export default function Article({ post }) {
     }
   })
   return (
-    <Post>
+    <Post post={ post }>
       <article className="prose">
         <h1 className="text-3xl text-black dark:text-white mb-4">{post.frontMatter.title}</h1>
-        <PostMeta post={ post }/>
+        <PostMeta post={post}/>
         <div>
         <Image 
             priority

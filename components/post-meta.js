@@ -5,7 +5,6 @@ import ViewCounter from './view-counter'
 
 export default function PostMeta({ post }) {
     const authorFrontMatter = post.relationships.author[0].frontMatter
-    console.log(authorFrontMatter)
     return (
         <div className="text-sm text-gray-700 flex justify-between">
             <div className="flex items-center">
