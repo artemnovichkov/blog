@@ -4,22 +4,19 @@ import Date from '../components/date'
 
 export default function PostPreview({ post }) {
     return (
-        <div>
-            <div style={{ position: 'relative', width: '300px', height: '200px' }}>
-                <Image 
-                    priority
-                    layout="fill"
-                    objectFit="cover"
-                    src={post.frontMatter.cover}
+        <Link href={post.url}>
+            <a className="w-full">
+                <h4 className="text-lg md:text-xl font-medium w-full text-gray-900"> 
+                    {post.frontMatter.title}
+                </h4>
+                <Date className="text-sm mb-2 text-gray-100" dateString={post.frontMatter.date} />
+                <Image className="rounded"
+                        priority
+                        width={ 1200 }
+                        height={ 740 }
+                        src={post.frontMatter.cover}
                 />
-            </div>
-            <Link href={post.url}>
-                <a>{post.frontMatter.title}</a>
-            </Link>
-            <br />
-            <small>
-                <Date dateString={post.frontMatter.date}/>
-            </small>
-        </div>
+            </a>
+        </Link>
     )
 }
