@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { getMdxNode, getMdxPaths } from 'next-mdx/server'
 import { useHydrate } from 'next-mdx/client'
 import mdxPrism from 'mdx-prism'
+const slug = require('remark-slug')
+const titles = require('remark-code-titles')
+const headings = require('remark-autolink-headings')
 
 export default function Post({ post }) {
   const content = useHydrate(post, {
@@ -38,6 +41,11 @@ export async function getStaticProps(context) {
       Image,
     },
     mdxOptions: {
+      remarkPlugins: [
+        slug,
+        titles,
+        headings
+      ],
       rehypePlugins: [mdxPrism]
     }
   })
