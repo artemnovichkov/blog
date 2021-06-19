@@ -14,7 +14,7 @@ export default function ViewCounter({ slug }) {
     const registerView = () =>
       fetch(`/api/views/${slug}`, {
         method: 'POST'
-      });
+      })
 
     registerView()
   }, [slug])
