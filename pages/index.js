@@ -5,7 +5,7 @@ import { getAllNodes } from "next-mdx/server"
 
 const name = 'Artem Novichkov'
 const about = 'Bearded Swift developer from Siberia 👨🏻‍💻'
-const title = () => { name + ` – ` + about }
+const title = `${name} – ${about}`
 
 export default function Main({ posts }) {
   return (
