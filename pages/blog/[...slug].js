@@ -26,7 +26,7 @@ export default function Post({ post }) {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.frontMatter.title} />
         <meta name="twitter:description" content={post.frontMatter.description} />
-        <meta name="twitter:image" content={`https://artemnovichkov.com${post.frontMatter.cover}`} />
+        <meta name="twitter:image" content={`https://blog-artemnovichkov.vercel.app${post.frontMatter.cover}`} />
       </Head>
       <article className="prose flex flex-col justify-center max-w-2xl mx-auto mb-16 mt-16 w-full">
         <h1 className="text-3xl text-black dark:text-white mb-4">{post.frontMatter.title}</h1>
