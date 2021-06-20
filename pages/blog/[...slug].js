@@ -2,7 +2,6 @@ import Head from 'next/head'
 import PostMeta from '../../components/post-meta'
 import Image from 'next/image'
 import PostActions from '../../components/post-actions'
-import Link from 'next/link'
 import { getMdxNode, getMdxPaths } from 'next-mdx/server'
 import { useHydrate } from 'next-mdx/client'
 import mdxPrism from 'mdx-prism'
@@ -28,7 +27,7 @@ export default function Post({ post }) {
         <meta name="twitter:description" content={post.frontMatter.description} />
         <meta name="twitter:image" content={`https://blog-artemnovichkov.vercel.app${post.frontMatter.cover}`} />
       </Head>
-      <article className="prose flex flex-col justify-center max-w-2xl mx-auto mb-16 mt-16 w-full">
+      <article className="prose flex flex-col justify-center max-w-2xl mx-auto px-8 mb-16 mt-16 w-full">
         <h1 className="text-3xl text-black dark:text-white mb-4">{post.frontMatter.title}</h1>
         <PostMeta post={post}/>
         <Image 
@@ -41,7 +40,7 @@ export default function Post({ post }) {
         <div className="mb-8">
           {content}
         </div>
-        <PostActions post={ post }/>
+        <PostActions post={post} />
     </article>
     </div>
   )

@@ -9,7 +9,7 @@ const title = `${name} – ${about}`
 
 export default function Main({ posts }) {
   return (
-    <div className="flex flex-col justify-center items-start max-w-2xl mx-auto my-16">
+    <div className="flex flex-col justify-center items-start max-w-2xl mx-auto px-8 my-16">
       <Head>
         <title>{title}</title>
         <meta property="og:type" content="website" />
