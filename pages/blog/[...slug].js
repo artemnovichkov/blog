@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import PostMeta from '../../components/post-meta'
 import Image from 'next/image'
 import PostActions from '../../components/post-actions'

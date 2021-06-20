@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import Image from 'next/image'
 import PostPreview from '../components/post-preview'
 import { getAllNodes } from "next-mdx/server"
