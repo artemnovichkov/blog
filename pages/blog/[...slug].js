@@ -16,22 +16,33 @@ export default function Post({ post }) {
     }
   })
   return (
-    <article className="prose flex flex-col justify-center max-w-2xl mx-auto mb-16 mt-16 w-full">
-      <h1 className="text-3xl text-black dark:text-white mb-4">{post.frontMatter.title}</h1>
-      <PostMeta post={post}/>
-      <Image 
-            priority
-            alt={post.frontMatter.title}
-            src={post.frontMatter.cover}
-            width={1200}
-            height={740}
+    <div>
+      <Head>
+        <title>{post.frontMatter.title}</title>
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={post.frontMatter.title} />
+        <meta property="og:description" content={post.frontMatter.description} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.frontMatter.title} />
+        <meta name="twitter:description" content={post.frontMatter.description} />
+        <meta name="twitter:image" content={post.frontMatter.cover} />
+      </Head>
+      <article className="prose flex flex-col justify-center max-w-2xl mx-auto mb-16 mt-16 w-full">
+        <h1 className="text-3xl text-black dark:text-white mb-4">{post.frontMatter.title}</h1>
+        <PostMeta post={post}/>
+        <Image 
+              priority
+              alt={post.frontMatter.title}
+              src={post.frontMatter.cover}
+              width={1200}
+              height={740}
         />
-      <div>{content}</div>
-      <PostActions post={ post }/>
-      <Link href="/">
-          <a>← Back to home</a>
-        </Link>
+        <div className="mb-8">
+          {content}
+        </div>
+        <PostActions post={ post }/>
     </article>
+    </div>
   )
 }
 
