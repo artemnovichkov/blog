@@ -1,6 +1,6 @@
 const ExternalLink = ({ href, children }) => (
     <a
-      className="text-gray-500 hover:text-gray-600 transition"
+      className="text-center text-gray-500 hover:text-gray-600 transition"
       target="_blank"
       rel="noopener noreferrer"
       href={href}
@@ -11,10 +11,13 @@ const ExternalLink = ({ href, children }) => (
 
 export default function Footer() {
     return (
-    <div className="flex flex-row space-x-4 w-full bg-gray-100">
+      <footer>
+        <hr />
+        <div className="grid grid-flow-col w-full my-8">
         <ExternalLink href="https://twitter.com/iosartem">Twitter</ExternalLink>
         <ExternalLink href="https://github.com/artemnovichkov">Github</ExternalLink>
         <ExternalLink href="https://t.me/subtlesettings">Telegram</ExternalLink>
-    </div>
+        </div>
+    </footer>
     )
 }

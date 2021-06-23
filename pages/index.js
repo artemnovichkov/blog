@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import PostPreview from '../components/post-preview'
+import Footer from '../components/footer'
 import { getAllNodes } from "next-mdx/server"
 
 const name = 'Artem Novichkov'
@@ -9,7 +10,7 @@ const title = `${name} – ${about}`
 
 export default function Main({ posts }) {
   return (
-    <div className="flex flex-col justify-center items-start max-w-2xl mx-auto px-8 my-16">
+    <div className="flex flex-col justify-center max-w-2xl mx-auto px-8 mt-8">
       <Head>
         <title>{title}</title>
         <meta property="og:type" content="website" />
@@ -31,17 +32,18 @@ export default function Main({ posts }) {
         <h1 className="font-bold text-3xl text-black">{name}</h1>
         <p>{about}</p>
       </header>
-      <main>
-      <section>
-          <ul>
-          {posts.map((post) => (
-            <li key={post.slug}>
-              <PostPreview post={post}/>
-            </li>
-          ))}
-          </ul>
-      </section>
+      <main className="mb-8">
+        <section>
+            <ul>
+            {posts.map((post) => (
+              <li key={post.slug}>
+                <PostPreview post={post}/>
+              </li>
+            ))}
+            </ul>
+        </section>
       </main>
+      <Footer />
     </div>
   )
 }
