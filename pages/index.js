@@ -1,28 +1,15 @@
-import Head from 'next/head'
+import Container from '../components/container'
 import Image from 'next/image'
 import PostPreview from '../components/post-preview'
-import Footer from '../components/footer'
 import { getAllNodes } from "next-mdx/server"
-
-const name = 'Artem Novichkov'
-const about = 'Bearded Swift developer from Siberia 👨🏻‍💻'
-const title = `${name} – ${about}`
+import { name, about } from '../lib/const'
 
 export default function Main({ posts }) {
   return (
-    <div className="flex flex-col justify-center max-w-2xl mx-auto px-8 mt-8">
-      <Head>
-        <title>{title}</title>
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content={name} />
-        <meta property="og:description" content={about} />
-        <meta property="og:title" content={title} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={about} />
-      </Head>
+    <Container>
       <header className="flex flex-col mb-16 w-full items-center">
-        <Image className="rounded-full"
+        <Image
+          className="rounded-full"
           priority
           src="/images/avatar.jpg"
           height={144}
@@ -32,19 +19,18 @@ export default function Main({ posts }) {
         <h1 className="font-bold text-3xl text-black">{name}</h1>
         <p>{about}</p>
       </header>
-      <main className="mb-8">
+      <div className="flex flex-col justify-center max-w-2xl mx-auto px-8 mt-8">
         <section>
-            <ul>
-            {posts.map((post) => (
-              <li key={post.slug}>
-                <PostPreview post={post}/>
-              </li>
-            ))}
-            </ul>
+          <ul>
+              {posts.map((post) => (
+                <li key={post.slug}>
+                  <PostPreview post={post}/>
+                </li>
+              ))}
+          </ul>
         </section>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </Container>
   )
 }
 
