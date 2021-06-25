@@ -1,5 +1,5 @@
-import RSS from 'rss'
-import { getAllNodes } from "next-mdx/server"
+const RSS = require('rss');
+const { getAllNodes } = require('next-mdx/server')
 const { promises: fs } = require('fs')
 
 async function generate() {
