@@ -10,8 +10,8 @@ export default function PostPreview({ post }) {
                 <h4 className="text-lg md:text-xl font-medium w-full text-gray-900"> 
                     {post.frontMatter.title}
                     </h4>
-                    <div className="text-gray-500">
-                        <Date className="text-sm mb-2" dateString={post.frontMatter.date} />
+                    <div className="text-xs mb-2 text-gray-500">
+                        <Date dateString={post.frontMatter.date} />
                     </div>
                 <Image className="rounded"
                         priority
