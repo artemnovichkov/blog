@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: optional;
+}
+
 .sticky-nav {
   position: sticky;
   z-index: 10;
@@ -22,14 +29,4 @@
 /* inline code */
 .prose code {
   @apply text-gray-800 px-1 py-0.5 border border-gray-100 rounded-md bg-gray-100;
-}
-
-prose .anchor {
-  @apply absolute invisible;
-
-  margin-left: -1em;
-  padding-right: 0.5em;
-  width: 80%;
-  max-width: 700px;
-  cursor: pointer;
 }

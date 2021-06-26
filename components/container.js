@@ -1,4 +1,5 @@
 import NextLink from 'next/link'
+import ExternalLink from './external-link'
 import Head from 'next/head'
 import Footer from '../components/footer'
 import { name, about, title} from '../lib/const'
@@ -25,7 +26,7 @@ export default function Container(props) {
                 <meta name="twitter:title" content={meta.title} />
                 <meta name="twitter:description" content={meta.description} />
             </Head>
-            <nav className="sticky-nav w-full p-8">
+            <nav className="sticky-nav w-full py-4">
                 <div>
                 <NextLink href="/">
                     <a className="p-4 text-gray-900">Home</a>
@@ -33,9 +34,10 @@ export default function Container(props) {
                 <NextLink href="/about">
                     <a className="p-4 text-gray-900">About</a>
                 </NextLink>
+                <ExternalLink className="p-4" href="https://artemnovichkov.com/feed.xml">RSS</ExternalLink>
                 </div>
             </nav>
-            <div className="flex flex-col justify-center max-w-2xl mx-auto px-8 mt-8">
+            <div className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
                 <main>
                     {children}
                 </main>

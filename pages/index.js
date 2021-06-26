@@ -19,7 +19,7 @@ export default function Main({ posts }) {
         <h1 className="font-bold text-3xl text-black">{name}</h1>
         <p>{about}</p>
       </header>
-      <div className="flex flex-col justify-center max-w-2xl mx-auto px-8 mt-8">
+      <div>
         <section>
           <ul>
               {posts.map((post) => (

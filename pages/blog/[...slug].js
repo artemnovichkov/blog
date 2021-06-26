@@ -23,9 +23,11 @@ export default function Post({ post }) {
         type="article"
     >
         <div>
-          <article className="prose">
-              <h1 className="text-3xl text-black mb-4">{post.frontMatter.title}</h1>
-              <PostMeta post={post}/>
+          <article>
+            <h1 className="font-bold text-3xl tracking-tight text-black mb-4">
+              {post.frontMatter.title}
+            </h1>
+            <PostMeta post={post}/>
               <Image 
                     priority
                     alt={post.frontMatter.title}
@@ -33,10 +35,10 @@ export default function Post({ post }) {
                     width={1200}
                     height={740}
               />
-              <div>
-                {content}
-              </div>
-            </article>
+            <div className="prose">
+              {content}
+            </div>
+          </article>
             <PostActions post={post} />
         </div>
       </Container>
