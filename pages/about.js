@@ -37,7 +37,7 @@ const Position = ({ position }) => {
     )
 }
 
-const positions = [
+const fullTimePositions = [
     {
         title: "iOS Developer",
         company: "Skyeng",
@@ -45,6 +45,25 @@ const positions = [
         url: "https://skyeng.ru",
         startDate: "2020-07",
     },
+    {
+        title: "iOS Developer",
+        company: "Rosberry",
+        image: "/images/companies/rosberry.png",
+        url: "https://rosberry.com",
+        startDate: "2014-11",
+        finishDate: "2020-07",
+    },
+    {
+        title: "iOS Developer",
+        company: "Burning Buttons",
+        image: "/images/companies/burning_buttons.png",
+        url: "https://burningbuttons.com",
+        startDate: "2014-02",
+        finishDate: "2014-05",
+    }
+]
+
+const partTimePositions = [
     {
         title: "iOS Expert",
         company: "Netology",
@@ -67,37 +86,29 @@ const positions = [
         startDate: "2015-09",
         finishDate: "2018-09",
     },
-    {
-        title: "iOS Developer",
-        company: "Rosberry",
-        image: "/images/companies/rosberry.png",
-        url: "https://rosberry.com",
-        startDate: "2014-11",
-        finishDate: "2020-07",
-    },
-    {
-        title: "iOS Developer",
-        company: "Burning Buttons",
-        image: "/images/companies/burning_buttons.png",
-        url: "https://burningbuttons.com",
-        startDate: "2014-02",
-        finishDate: "2014-05",
-    }
 ]
 
 export default function About() {
     return (
-        <Container title="About – Artem Novichkov">
+        <Container title="About – Artem Novichkov" hideFooter="true">
             <div className="flex flex-col justify-center items-start max-w-2xl mx-auto">
-                <h1 className="font-bold text-3xl tracking-tight mb-4 text-black">
+                <p className="font-bold text-3xl tracking-tight mb-4 text-black">
                     About Me
-                </h1>
-                <div className="flex flex-col gap-2 mb-4">
+                </p>
+                <Image
+                    className="rounded-full"
+                    priority
+                    src="/images/avatar.jpg"
+                    height={144}
+                    width={144}
+                    alt="Artem Novichkov"
+                />
+                <div className="flex flex-col gap-2 my-4">
                     <p>
                         Hi there! I'm Artem Novichkov. I live in Omsk, Russia (UTC+6).
                     </p>
                     <p>
-                        📝 I'm currently working as an iOS Developer at Skyeng, developing&nbsp;
+                        📝 I work as an iOS Developer at Skyeng, developing&nbsp;
                         <a className="text-base underline" href="https://apps.apple.com/app/id1473109163" target="_blank" rel="noopener noreferrer">
                             Skysmart
                         </a>
@@ -124,11 +135,24 @@ export default function About() {
                     🕹 In free time I play videogames with Nintendo Switch и PS4 Pro. I like Nintendo exclusives, sometimes drop in PvP battles.
                     </p>
                 </div>
-                <h2 className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
+                <p className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
                     Experience
-                </h2>
+                </p>
+                <h3 className="font-bold text-2xl tracking-tight mb-4 text-black dark:text-white">
+                    Full-time positions
+                </h3>
                 <ul>
-                    {positions.map((position) => (
+                    {fullTimePositions.map((position) => (
+                        <li key={position.company}>
+                            <Position position={position}/>
+                        </li>
+                    ))}
+                </ul>
+                <h3 className="font-bold text-2xl tracking-tight mb-4 text-black dark:text-white">
+                    Part-time positions
+                </h3>
+                <ul>
+                    {partTimePositions.map((position) => (
                         <li key={position.company}>
                             <Position position={position}/>
                         </li>
@@ -140,7 +164,32 @@ export default function About() {
                 <ul className="mb-4">
                     <li>
                         <a className="text-base underline" href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">
-                        mail@artemnovichkov.com
+                            mail@artemnovichkov.com
+                        </a>
+                    </li>
+                    <li>
+                        <a className="text-base underline" href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">
+                            Twitter
+                        </a>
+                    </li>
+                    <li>
+                        <a className="text-base underline" href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">
+                            Github
+                        </a>
+                    </li>
+                    <li>
+                        <a className="text-base underline" href="https://t.me/artemnovichkov" target="_blank" rel="noopener noreferrer">
+                            Telegram
+                        </a>
+                    </li>
+                    <li>
+                        <a className="text-base underline" href="https://medium.com/@artemnovichkov" target="_blank" rel="noopener noreferrer">
+                            Medium
+                        </a>
+                    </li>
+                    <li>
+                        <a className="text-base underline" href="https://stackoverflow.com/users/3514372/artem-novichkov" target="_blank" rel="noopener noreferrer">
+                            StackOverflow
                         </a>
                     </li>
                 </ul>

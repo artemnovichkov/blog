@@ -5,7 +5,7 @@ import Footer from '../components/footer'
 import { name, about, title} from '../lib/const'
 
 export default function Container(props) {
-    const { children, ...customMeta } = props
+    const { children, hideFooter, ...customMeta } = props
     const meta = {
         type: 'website',
         siteName: name,
@@ -41,7 +41,7 @@ export default function Container(props) {
                 <main>
                     {children}
                 </main>
-                <Footer />
+                { !hideFooter && <Footer />}
             </div>
         </div>
     )
