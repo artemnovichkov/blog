@@ -18,6 +18,7 @@ export default function Container(props) {
             <Head>
                 <title>{meta.title}</title>
                 <meta name="robots" content="follow, index" />
+                <meta name="description" content={meta.description} />
                 <meta property="og:type" content={meta.type} />
                 <meta property="og:site_name" content={meta.siteName} />
                 <meta property="og:description" content={meta.description} />
