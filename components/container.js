@@ -11,6 +11,7 @@ export default function Container(props) {
         siteName: name,
         description: about,
         title: title,
+        image: 'https://artemnovichkov.com/static/images/banner.png',
         ...customMeta
     }
     return (
