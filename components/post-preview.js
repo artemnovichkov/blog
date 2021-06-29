@@ -6,7 +6,7 @@ export default function PostPreview({ post }) {
     return (
         <Link href={post.url}>
             <a>
-                <div className="mb-4">
+                <div className="mb-20">
                     <h4 className="text-lg font-medium text-gray-900"> 
                         {post.frontMatter.title}
                     </h4>
