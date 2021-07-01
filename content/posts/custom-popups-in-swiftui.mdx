@@ -1,0 +1,230 @@
+---
+title: Implementing custom popups in SwiftUI
+description: Let's try to implement custom popups in SwiftUI
+cover: /images/custom-popups-in-swiftui/cover.png
+date: '2021-05-20'
+author:
+  - artem-novichkov
+---
+
+Two months ago my friend [@iamnalimov](https://twitter.com/iamnalimov) and I published jstnmbr app on [ProductHunt](https://www.producthunt.com/posts/jstnmbr). The idea of the app is very simple — count everything: books, push-ups, glasses of water. Of course, I choose SwiftUI for implementation. In this article, I want to highlight the key moments of implementing custom popups. It won't be in the tutorial format, we'll add a specific layout, but I hope it helps you in using overlays, geometry readers, and modifiers in your projects. If you have any questions or ideas on how to improve it, ping me on [Twitter](http://twitter.com/iosartem).
+
+## Design is the key
+
+Let's start with the design. Popups may contain different content, but the appearance and behavior are the same. Superviews are covered with blur overlay, popups have the same background color, top left and right rounded corners, and ability to dismissing:
+
+<Image
+  alt={`Final design`}
+  src={`/images/custom-popups-in-swiftui/design.png`}
+  width={414}
+  height={896}
+/>
+
+We want to implement a familiar API interface for presenting like alerts or action sheets:
+
+```swift
+.popup(isPresented: $isPresented) {
+    popupView
+}
+```
+
+Here we have a `Binding<Bool>` for presenting state and `@ViewBuilder` for popup content. Internally it will contain two parts:
+
+- Custom ViewModifier that will show popups via overlays.
+- View extension for convenience interface and blur overlays.
+
+## Modifiers And View Extensions
+
+Initially, we create `OverlayModifier`:
+
+```swift
+import SwiftUI
+
+struct OverlayModifier<OverlayView: View>: ViewModifier {
+    
+    @Binding var isPresented: Bool
+    @ViewBuilder var overlayView: () -> OverlayView
+    
+    init(isPresented: Binding<Bool>, @ViewBuilder overlayView: @escaping () -> OverlayView) {
+        self._isPresented = isPresented
+        self.overlayView = overlayView
+    }
+}
+```
+
+It contains `isPresented` state and the popup content. To conform `ViewModifier` protocol, we must implement `body(content:)` function. In our case it just optionally adds an overlay based on the state:
+
+```swift
+func body(content: Content) -> some View {
+    content.overlay(isPresented ? overlayView() : nil)
+}
+```
+
+Pay attention to `overlayView()`. Its body will be called only when popups is presented. `View` knows nothing about this modifier, so we extend `View` protocol with popup presentation:
+
+```swift
+extension View {
+    
+    func popup<OverlayView: View>(isPresented: Binding<Bool>,
+                                  blurRadius: CGFloat = 3,
+                                  blurAnimation: Animation? = .linear,
+                                  @ViewBuilder overlayView: @escaping () -> OverlayView) -> some View {
+        blur(radius: isPresented.wrappedValue ? blurRadius : 0)
+            .animation(blurAnimation)
+            .allowsHitTesting(!isPresented.wrappedValue)
+            .modifier(OverlayModifier(isPresented: isPresented, overlayView: overlayView))
+    }
+}
+```
+
+Let's describe every modifier:
+
+1. `blur` adds a blur overlay to superview if the popup is presented. We have a default value in function parameters to reuse the same radius and modify for specific popups if needed.
+2. `animation` adds an animation for blur overlay if needed.
+3. `allowsHitTesting` disables user interactions in superview if the popup is presented.
+4. `modifier` applies custom `OverlayModifier` with passed `overlayView`.
+
+We're ready to show popups, but we don't have any yet 😅. Let's make a basic PopupView with a common appearance according to our goals:
+- It may contain different content inside;
+- It has a background color and rounded top left and top right corners;
+- It is showed from the bottom with animation.
+
+## Popup Layout
+
+Let's create a simple view named NamePopupView that knows nothing about popup logic:
+
+<Image
+  alt={`NamePopupView`}
+  src={`/images/custom-popups-in-swiftui/popup-1.png`}
+  width={1044}
+  height={650}
+/>
+
+The app may show different popups, so we create a reusable `BottomPopupView` to show different content:
+
+```swift
+struct BottomPopupView<Content: View>: View {
+    
+    @ViewBuilder var content: () -> Content
+    
+    var body: some View {
+        content()
+    }
+}
+```
+
+Now we can show it in `.popup` modifier:
+
+```swift
+.popup(isPresented: $isPresented) {
+	BottomPopupView {
+		NamePopupView(isPresented: $isPresented)
+	}
+}
+```
+
+By default, overlays are shown in the center of the superview. To pin it to the bottom we wrap the content into `VStack` with `Spacer`:
+
+```swift
+VStack {
+	Spacer()
+	content()
+	    .background(Color.white)
+	    .cornerRadius(radius: 16, corners: [.topLeft, .topRight])
+}
+```
+
+Default `cornerRadius` modifier works for all corners, so here we use a custom modifier for it:
+
+```swift
+struct RoundedCornersShape: Shape {
+    
+    let radius: CGFloat
+    let corners: UIRectCorner
+    
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect,
+                                byRoundingCorners: corners,
+                                cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
+    }
+}
+
+extension View {
+    
+    func cornerRadius(radius: CGFloat, corners: UIRectCorner = .allCorners) -> some View {
+        clipShape(RoundedCornersShape(radius: radius, corners: corners))
+    }
+}
+```
+
+All is now ready, and here is the result:
+
+<Image
+  alt={`Popup with extra Safe Area insets`}
+  src={`/images/custom-popups-in-swiftui/popup-2.png`}
+  width={946}
+  height={1764}
+/>
+
+Insets for Safe Area have added automatically, but we want to overlay superviews at the bottom too. To read and use Safe Area insets, we add `GeometryReader`:
+
+```swift
+GeometryReader { geometry in
+	VStack {
+	    Spacer()
+	    content()
+		    .padding(.bottom, geometry.safeAreaInsets.bottom)
+		    .background(Color.white)
+		    .cornerRadius(radius: 16, corners: [.topLeft, .topRight])
+	}
+	.edgesIgnoringSafeArea([.bottom])
+}
+```
+
+To pin our popup at the bottom, we add `.edgesIgnoringSafeArea` modifier. According to the content, we add a bottom padding with the bottom inset before `.background` modifier. With this logic background color will appear as expected.
+
+<Image
+  alt={`Popup with ignoring Safe Area insets`}
+  src={`/images/custom-popups-in-swiftui/popup-3.png`}
+  width={946}
+  height={1764}
+/>
+
+Since iOS 14 we even have an automatic keyboard avoidance:
+
+<Image
+  alt={`Popup with keyboard avoidance`}
+  src={`/images/custom-popups-in-swiftui/popup-4.png`}
+  width={946}
+  height={1764}
+/>
+
+## Animations
+
+The layout is finished 🥳, but there is no animation. Luckily SwiftUI has easy-to-use modifiers for animations and transitions:
+
+```swift
+GeometryReader { geometry in
+    ...
+}
+.animation(.easeOut)
+.transition(.move(edge: .bottom))
+```
+
+<Image
+  alt={`Popup with extra Safe Area insets`}
+  src={`/images/custom-popups-in-swiftui/final.gif`}
+  width={600}
+  height={1298}
+/>
+
+## Source Code
+
+You can find the final project on [Github](https://github.com/artemnovichkov/CustomPopupExample). Thanks for reading!
+
+## Related Articles
+
+- [Custom Popup in SwiftUI](https://www.vadimbulavin.com/swiftui-popup-sheet-popover) by [Vadim Bulavin](https://twitter.com/V8tr)
+- [How to use GeometryReader without breaking SwiftUI layout](https://swiftwithmajid.com/2020/11/04/how-to-use-geometryreader-without-breaking-swiftui-layout) by [Majid Jabrayilov](https://twitter.com/mecid)
+- [SwiftUI keyboard avoidance](https://www.fivestars.blog/articles/swiftui-keyboard) by [Federico Zanetello](https://twitter.com/zntfdr)

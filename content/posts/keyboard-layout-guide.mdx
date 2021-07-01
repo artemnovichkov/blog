@@ -1,0 +1,93 @@
+---
+title: Guide for UIKeyboardLayoutGuide
+description: Working with UIKeyboardLayoutGuide in iOS 15
+cover: /images/keyboard-layout-guide/cover.png
+date: '2021-06-09'
+author:
+  - artem-novichkov
+---
+
+A common task making app layout is keyboard avoidance. Since iOS 14.0 it works automatically for SwiftUI views. What's about old, but good UIKit? Previously we used keyboard notifications, checked keyboard height, and updated related constraints. iOS 15 introduces a new layout guide — `UIKeyboardLayoutGuide`. It's super intuitive if you're familiar with other guides like `safeAreaLayoutGuide` and `readableContentGuide`. Let's try to use it in a simple example — we have a login screen with text fields and a login button pinned to the bottom.
+
+## Base usage
+
+We add just two constraints with system spacing:
+
+```swift
+view.addSubview(loginButton)
+let buttonBottom = view.keyboardLayoutGuide.topAnchor.constraint(equalToSystemSpacingBelow: loginButton.bottomAnchor, multiplier: 1.0)
+let buttonTrailing = view.keyboardLayoutGuide.trailingAnchor.constraint(equalToSystemSpacingAfter: loginButton.trailingAnchor, multiplier: 1.0)
+NSLayoutConstraint.activate([buttonBottom, buttonTrailing])
+```
+
+Now `loginButton` layout follows keyboard changes. When the keyboard is offscreen, `keyboardLayoutGuide.topAnchor` matches the view's `safeAreaLayoutGuide.bottomAnchor`.
+
+<Image
+  alt={`Works as simple as it must be`}
+  src={`/images/keyboard-layout-guide/button.png`}
+  width={946}
+  height={882}
+/>
+
+That's all, thank you for coming to my TED talk! Wait, the keyboard is no so simple, especially on iPadOS. You can undock and drag it to any place. Luckily, the keyboard guide helps us to handle these cases.
+
+<Image
+  alt={`Floating keyboard on iPadOS`}
+  src={`/images/keyboard-layout-guide/floating-keyboard.png`}
+  width={1276}
+  height={1780}
+/>
+
+## Working with floating keyboards
+
+At first, we must enable keyboard tracking, it's disabled by default:
+
+```swift
+view.keyboardLayoutGuide.followsUndockedKeyboard = true
+```
+
+Now, loginButton starts to follow the keyboard:
+
+<Image
+  src={`/images/keyboard-layout-guide/button-follow.png`}
+  width={524}
+  height={424}
+/>
+
+It works great, but here we have edge cases. When we move the keyboard at the top, `loginButton` may be outside of the view frame.
+
+Actually, `UIKeyboardLayoutGuide` is a subclass of `UITrackingLayoutGuide`. It's a layout guide that automatically activates and deactivates constraints depending on its nearness to edges. To use it, we replace buttonTrailing constraint with:
+
+```swift
+let buttonTop = view.keyboardLayoutGuide.topAnchor.constraint(equalToSystemSpacingBelow: loginButton.bottomAnchor, multiplier: 1.0)
+buttonTop.identifier = "buttonTop"
+view.keyboardLayoutGuide.setConstraints([buttonTop], activeWhenAwayFrom: .top)
+```
+
+`buttonTop` constraint will be active only when the keyboard is away from the top. Finally, we add `buttonBottom` constraint to pin `loginButton` at the keyboard bottom:
+
+```swift
+let buttonBottom = loginButton.topAnchor.constraint(equalToSystemSpacingBelow: view.keyboardLayoutGuide.bottomAnchor, multiplier: 1.0)
+buttonBottom.identifier = "buttonBottom"
+view.keyboardLayoutGuide.setConstraints([buttonBottom], activeWhenNearEdge: .top)
+```
+
+> Note: configuring identifiers for NSLayoutConstraint allows you to find constraints easily during debugging.
+
+Here is a final demo of our example. I've added some leading and trailing constraints as well. Check out [UIKeyboardLayoutGuideExample](https://github.com/artemnovichkov/UIKeyboardLayoutGuideExample) on Github.
+
+<iframe
+  width="100%"
+  height="315"
+  src="//www.youtube.com/embed/C2aWOSRhTOM"
+  frameBorder="0"
+  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+/>
+
+## Related resources
+
+- [Use the floating keyboard on your iPad](https://support.apple.com/en-us/HT210758) by Apple
+- [Your guide to keyboard layout](https://developer.apple.com/videos/play/wwdc2021/10259) by Apple
+- [Adjust Your Layout with Keyboard Layout Guide](https://developer.apple.com/documentation/uikit/keyboards_and_input/adjust_your_layout_with_keyboard_layout_guide) by Apple
+- [SwiftUI keyboard avoidance](https://fivestars.blog/articles/swiftui-keyboard) by [Federico Zanetello](https://twitter.com/zntfdr)
