@@ -21,6 +21,7 @@ export default function Main({ posts }) {
       </header>
       <div>
         <section>
+        <h1 className="mb-4 font-bold text-3xl text-black">{`Recent posts`}</h1>
           <ul>
               {posts.map((post) => (
                 <li key={post.slug}>
