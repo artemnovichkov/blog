@@ -24,7 +24,7 @@ export default function Post({ post }) {
     >
         <div>
           <article>
-            <h1 className="font-bold text-3xl tracking-tight text-black mb-4">
+            <h1 className="mb-4 font-bold text-3xl tracking-tight text-black dark:text-white">
               {post.frontMatter.title}
             </h1>
             <PostMeta post={post}/>

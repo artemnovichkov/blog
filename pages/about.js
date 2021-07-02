@@ -12,7 +12,7 @@ const Position = ({ position }) => {
     return (
         <div className="flex flex-row items-start gap-4 mb-4">
             <Image
-                className="rounded"
+                className="rounded dark:bg-white"
                 priority
                 alt={position.company}
                 src={position.image}
@@ -20,14 +20,14 @@ const Position = ({ position }) => {
                 height={40}
             />
             <div className="flex flex-col items-start">
-            <p className="text-xl">{position.title}</p>
-            <a className="text-base underline"
+            <p className="text-xl text-black dark:text-white">{position.title}</p>
+            <a className="text-base underline text-black dark:text-white"
                 target="_blank"
                 rel="noopener noreferrer"
                 href={position.url}>
                 {position.company}
             </a>
-            <div className="flex items-center gap-1 text-sm text-gray-400">
+            <div className="flex items-center gap-1 text-sm text-gray-400 dark:text-gray-600">
                 <time dateTime={startDate}>{format(startDate, 'LLL yyyy')}</time>
                 {`→`}
                 {finishDateTag}
@@ -92,7 +92,7 @@ export default function About() {
     return (
         <Container title="About – Artem Novichkov" hideFooter="true">
             <div className="flex flex-col justify-center items-start max-w-2xl mx-auto">
-                <p className="font-bold text-3xl tracking-tight mb-4 text-black">
+                <p className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
                     About Me
                 </p>
                 <Image
@@ -103,7 +103,7 @@ export default function About() {
                     width={144}
                     alt="Artem Novichkov"
                 />
-                <div className="flex flex-col gap-2 my-4">
+                <div className="flex flex-col gap-2 my-4 text-black dark:text-white">
                     <p>
                         Hi there! I'm Artem Novichkov. I live in Omsk, Russia (UTC+6).
                     </p>
@@ -161,34 +161,34 @@ export default function About() {
                 <h2 className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
                     Contacts
                 </h2>
-                <ul className="mb-4">
+                <ul className="mb-4 text-base underline text-black dark:text-white">
                     <li>
-                        <a className="text-base underline" href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">
+                        <a href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">
                             mail@artemnovichkov.com
                         </a>
                     </li>
                     <li>
-                        <a className="text-base underline" href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">
+                        <a href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">
                             Twitter
                         </a>
                     </li>
                     <li>
-                        <a className="text-base underline" href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">
+                        <a href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">
                             Github
                         </a>
                     </li>
                     <li>
-                        <a className="text-base underline" href="https://t.me/artemnovichkov" target="_blank" rel="noopener noreferrer">
+                        <a href="https://t.me/artemnovichkov" target="_blank" rel="noopener noreferrer">
                             Telegram
                         </a>
                     </li>
                     <li>
-                        <a className="text-base underline" href="https://medium.com/@artemnovichkov" target="_blank" rel="noopener noreferrer">
+                        <a href="https://medium.com/@artemnovichkov" target="_blank" rel="noopener noreferrer">
                             Medium
                         </a>
                     </li>
                     <li>
-                        <a className="text-base underline" href="https://stackoverflow.com/users/3514372/artem-novichkov" target="_blank" rel="noopener noreferrer">
+                        <a href="https://stackoverflow.com/users/3514372/artem-novichkov" target="_blank" rel="noopener noreferrer">
                             StackOverflow
                         </a>
                     </li>

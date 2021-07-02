@@ -16,12 +16,12 @@ export default function Main({ posts }) {
           width={144}
           alt={name}
         />
-        <h1 className="font-bold text-3xl text-black">{name}</h1>
-        <p>{about}</p>
+        <h1 className="font-bold text-3xl text-black dark:text-white">{name}</h1>
+        <p className="text-black dark:text-white">{about}</p>
       </header>
       <div>
         <section>
-        <h1 className="mb-4 font-bold text-3xl text-black">{`Recent posts`}</h1>
+        <h1 className="mb-4 font-bold text-3xl text-black dark:text-white">{`Recent posts`}</h1>
           <ul>
               {posts.map((post) => (
                 <li key={post.slug}>

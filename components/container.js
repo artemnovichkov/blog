@@ -15,7 +15,7 @@ export default function Container(props) {
         ...customMeta
     }
     return (
-        <div>
+        <div className="bg-white dark:bg-black">
             <Head>
                 <title>{meta.title}</title>
                 <meta name="robots" content="follow, index" />
@@ -34,12 +34,12 @@ export default function Container(props) {
             <nav className="sticky-nav w-full py-4">
                 <div>
                 <NextLink href="/">
-                    <a className="p-4 text-gray-900">Home</a>
+                    <a className="p-4 text-gray-900 hover:text-gray-600 dark:text-white">Home</a>
                 </NextLink>
                 <NextLink href="/about">
-                    <a className="p-4 text-gray-900">About</a>
+                    <a className="p-4 text-gray-900 hover:text-gray-600 dark:text-white">About</a>
                 </NextLink>
-                <ExternalLink className="p-4" href="https://artemnovichkov.com/feed.xml">RSS</ExternalLink>
+                <ExternalLink href="https://artemnovichkov.com/feed.xml">RSS</ExternalLink>
                 </div>
             </nav>
             <div className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
