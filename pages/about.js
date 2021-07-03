@@ -27,7 +27,7 @@ const Position = ({ position }) => {
                 href={position.url}>
                 {position.company}
             </a>
-            <div className="flex items-center gap-1 text-sm text-gray-400 dark:text-gray-600">
+            <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                 <time dateTime={startDate}>{format(startDate, 'LLL yyyy')}</time>
                 {`→`}
                 {finishDateTag}

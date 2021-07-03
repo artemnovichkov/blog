@@ -8,18 +8,35 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', ...fontFamily.sans]
       },
-      typography: {
+      typography: (theme) => ({
         DEFAULT: {
           css: {
-            "code::before": false,
-            "code::after": false,
-          }
-        }
-      }
+            'blockquote p:first-of-type::before': false,
+            'blockquote p:first-of-type::after': false,
+            'code::before': false,
+            'code::after': false,
+            color: theme("colors.black"),
+            'p,a,h1,h2,h3,h4': {
+              color: theme("colors.black"),
+            },
+          },
+        },
+        dark: {
+          css: {
+            color: theme("colors.white"),
+            'p,a,h1,h2,h3,h4': {
+              color: theme("colors.white"),
+            },
+          },
+        },
+      })
     },
   },
   variants: {
-    extend: {},
+    typography: ['dark']
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [
+    require("tailwindcss-dark-mode"),
+    require('@tailwindcss/typography')
+  ],
 }

@@ -35,7 +35,7 @@ export default function Post({ post }) {
                     width={1200}
                     height={740}
               />
-            <div className="prose">
+            <div className="prose dark:prose-dark">
               {content}
             </div>
           </article>

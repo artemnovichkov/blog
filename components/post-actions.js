@@ -1,6 +1,6 @@
 export default function PostActions({ post }) {
     return (
-        <div className="mb-8 text-sm text-gray-700">
+        <div className="mb-8 text-sm text-gray-500 dark:text-gray-400">
           <a
             href={twitterShareUrl(post)}
             target="_blank"
