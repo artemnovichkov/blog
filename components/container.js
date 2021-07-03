@@ -30,8 +30,6 @@ export default function Container(props) {
                 <meta name="twitter:title" content={meta.title} />
                 <meta name="twitter:description" content={meta.description} />
                 <meta name="twitter:image" content={meta.image} />
-                <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-                <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
             </Head>
             <nav className="sticky-nav w-full py-4">
                 <div>
