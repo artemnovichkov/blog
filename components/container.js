@@ -15,39 +15,41 @@ export default function Container(props) {
         ...customMeta
     }
     return (
-        <div className="bg-white dark:bg-black">
-            <Head>
-                <title>{meta.title}</title>
-                <meta name="robots" content="follow, index" />
-                <meta name="description" content={meta.description} />
-                <meta property="og:type" content={meta.type} />
-                <meta property="og:site_name" content={meta.siteName} />
-                <meta property="og:description" content={meta.description} />
-                <meta property="og:title" content={meta.title} />
-                <meta property="og:image" content={meta.image} />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:site" content="@iosartem" />
-                <meta name="twitter:title" content={meta.title} />
-                <meta name="twitter:description" content={meta.description} />
-                <meta name="twitter:image" content={meta.image} />
-            </Head>
-            <nav className="sticky-nav w-full py-4">
-                <div>
-                <NextLink href="/">
-                    <a className="p-4 text-gray-900 hover:text-gray-600 dark:text-white">Home</a>
-                </NextLink>
-                <NextLink href="/about">
-                    <a className="p-4 text-gray-900 hover:text-gray-600 dark:text-white">About</a>
-                </NextLink>
-                <ExternalLink href="https://artemnovichkov.com/feed.xml">RSS</ExternalLink>
+        <html className="bg-white dark:bg-black">
+            <div className="bg-white dark:bg-black">
+                <Head>
+                    <title>{meta.title}</title>
+                    <meta name="robots" content="follow, index" />
+                    <meta name="description" content={meta.description} />
+                    <meta property="og:type" content={meta.type} />
+                    <meta property="og:site_name" content={meta.siteName} />
+                    <meta property="og:description" content={meta.description} />
+                    <meta property="og:title" content={meta.title} />
+                    <meta property="og:image" content={meta.image} />
+                    <meta name="twitter:card" content="summary_large_image" />
+                    <meta name="twitter:site" content="@iosartem" />
+                    <meta name="twitter:title" content={meta.title} />
+                    <meta name="twitter:description" content={meta.description} />
+                    <meta name="twitter:image" content={meta.image} />
+                </Head>
+                <nav className="sticky-nav w-full py-4">
+                    <div>
+                    <NextLink href="/">
+                        <a className="p-4 text-gray-900 hover:text-gray-600 dark:text-white">Home</a>
+                    </NextLink>
+                    <NextLink href="/about">
+                        <a className="p-4 text-gray-900 hover:text-gray-600 dark:text-white">About</a>
+                    </NextLink>
+                    <ExternalLink href="https://artemnovichkov.com/feed.xml">RSS</ExternalLink>
+                    </div>
+                </nav>
+                <div className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
+                    <main>
+                        {children}
+                    </main>
+                    { !hideFooter && <Footer />}
                 </div>
-            </nav>
-            <div className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
-                <main>
-                    {children}
-                </main>
-                { !hideFooter && <Footer />}
             </div>
-        </div>
+        </html>
     )
 }
