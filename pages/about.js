@@ -132,7 +132,7 @@ export default function About() {
                         &nbsp;Telegram channel. I write entertaining posts about my dev and life experience.
                     </p>
                     <p>
-                    🕹 In free time I play videogames with Nintendo Switch и PS4 Pro. I like Nintendo exclusives, sometimes drop in PvP battles.
+                    🕹 In free time I play videogames with Nintendo Switch and PS4 Pro. I like Nintendo exclusives, sometimes drop in PvP battles.
                     </p>
                 </div>
                 <p className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
