@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://artemnovichkov.com
+
+# Sitemaps
+Sitemap: https://artemnovichkov.com/sitemap.xml
