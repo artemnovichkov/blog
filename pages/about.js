@@ -110,9 +110,10 @@ export default function About() {
                     <p>
                         📝 I work as an iOS Developer at Skyeng, developing&nbsp;
                         <a className="text-base underline" href="https://apps.apple.com/app/id1473109163" target="_blank" rel="noopener noreferrer">
-                            Skysmart
-                        </a>
-                        &nbsp;app that helps school students get A's for homeworks.
+                            Skysmart Workbook </a>&nbsp;
+                            and <a className="text-base underline" href="https://apps.apple.com/app/1576814600" target="_blank" rel="noopener noreferrer">
+                            Skysmart Solutions</a>&nbsp;
+                        apps that help school students get A's for homeworks.
                     </p>
                     <p>
                     👨‍🏫 My second work activity is teaching at Netology on iOS development course. I host webinars, check homeworks and courseworks and develop teaching materials.
