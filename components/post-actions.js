@@ -28,4 +28,4 @@ const twitterShareUrl = (post) => {
   }
   
   const editUrl = (filepath) =>
-    `https://github.com/artemnovichkov/nextjs-blog/edit/main/${filepath}`;
+    `https://github.com/artemnovichkov/blog/edit/main/${filepath}`;
