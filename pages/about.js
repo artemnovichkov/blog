@@ -117,9 +117,9 @@ export default function About() {
                     <p>
                         📝 I work as an iOS Developer at Skyeng, developing&nbsp;
                         <a className="text-base underline" href="https://apps.apple.com/app/id1473109163" target="_blank" rel="noopener noreferrer">
-                            Skysmart Workbook</a>&nbsp;
+                            Skysmart: Class</a>&nbsp;
                             and <a className="text-base underline" href="https://apps.apple.com/app/1576814600" target="_blank" rel="noopener noreferrer">
-                            Skysmart Solutions</a>&nbsp;
+                            Skysmart: Solutions</a>&nbsp;
                         apps that help school students get A's for homeworks.
                     </p>
                     <p>
