@@ -7,6 +7,8 @@ author:
   - artem-novichkov
 ---
 
+~Translations: [Russian](https://habr.com/ru/company/skyeng/blog/585790)~
+
 A common task making app layout is keyboard avoidance. Since iOS 14.0 it works automatically for SwiftUI views. What's about old, but good UIKit? Previously we used keyboard notifications, checked keyboard height, and updated related constraints. iOS 15 introduces a new layout guide — `UIKeyboardLayoutGuide`. It's super intuitive if you're familiar with other guides like `safeAreaLayoutGuide` and `readableContentGuide`. Let's try to use it in a simple example — we have a login screen with text fields and a login button pinned to the bottom.
 
 ## Base usage
