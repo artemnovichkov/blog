@@ -7,23 +7,45 @@ author:
   - artem-novichkov
 ---
 
-Previously I wrote a post about [working with web view content offline](https://www.artemnovichkov.com/blog/swiftui-offline). Since then Apple team have released Xcode 13.2 beta with Swift 5.5, I've read a book about [modern concurrency model in Swift](https://www.raywenderlich.com/books/modern-concurrency-in-swift), and I guess it's a perfect time to update my examples with async/await!
+Previously I wrote a post about [working with web view content offline](https://www.artemnovichkov.com/blog/swiftui-offline). Since then Apple team has released Xcode 13.2 beta with Swift 5.5, I've read a book about [modern concurrency model in Swift](https://www.raywenderlich.com/books/modern-concurrency-in-swift), and I guess it's a perfect time to update my examples with async/await!
 
-Before reading this post I highly recommend to check [Concurrency](https://docs.swift.org/swift-book/LanguageGuide/Concurrency.html) article in Swift Language Guide.
+Before reading this post I highly recommend checking [Concurrency](https://docs.swift.org/swift-book/LanguageGuide/Concurrency.html) article in Swift Language Guide.
 
-> Note: Code examples are written in Swift 5.5 and tested on iOS 15.0 with Xcode 13.2 (13C5081f).
+> Note: Code examples are written in Swift 5.5 and tested on iOS 15.0 with Xcode 13.2 beta (13C5081f).
 
 ## Preparation
 
 Let's brush up on the implementation of `WebDataManager` that allows us to get data for web content by URL:
 
 ```swift
+import WebKit
+
 final class WebDataManager: NSObject {
-  
-    // Another properties and types
+    
+    enum DataError: Error {
+        case noImageData
+    }
+    
+    // 1
+    enum DataType: String, CaseIterable {
+        case snapshot = "Snapshot"
+        case pdf = "PDF"
+        case webArchive = "Web Archive"
+    }
+    
+    // 2
+    private var type: DataType = .webArchive
+    
+    // 3
+    private lazy var webView: WKWebView = {
+        let webView = WKWebView()
+        webView.navigationDelegate = self
+        return webView
+    }()
     
     private var completionHandler: ((Result<Data, Error>) -> Void)?
     
+    // 4
     func createData(url: URL, type: DataType, completionHandler: @escaping (Result<Data, Error>) -> Void) {
         self.type = type
         self.completionHandler = completionHandler
@@ -32,10 +54,46 @@ final class WebDataManager: NSObject {
 }
 ```
 
-Because `WKWebView` works with delegates, we must save `completionHandler` and call it later, for example, to handle navigation errors:
+Here we have:
+
+1. A `DataType` enum for different data formats.
+2. A `dataType` property with default value to avoid optoinal values.
+3. A `webView` property for data loading.
+4. A `createData` function for handling `dataType`, `completionHandler` and loading of web data for a passed url.
+
+What is missing here? Of course, `WKNavigationDelegate` implementation:
 
 ```swift
 extension WebDataManager: WKNavigationDelegate {
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        switch type {
+        case .snapshot:
+            let config = WKSnapshotConfiguration()
+            config.rect = .init(origin: .zero, size: webView.scrollView.contentSize)
+            webView.takeSnapshot(with: config) { [weak self] image, error in
+                if let error = error {
+                    self?.completionHandler?(.failure(error))
+                    return
+                }
+                guard let pngData = image?.pngData() else {
+                    self?.completionHandler?(.failure(DataError.noImageData))
+                    return
+                }
+                self?.completionHandler?(.success(pngData))
+            }
+        case .pdf:
+            let config = WKPDFConfiguration()
+            config.rect = .init(origin: .zero, size: webView.scrollView.contentSize)
+            webView.createPDF(configuration: config) { [weak self] result in
+                self?.completionHandler?(result)
+            }
+        case .webArchive:
+            webView.createWebArchiveData { [weak self] result in
+                self?.completionHandler?(result)
+            }
+        }
+    }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         completionHandler?(.failure(error))
@@ -43,17 +101,19 @@ extension WebDataManager: WKNavigationDelegate {
 }
 ```
 
-We starts with refactoring `createData` function in async manner:
+Here we have a 6 calls of `completionHandler` and weak using of self to avoid retain cycles. Can we improve this code with async/awaits? Let's try it out!
+
+## Adding asynchronous code
+
+We start with refactoring `createData` function in async manner:
 
 ```swift
 func createData(url: URL, type: DataType) async throws -> Data
 ```
 
-Before working with web view content, we must be sure that a main frame navigation completes. We can handle it in `webView(_:didFinish🙂` function of `WKNavigationDelegate`. To make this logic async\await-compatible, we will use `withCheckedThrowingContinuation` function.
+Before working with web view content, we must be sure that the main frame navigation completes. We can handle it in `webView(_:didFinish:)` function of `WKNavigationDelegate`. To make this logic async\await-compatible, we will use `withCheckedThrowingContinuation` function.
 
-## Interface between synchronous and asynchronous code
-
-Let's white a function to load web content by URL asynchronously:
+Let's write a function to load web content by URL asynchronously:
 
 ```swift
 private var continuation: CheckedContinuation<Void, Error>?
@@ -66,18 +126,7 @@ private func load(_ url: URL) async throws {
 }
 ```
 
-We store `continuation` to use it in delegate functions. If you try to run this code, you get an error:
-
-> Call to main actor-isolated instance method 'load' in a synchronous nonisolated context
-
-To fix it we adds a MainActor attribute:
-
-```swift
-@MainActor
-private func load(_ url: URL) async throws
-```
-
-MainActor it a global actor that allow us execute code on the main thread. To handle navigation updates, we adds `continuation` using:
+We store `continuation` to use it in delegate functions.  To handle navigation updates, we add `continuation` using:
 
 ```swift
 extension WebDataManager: WKNavigationDelegate {
@@ -92,13 +141,39 @@ extension WebDataManager: WKNavigationDelegate {
 }
 ```
 
+But if you try to run this code, you get an error:
+
+> Call to main actor-isolated instance method 'load' in a synchronous nonisolated context
+
+To fix it we adds a `MainActor` attribute:
+
+```swift
+@MainActor
+private func load(_ url: URL) async throws {
+  // implementation
+}
+```
+
+MainActor is a global actor that allows us to execute code on the main queue. All `UIView`s (therefore `WKWebView`) are declared with this attribute and accessed on the main queue.
+
 Now we can call `load` function:
 
 ```swift
 @MainActor
 func createData(url: URL, type: DataType) async throws -> Data {
     try await load(url)
-...
+    // To be implemented
+    return Data()
+}
+```
+
+Because `load` function must be called in the main queue, we mark `createData` function with `MainActor` attribute as well. Even more, we can add this attribute to `WebDataManager` class instead:
+
+```swift
+@MainActor 
+final class WebDataManager: NSObject {
+    // implementation
+}
 ```
 
 ## Working with system async/await APIs
@@ -138,7 +213,33 @@ extension WKWebView {
 }
 ```
 
-Pay attention continuation can automatically handle the state of the given `Result` value and its associated values.
+Pay attention the continuation can automatically handle the state of the given `Result` value and its associated values.
+
+The final version of `createData` function looks better:
+
+```swift
+func createData(url: URL, type: DataType) async throws -> Data {
+        try await load(url)
+        switch type {
+        case .snapshot:
+            let config = WKSnapshotConfiguration()
+            config.rect = .init(origin: .zero, size: webView.scrollView.contentSize)
+            let image = try await webView.takeSnapshot(configuration: config)
+            guard let pngData = image.pngData() else {
+                throw DataError.noImageData
+            }
+            return pngData
+        case .pdf:
+            let config = WKPDFConfiguration()
+            config.rect = .init(origin: .zero, size: webView.scrollView.contentSize)
+            return try await webView.pdf(configuration: config)
+        case .webArchive:
+            return try await webView.webArchiveData()
+        }
+    }
+```
+
+We have one place to handle all errors and reduce capturing self in closures.
 
 ## Using new async functions
 
@@ -161,10 +262,10 @@ To get the final result, check [OfflineDataAsyncExample](https://github.com/arte
 
 ## Conclusion
 
-Общие мысли:
+Common thoughts:
 
-- Лучше синтаксис
-- Проще работать с ошибками
-- Меньше захвата self в блоках
+- Better syntax
+- Simple work with errors
+- Less work with closures and self capturing
 
-I'm still playing with new concurrency model and collecting useful resources in [awesome-swift-async-await](https://github.com/artemnovichkov/awesome-swift-async-await) repo. Feel free to send a PR with your favourite learning materials related to this topic!
+I'm still playing with the new concurrency model and collecting useful resources in [awesome-swift-async-await](https://github.com/artemnovichkov/awesome-swift-async-await) repo. Feel free to send a PR with your favorite learning materials related to this topic!
