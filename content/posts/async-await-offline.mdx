@@ -57,7 +57,7 @@ final class WebDataManager: NSObject {
 Here we have:
 
 1. A `DataType` enum for different data formats.
-2. A `dataType` property with default value to avoid optoinal values.
+2. A `dataType` property with default value to avoid optional values.
 3. A `webView` property for data loading.
 4. A `createData` function for handling `dataType`, `completionHandler` and loading of web data for a passed url.
 
@@ -145,7 +145,7 @@ But if you try to run this code, you get an error:
 
 > Call to main actor-isolated instance method 'load' in a synchronous nonisolated context
 
-To fix it we adds a `MainActor` attribute:
+To fix it we add a `MainActor` attribute:
 
 ```swift
 @MainActor
@@ -167,7 +167,7 @@ func createData(url: URL, type: DataType) async throws -> Data {
 }
 ```
 
-Because `load` function must be called in the main queue, we mark `createData` function with `MainActor` attribute as well. Even more, we can add this attribute to `WebDataManager` class instead:
+Because `load` function must be called in the main queue, we mark `createData` function with `MainActor` attribute as well. Even more, we can add this attribute to `WebDataManager` class instead all functions:
 
 ```swift
 @MainActor 
@@ -188,7 +188,7 @@ webView.createPDF(configuration: config) { [weak self] result in
 }
 ```
 
-Luckily, Apple team have added async/await analogues for plenty of existing functions with callbacks: 
+Luckily, Apple team has added async/await analogues for plenty of existing functions with callbacks: 
 
 ```swift
 let config = WKPDFConfiguration()
@@ -243,7 +243,7 @@ We have one place to handle all errors and reduce capturing self in closures.
 
 ## Using new async functions
 
-Congratulations, we did it! Wait, but how to use new async functions from sync context? With instances of  `Task` type we can perform async tasks:
+Congratulations, we did it! Wait, but how to use new async functions from sync context? With instances of  `Task`  we can perform async tasks:
 
 ```swift
 Task {
