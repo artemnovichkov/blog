@@ -57,7 +57,7 @@ final class WebDataManager: NSObject {
 Here we have:
 
 1. A `DataType` enum for different data formats.
-2. A `dataType` property with default value to avoid optional values.
+2. A `type` property with default value to avoid optional values.
 3. A `webView` property for data loading.
 4. A `createData` function for handling `dataType`, `completionHandler` and loading of web data for a passed url.
 
@@ -101,7 +101,7 @@ extension WebDataManager: WKNavigationDelegate {
 }
 ```
 
-Here we have a 6 calls of `completionHandler` and weak using of self to avoid retain cycles. Can we improve this code with async/awaits? Let's try it out!
+Here we have 6 calls of `completionHandler` and weak using of self to avoid retain cycles. Can we improve this code with async/awaits? Let's try it out!
 
 ## Adding asynchronous code
 
@@ -111,7 +111,7 @@ We start with refactoring `createData` function in async manner:
 func createData(url: URL, type: DataType) async throws -> Data
 ```
 
-Before working with web view content, we must be sure that the main frame navigation completes. We can handle it in `webView(_:didFinish:)` function of `WKNavigationDelegate`. To make this logic async\await-compatible, we will use `withCheckedThrowingContinuation` function.
+Before working with web view content, we must be sure that the main frame navigation is completed. We can handle it in `webView(_:didFinish:)` function of `WKNavigationDelegate`. To make this logic async\await-compatible, we will use `withCheckedThrowingContinuation` function.
 
 Let's write a function to load web content by URL asynchronously:
 
@@ -248,7 +248,7 @@ Congratulations, we did it! Wait, but how to use new async functions from sync c
 ```swift
 Task {
     do {
-        let url - URL(string: "https://www.artemnovichkov.com")!
+        let url = URL(string: "https://www.artemnovichkov.com")!
         let data = try await webDataManager.createData(url: url, type: .pdf)
         print(data)
     }
