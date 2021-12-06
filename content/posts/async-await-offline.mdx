@@ -219,24 +219,24 @@ The final version of `createData` function looks better:
 
 ```swift
 func createData(url: URL, type: DataType) async throws -> Data {
-        try await load(url)
-        switch type {
-        case .snapshot:
-            let config = WKSnapshotConfiguration()
-            config.rect = .init(origin: .zero, size: webView.scrollView.contentSize)
-            let image = try await webView.takeSnapshot(configuration: config)
-            guard let pngData = image.pngData() else {
-                throw DataError.noImageData
-            }
-            return pngData
-        case .pdf:
-            let config = WKPDFConfiguration()
-            config.rect = .init(origin: .zero, size: webView.scrollView.contentSize)
-            return try await webView.pdf(configuration: config)
-        case .webArchive:
-            return try await webView.webArchiveData()
+    try await load(url)
+    switch type {
+    case .snapshot:
+        let config = WKSnapshotConfiguration()
+        config.rect = .init(origin: .zero, size: webView.scrollView.contentSize)
+        let image = try await webView.takeSnapshot(configuration: config)
+        guard let pngData = image.pngData() else {
+            throw DataError.noImageData
         }
+        return pngData
+    case .pdf:
+        let config = WKPDFConfiguration()
+        config.rect = .init(origin: .zero, size: webView.scrollView.contentSize)
+        return try await webView.pdf(configuration: config)
+    case .webArchive:
+        return try await webView.webArchiveData()
     }
+}
 ```
 
 We have one place to handle all errors and reduce capturing self in closures.
