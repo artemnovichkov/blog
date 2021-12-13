@@ -7,7 +7,7 @@ author:
   - artem-novichkov
 ---
 
-SwiftUI has a lot of modern and useful features. One of my favourite is @Environment property wrapper. It allows you to get system-wide settings, for instance, current locale or color scheme. Since iOS 14.0 you can useopenURL value to open URLs from apps easily.
+SwiftUI has a lot of modern and useful features. One of my favourite is @Environment property wrapper. It allows you to get system-wide settings, for instance, current locale or color scheme. Since iOS 14.0 you can use `openURL` value to open URLs from apps easily.
 
 ```swift
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
@@ -30,7 +30,7 @@ struct ContentView: View {
     
     var body: some View {
         Button("Share") {
-            openURL(URL(string: "https://artemnovichkov.com")!)
+            openURL(URL(string: "https://www.artemnovichkov.com")!)
         }
     }
 }
@@ -89,7 +89,7 @@ struct ContentView: View {
     
     var body: some View {
         Button("Share") {
-            share([URL(string: "https://artemnovichkov.com")!])
+            share([URL(string: "https://www.artemnovichkov.com")!])
         }
     }
 }
