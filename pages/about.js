@@ -171,22 +171,25 @@ export default function About() {
                 </h2>
                 <ul className="mb-4 text-base underline text-black dark:text-white">
                     <li>
-                        <p>✉️ </p>
-                        <a href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">
+                        <p>
+                        ✉️ <a href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">
                             mail@artemnovichkov.com
-                        </a>
+                           </a>
+                        </p>
                     </li>
                     <li>
-                        <p>🐤 </p>
-                        <a href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">
+                        <p>
+                        🐤 <a href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">
                             Twitter
-                        </a>
+                           </a>
+                        </p>
                     </li>
                     <li>
-                        <p>👨‍💻 </p>
-                        <a href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">
+                        <p>
+                        👨‍💻 <a href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">
                             Github
-                        </a>
+                            </a>
+                        </p>
                     </li>
                     <li>
                         <p>🤳</p>
