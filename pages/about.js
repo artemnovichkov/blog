@@ -171,33 +171,39 @@ export default function About() {
                 </h2>
                 <ul className="mb-4 text-base underline text-black dark:text-white">
                     <li>
+                        <p>✉️ </p>
                         <a href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">
-                            ✉️ mail@artemnovichkov.com
+                            mail@artemnovichkov.com
                         </a>
                     </li>
                     <li>
+                        <p>🐤 </p>
                         <a href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">
-                            🐤 Twitter
+                            Twitter
                         </a>
                     </li>
                     <li>
+                        <p>👨‍💻 </p>
                         <a href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">
-                            👨‍💻 Github
+                            Github
                         </a>
                     </li>
                     <li>
+                        <p>🤳</p>
                         <a href="https://t.me/artemnovichkov" target="_blank" rel="noopener noreferrer">
-                            🤳 Telegram
+                            Telegram
                         </a>
                     </li>
                     <li>
+                        <p>📝</p>
                         <a href="https://medium.com/@artemnovichkov" target="_blank" rel="noopener noreferrer">
-                            📝 Medium
+                            Medium
                         </a>
                     </li>
                     <li>
+                        <p>❓</p>
                         <a href="https://stackoverflow.com/users/3514372/artem-novichkov" target="_blank" rel="noopener noreferrer">
-                            ❓ StackOverflow
+                            StackOverflow
                         </a>
                     </li>
                 </ul>
