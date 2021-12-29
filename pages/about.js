@@ -169,45 +169,36 @@ export default function About() {
                 <h2 className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
                     Contacts
                 </h2>
-                <ul className="mb-4 text-base underline text-black dark:text-white">
+                <ul className="mb-4 text-base text-black dark:text-white">
                     <li>
                         <p>
-                        ✉️ <a href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">
-                            mail@artemnovichkov.com
-                           </a>
+                          ✉️ <a className="underline" href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">mail@artemnovichkov.com</a>
                         </p>
                     </li>
                     <li>
                         <p>
-                        🐤 <a href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">
-                            Twitter
-                           </a>
+                          🐤 <a className="underline" href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">Twitter</a>
                         </p>
                     </li>
                     <li>
                         <p>
-                        👨‍💻 <a href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">
-                            Github
-                            </a>
+                          👨‍💻 <a className="underline" href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">Github</a>
                         </p>
                     </li>
                     <li>
-                        <p>🤳</p>
-                        <a href="https://t.me/artemnovichkov" target="_blank" rel="noopener noreferrer">
-                            Telegram
-                        </a>
+                        <p>
+                          🤳 <a className="underline" href="https://t.me/artemnovichkov" target="_blank" rel="noopener noreferrer">Telegram</a>
+                        </p>
                     </li>
                     <li>
-                        <p>📝</p>
-                        <a href="https://medium.com/@artemnovichkov" target="_blank" rel="noopener noreferrer">
-                            Medium
-                        </a>
+                        <p>
+                          📝 <a className="underline" href="https://medium.com/@artemnovichkov" target="_blank" rel="noopener noreferrer">Medium</a>
+                        </p>
                     </li>
                     <li>
-                        <p>❓</p>
-                        <a href="https://stackoverflow.com/users/3514372/artem-novichkov" target="_blank" rel="noopener noreferrer">
-                            StackOverflow
-                        </a>
+                        <p>
+                          ❓ <a className="underline" href="https://stackoverflow.com/users/3514372/artem-novichkov" target="_blank" rel="noopener noreferrer">StackOverflow</a>
+                        </p>
                     </li>
                 </ul>
             </div>
