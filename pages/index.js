@@ -8,7 +8,6 @@ export default function Main({ posts }) {
   return (
     <Container>
       <header className="flex flex-col mb-16 w-full items-center">
-        <meta name="yandex-verification" content="0dbe1f786dcb070d" />
         <Image
           className="rounded-full"
           priority
