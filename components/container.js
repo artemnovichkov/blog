@@ -31,6 +31,7 @@ export default function Container(props) {
                     <meta name="twitter:title" content={meta.title} />
                     <meta name="twitter:description" content={meta.description} />
                     <meta name="twitter:image" content={meta.image} />
+                    <meta name="yandex-verification" content="0dbe1f786dcb070d" />
                 </Head>
                 <nav className="sticky-nav w-full py-4">
                     <div>
