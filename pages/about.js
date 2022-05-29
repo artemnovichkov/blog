@@ -133,14 +133,13 @@ export default function About() {
                         . Now I'm focusing on SwiftUI, developing pet projects and writing blog posts.
                     </p>
                     <p>
-                        💻 I'm the host of&nbsp;
-                        <a className="text-base underline" href="https://t.me/subtlesettings" target="_blank" rel="noopener noreferrer">
-                        Subtle Settings
-                        </a>
-                        &nbsp;Telegram channel. I write entertaining posts about my dev and life experience.
+                        📷 From time to time I share my knowledge with public speaking. Here is a &nbsp;
+                        <a className="text-base underline" href="https://www.youtube.com/playlist?list=PLRSU1SC70qRudLaYKSjM14tJmA-J-dRvU" target="_blank" rel="noopener noreferrer">
+                        Youtube playlist
+                        </a> with my talks.
                     </p>
                     <p>
-                    🕹 In free time I play videogames with Nintendo Switch OLED and PS 5. I like Nintendo exclusives, sometimes drop in PvP battles.
+                    🕹 In free time I play videogames with Nintendo Switch OLED and PS5. When I'm not at home I fly a DJI mini 2 drone.
                     </p>
                 </div>
                 <p className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">

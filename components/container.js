@@ -42,7 +42,6 @@ export default function Container(props) {
                         <a className="p-4 text-gray-900 hover:text-gray-600 dark:text-white">About</a>
                     </NextLink>
                     <ExternalLink href="https://artemnovichkov.com/feed.xml">RSS</ExternalLink>
-                    <ExternalLink href="https://www.buymeacoffee.com/artemnovichkov">🍩 Donate</ExternalLink>
                     </div>
                 </nav>
                 <div className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
