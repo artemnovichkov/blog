@@ -12,7 +12,7 @@ const Position = ({ position }) => {
     return (
         <div className="flex flex-row items-start gap-4 mb-4">
             <Image
-                className="rounded dark:bg-white"
+                className="rounded"
                 priority
                 alt={position.company}
                 src={position.image}
