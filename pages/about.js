@@ -40,10 +40,18 @@ const Position = ({ position }) => {
 const fullTimePositions = [
     {
         title: "iOS Developer",
+        company: "Welltory",
+        image: "/images/companies/welltory.png",
+        url: "https://welltory.com",
+        startDate: "2022-06",
+    },
+    {
+        title: "iOS Developer",
         company: "Skyeng",
         image: "/images/companies/skyeng.png",
         url: "https://skyeng.ru",
         startDate: "2020-07",
+        finishDate: "2022-06",
     },
     {
         title: "iOS Developer",
