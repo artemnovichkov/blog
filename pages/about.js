@@ -123,12 +123,7 @@ export default function About() {
                         Hi there! I'm Artem Novichkov. I live in Omsk, Russia (UTC+6).
                     </p>
                     <p>
-                        📝 I work as an iOS Developer at Skyeng, developing&nbsp;
-                        <a className="text-base underline" href="https://apps.apple.com/app/id1473109163" target="_blank" rel="noopener noreferrer">
-                            Skysmart: Class</a>&nbsp;
-                            and <a className="text-base underline" href="https://apps.apple.com/app/1576814600" target="_blank" rel="noopener noreferrer">
-                            Skysmart: Solutions</a>&nbsp;
-                        apps that help school students get A's for homeworks.
+                        📝 I work as an iOS Developer at Welltory, developing an app that lets you sync data from other apps & gadgets for more insights into your health and lifestyle.
                     </p>
                     <p>
                     👨‍🏫 My second work activity is teaching at Netology on iOS development course. I host webinars, check homeworks and courseworks and develop teaching materials.
