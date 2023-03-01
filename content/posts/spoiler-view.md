@@ -30,7 +30,7 @@ emitter.setValue(2.0, forKey: "massRange")
 
 We will reuse their configuration, but in final, we want to see something like this:
 
-```
+```swift
 import SwiftUI
 
 struct ContentView: View {
