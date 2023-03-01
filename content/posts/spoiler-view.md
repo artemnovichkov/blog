@@ -11,7 +11,7 @@ Telegram has a spoiler feature that allows you to hide certain parts of your mes
 
 ## Dive into source code
 
-If you're interested in exploring Telegram's source code, you'll find that they use the `CAEmitterLayer` and `CAEmitterCell` classes from Core Animation to implement the spoiler effect. `CAEmitterLayer` is a powerful class that allows you to create particle effects like fire, smoke, or snow. In the case of the Telegram spoiler effect, `CAEmitterLayer` is used to generate a cloud of particles that obscures the spoiler text:
+If you're interested in exploring Telegram's source code, you'll find that they use the `CAEmitterLayer` and `CAEmitterCell` classes from Core Animation to implement the spoiler effect. `CAEmitterLayer` is a powerful class that allows you to create particle effects like fire, smoke, or snow. In the case of the Telegram spoiler effect, `CAEmitterLayer` is used to generate a cloud of particles that obscure the spoiler text:
 
 ```swift
 let emitter = CAEmitterCell()
@@ -100,6 +100,7 @@ struct SpoilerView: UIViewRepresentable {
 ```
 
 The `size` property in `SpoilerView` is used to set the size of the emitter for the particle effect. It's required to set and we can update it in `updateUIView` in case of layout changes.
+Of course, we can move all constants to the properties as well, but we hardcode it to simplify the example.
 
 ## Modifiers and extensions
 
@@ -123,6 +124,8 @@ struct SpoilerModifier: ViewModifier {
 }
 ```
 
+In this case `GeometryReader` inside the overlay allows us to use `proxy.size` of the hidden content.
+
 We already can use it like a usual modifier:
 
 ```swift
@@ -139,7 +142,7 @@ struct ContentView: View {
 }
 ```
 
-Or we can expend View protocol and add some useful modifiers:
+Or we can expend `View` protocol and add some useful modifiers:
 
 
 ```swift
@@ -147,9 +150,13 @@ extension View {
 
     func spoiler(isOn: Binding<Bool>) -> some View {
         self
+            // 1
             .opacity(isOn.wrappedValue ? 0 : 1)
+            // 2
             .modifier(SpoilerModifier(isOn: isOn.wrappedValue))
+            // 3
             .animation(.default, value: isOn.wrappedValue)
+            // 4
             .onTapGesture {
                 isOn.wrappedValue = !isOn.wrappedValue
             }
@@ -157,7 +164,14 @@ extension View {
 }
 ```
 
-Also we can control visibility with `isOn` from the outside.
+Let's discover every line here:
+
+1. Hides the content if the spoiler is on.
+2. Adds the modifier with the spoiler modifier.
+3. Adds a default animation for smooth transitions between states. The type of the animation we also can pass via parameters to change it from the outside.
+4. Add a tap gesture to change the states.
+
+Now we can apply these modifiers to any view in our apps. It doesn't work exactly like in Telegram, because it should overlay every word separately and hide the particles from the tap area. According to `Text` interface in SwiftUI and initial tricky implementation (hello, private API), this solution is simple and flexible enough. If you know how to improve it, feel free to ping me on [Twitter](https://twitter.com/iosartem).
 
 If you want to play with SpoilerView by yourself, check out [SpoilerViewExample](https://github.com/artemnovichkov/SpoilerViewExample) project on Github.
 
