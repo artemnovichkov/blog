@@ -1,13 +1,13 @@
 ---
 title: Implementing spoilers in SwiftUI
 description: Recreation of spoiler feature from Telegram in SwiftUI
-cover: /images/spoiler-view/cover.png
+cover: /images/spoiler-view/cover.gif
 date: '2023-03-01'
 author:
   - artem-novichkov
 ---
 
-Telegram has a spoiler feature that allows you to hide certain parts of your message that could reveal a spoiler. In this article, we will explore how to implement the feature in SwiftUI.
+Telegram has a [spoiler feature](https://telegram.org/blog/reactions-spoilers-translations#spoilers) that allows you to hide certain parts of your message that could reveal a spoiler. In this article, we will explore how to implement the feature in SwiftUI.
 
 ## Dive into source code
 
@@ -160,7 +160,7 @@ extension View {
             .animation(.default, value: isOn.wrappedValue)
             // 4
             .onTapGesture {
-                isOn.wrappedValue = !isOn.wrappedValue
+                isOn.wrappedValue.toggle()
             }
     }
 }
@@ -173,7 +173,7 @@ Let's discover every line here:
 3. Adds a default animation for smooth transitions between states. The type of the animation we also can pass via parameters to change it from the outside.
 4. Add a tap gesture to change the states.
 
-Now we can apply these modifiers to any view in our apps. It doesn't work exactly like in Telegram, because it should overlay every word separately and hide the particles from the tap area. According to `Text` interface in SwiftUI and initial tricky implementation (hello, private API), this solution is simple and flexible enough. If you know how to improve it, feel free to ping me on [Twitter](https://twitter.com/iosartem).
+Now we can apply these modifiers to any view in our apps. It doesn't work exactly like in Telegram, because it should overlay every word separately and hide the particles starting from the tap area. According to `Text` interface in SwiftUI and initial tricky implementation (hello, private API), this solution is simple and useful for rectangles like one-line text or images. If you know how to improve it, feel free to ping me on [Twitter](https://twitter.com/iosartem).
 
 If you want to play with SpoilerView by yourself, check out [SpoilerViewExample](https://github.com/artemnovichkov/SpoilerViewExample) project on Github.
 
