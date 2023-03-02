@@ -11,7 +11,7 @@ Telegram has a spoiler feature that allows you to hide certain parts of your mes
 
 ## Dive into source code
 
-If you're interested in exploring Telegram's source code, you'll find that they use the `CAEmitterLayer` and `CAEmitterCell` classes from Core Animation to implement the spoiler effect. `CAEmitterLayer` is a powerful class that allows you to create particle effects like fire, smoke, or snow. In the case of the Telegram spoiler effect, `CAEmitterLayer` is used to generate a cloud of particles that obscure the spoiler text:
+If you're interested in exploring Telegram's source code, you'll find that they use the `CAEmitterLayer` and `CAEmitterCell` classes from Core Animation to [implement the spoiler effect](https://github.com/TelegramMessenger/Telegram-iOS/blob/930d1fcc46e39830e6d590986a6a838c3ff49e27/submodules/InvisibleInkDustNode/Sources/InvisibleInkDustNode.swift#L97-L109). `CAEmitterLayer` is a powerful class that allows you to create particle effects like fire, smoke, or snow. In the case of the Telegram spoiler effect, `CAEmitterLayer` is used to generate a cloud of particles that obscure the spoiler text:
 
 ```swift
 let emitter = CAEmitterCell()
@@ -59,17 +59,26 @@ final class EmitterView: UIView {
     override var layer: CAEmitterLayer {
         super.layer as! CAEmitterLayer
     }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        layer.emitterPosition = .init(x: bounds.size.width / 2,
+                                      y: bounds.size.height / 2)
+        layer.emitterSize = bounds.size
+    }
 }
 ```
 
 We override the `layerClass` property to specify that the layer for this view should be of type `CAEmitterLayer`. We also override the `layer` property to cast the `super.layer` as a `CAEmitterLayer`, which allows us to access the emitter layer's properties and methods more easily.
 
-Next, we'll use `UIViewRepresentable` wrapper and add required configurations:
+Pay attention to `layoutSubviews()` function. It's required to set position  and size for the emitter.
+
+Next, we'll use `UIViewRepresentable` wrapper and add emitter cell configurations:
 
 ```swift
 struct SpoilerView: UIViewRepresentable {
 
-    let size: CGSize
+    var isOn: Bool
 
     func makeUIView(context: Context) -> EmitterView {
         let emitterView = EmitterView()
@@ -92,15 +101,15 @@ struct SpoilerView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: EmitterView, context: Context) {
-        uiView.layer.emitterPosition = .init(x: size.width / 2,
-                                             y: size.height / 2)
-        uiView.layer.emitterSize = size
+        if isOn {
+            uiView.layer.beginTime = CACurrentMediaTime()
+        }
+        uiView.layer.birthRate = isOn ? 1 : 0
     }
 }
 ```
 
-The `size` property in `SpoilerView` is used to set the size of the emitter for the particle effect. It's required to set and we can update it in `updateUIView` in case of layout changes.
-Of course, we can move all constants to the properties as well, but we hardcode it to simplify the example.
+The `isOn` property in `SpoilerView` is used to change visibility of the particle effect via `birthRate` property. Of course, we can move all constants to the properties as well, but we hardcode it to simplify the example.
 
 ## Modifiers and extensions
 
@@ -112,19 +121,12 @@ struct SpoilerModifier: ViewModifier {
     let isOn: Bool
 
     func body(content: Content) -> some View {
-        content
-            .overlay {
-                if isOn {
-                    GeometryReader { proxy in
-                        SpoilerView(size: proxy.size)
-                    }
-                }
-            }
+        content.overlay {
+            SpoilerView(isOn: isOn)
+        }
     }
 }
 ```
-
-In this case `GeometryReader` inside the overlay allows us to use `proxy.size` of the hidden content.
 
 We already can use it like a usual modifier:
 
