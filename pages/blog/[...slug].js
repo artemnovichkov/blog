@@ -4,7 +4,7 @@ import Image from 'next/image'
 import PostActions from '../../components/post-actions'
 import { getMdxNode, getMdxPaths } from 'next-mdx/server'
 import { useHydrate } from 'next-mdx/client'
-import mdxPrism from 'mdx-prism'
+import rehypePrism from 'rehype-prism'
 const slug = require('remark-slug')
 const titles = require('remark-code-titles')
 const headings = require('remark-autolink-headings')
@@ -56,7 +56,7 @@ export async function getStaticProps(context) {
         titles,
         headings
       ],
-      rehypePlugins: [mdxPrism]
+      rehypePlugins: [rehypePrism]
     }
   })
 
