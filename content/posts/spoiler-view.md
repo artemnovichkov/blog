@@ -2,7 +2,7 @@
 title: Implementing spoilers in SwiftUI
 description: Recreation of spoiler feature from Telegram in SwiftUI
 cover: /images/spoiler-view/cover.gif
-date: '2023-03-01'
+date: '2023-03-09'
 author:
   - artem-novichkov
 ---
