@@ -1,7 +1,7 @@
 ---
 title: Implementing spoilers in SwiftUI
 description: Recreation of spoiler feature from Telegram in SwiftUI
-cover: /images/spoiler-view/cover.gif
+cover: /images/spoiler-view/cover.png
 date: '2023-03-09'
 author:
   - artem-novichkov
@@ -109,7 +109,7 @@ struct SpoilerView: UIViewRepresentable {
 }
 ```
 
-The `isOn` property in `SpoilerView` is used to change visibility of the particle effect via `birthRate` property. Of course, we can move all constants to the properties as well, but we hardcode it to simplify the example.
+The `isOn` property in `SpoilerView` is used to change visibility of the particle effect via `birthRate` property. `textSpeckle_Normal` image is reused from Telegram, it's a simple white dot, we can use any image for particles or generate it in runtime. And of course, we can move all constants to the properties as well, but we hardcode it to simplify the example.
 
 ## Modifiers and extensions
 
