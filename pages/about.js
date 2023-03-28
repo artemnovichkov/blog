@@ -1,6 +1,7 @@
 import Container from "../components/container"
 import Image from "next/image"
 import { parseISO, format } from 'date-fns'
+import Footer from '../components/footer'
 
 const Position = ({ position }) => {
     const startDate = parseISO(position.startDate)
@@ -168,41 +169,9 @@ export default function About() {
                         </li>
                     ))}
                 </ul>
-                <h2 className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
-                    Contacts
-                </h2>
-                <ul className="mb-4 text-base text-black dark:text-white">
-                    <li>
-                        <p>
-                          ✉️ <a className="underline" href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">mail@artemnovichkov.com</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          🐤 <a className="underline" href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">Twitter</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          👨‍💻 <a className="underline" href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">Github</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          🤳 <a className="underline" href="https://t.me/artemnovichkov" target="_blank" rel="noopener noreferrer">Telegram</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          📝 <a className="underline" href="https://medium.com/@artemnovichkov" target="_blank" rel="noopener noreferrer">Medium</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          ❓ <a className="underline" href="https://stackoverflow.com/users/3514372/artem-novichkov" target="_blank" rel="noopener noreferrer">StackOverflow</a>
-                        </p>
-                    </li>
-                </ul>
+                <div className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
+                    <Footer />
+                </div>
             </div>
         </Container>
     )

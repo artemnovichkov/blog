@@ -1,13 +1,31 @@
 import ExternalLink from './external-link'
+import Image from "next/image"
+
+const socialMedias = [
+  {
+    image: "/images/github.svg",
+    url: "https://github.com/artemnovichkov",
+  },
+  {
+    image: "/images/twitter.svg",
+    url: "https://twitter.com/iosartem",
+  },
+  {
+    image: "/images/telegram.svg",
+    url: "https://t.me/artemnovichkov",
+  },
+]
 
 export default function Footer() {
     return (
       <footer>
-        <hr />
-        <div className="grid grid-flow-col w-full my-4 text-center">
-        <ExternalLink href="https://twitter.com/iosartem">Twitter</ExternalLink>
-        <ExternalLink href="https://github.com/artemnovichkov">Github</ExternalLink>
-        <ExternalLink href="https://t.me/subtlesettings">Telegram</ExternalLink>
+        <div className="text-center pb-8">
+          {socialMedias.map((socialMedia) => (
+          <ExternalLink href={socialMedia.url}>
+            <Image className="hover:scale-110 dark:invert" src={socialMedia.image} width={28} height={28} />
+          </ExternalLink>
+          ))}
+          <p className="pt-4">Made with ❤️ by Artem Novichkov</p>
         </div>
     </footer>
     )
