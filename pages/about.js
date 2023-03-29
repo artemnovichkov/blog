@@ -1,6 +1,7 @@
 import Container from "../components/container"
 import Image from "next/image"
 import { parseISO, format } from 'date-fns'
+import Footer from '../components/footer'
 
 const Position = ({ position }) => {
     const startDate = parseISO(position.startDate)
@@ -120,29 +121,28 @@ export default function About() {
                 />
                 <div className="flex flex-col gap-2 my-4 text-black dark:text-white">
                     <p>
-                        Hi there! I'm Artem Novichkov. I live in Omsk, Russia (UTC+6).
+                        Hi there! My name is Artem Novichkov. I am an iOS Developer.
                     </p>
                     <p>
-                        📝 I work as an iOS Developer at Welltory, developing an app that lets you sync data from other apps & gadgets for more insights into your health and lifestyle.
+                        I work at Welltory, where I'm developing an app that enables users to sync data from other apps and gadgets to gain insights into their health and lifestyle.
                     </p>
                     <p>
-                    👨‍🏫 My second work activity is teaching at Netology on iOS development course. I host webinars, check homeworks and courseworks and develop teaching materials.
+                        In addition to my work at Welltory, I am also a teacher at Netology, where I teach iOS development courses. My responsibilities include hosting webinars, grading homework and course assignments, and creating teaching materials.
                     </p>
                     <p>
-                        🧑🏻‍💻 I really like Swift and Open Source. I mostly write for iOS platform and publish interesting and useful things on my&nbsp;
+                        I am passionate about Swift and open-source development. My primary focus is on the iOS platform, and sometimes I publish interesting and useful content on my&nbsp;
                         <a className="text-base underline" href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">
                             Github
-                        </a>
-                        . Now I'm focusing on SwiftUI, developing pet projects and writing blog posts.
+                        </a>. I am currently working on developing pet projects and writing blog posts on SwiftUI.
                     </p>
                     <p>
-                        📷 From time to time I share my knowledge with public speaking. Here is a &nbsp;
+                        Occasionally, I also enjoy sharing my knowledge through public speaking. You can find a playlist of my talks on &nbsp;
                         <a className="text-base underline" href="https://www.youtube.com/playlist?list=PLRSU1SC70qRudLaYKSjM14tJmA-J-dRvU" target="_blank" rel="noopener noreferrer">
-                        Youtube playlist
-                        </a> with my talks.
+                        Youtube
+                        </a>.
                     </p>
                     <p>
-                    🕹 In free time I play videogames with Nintendo Switch OLED and PS5. When I'm not at home I fly a DJI mini 2 drone.
+                        In my free time, I enjoy playing video games on my Nintendo Switch OLED and PS5. When I'm not at home, I like to fly my DJI mini 2 drone.
                     </p>
                 </div>
                 <p className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
@@ -168,41 +168,9 @@ export default function About() {
                         </li>
                     ))}
                 </ul>
-                <h2 className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
-                    Contacts
-                </h2>
-                <ul className="mb-4 text-base text-black dark:text-white">
-                    <li>
-                        <p>
-                          ✉️ <a className="underline" href="mailto:mail@artemnovichkov.com" target="_blank" rel="noopener noreferrer">mail@artemnovichkov.com</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          🐤 <a className="underline" href="https://twitter.com/iosartem" target="_blank" rel="noopener noreferrer">Twitter</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          👨‍💻 <a className="underline" href="https://github.com/artemnovichkov" target="_blank" rel="noopener noreferrer">Github</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          🤳 <a className="underline" href="https://t.me/artemnovichkov" target="_blank" rel="noopener noreferrer">Telegram</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          📝 <a className="underline" href="https://medium.com/@artemnovichkov" target="_blank" rel="noopener noreferrer">Medium</a>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                          ❓ <a className="underline" href="https://stackoverflow.com/users/3514372/artem-novichkov" target="_blank" rel="noopener noreferrer">StackOverflow</a>
-                        </p>
-                    </li>
-                </ul>
+                <div className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
+                    <Footer />
+                </div>
             </div>
         </Container>
     )
