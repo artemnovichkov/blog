@@ -3,6 +3,7 @@ import ExternalLink from './external-link'
 import Head from 'next/head'
 import Footer from '../components/footer'
 import { name, about, title} from '../lib/const'
+import { Analytics } from '@vercel/analytics/react'
 
 export default function Container(props) {
     const { children, hideFooter, ...customMeta } = props
@@ -47,6 +48,7 @@ export default function Container(props) {
                 <div className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
                     <main>
                         {children}
+                        <Analytics />
                     </main>
                     { !hideFooter && <Footer />}
                 </div>

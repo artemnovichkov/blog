@@ -12,6 +12,7 @@
     "@mapbox/rehype-prism": "^0.8.0",
     "@next/mdx": "^10.2.3",
     "@tailwindcss/typography": "^0.4.1",
+    "@vercel/analytics": "^1.0.1",
     "date-fns": "^2.22.1",
     "firebase-admin": "^11.5.0",
     "gray-matter": "4.0.3",
