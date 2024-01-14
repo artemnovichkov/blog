@@ -2,7 +2,7 @@
 title: Remove background from image in SwiftUI
 description: Recreation of photo cutout feature from Telegram in SwiftUI
 cover: /images/remove-background-from-image-in-swiftui/cover.png
-date: '2024-01-15'
+date: '2024-01-16'
 author:
   - artem-novichkov
 ---
