@@ -7,11 +7,11 @@ author:
   - artem-novichkov
 ---
 
-In my [last article](https://www.artemnovichkov.com/blog/spoiler-view) I implemented a spoiler feature from Telegram. Guys from [Drawww](https://www.drawww.app) team were inspired by it and asked to recreate a new feature — [removing background from images](https://telegram.org/blog/posts-in-stories-and-more#photo-cutouts-for-stories). Luckily, it's very easy with a new iOS 17 API — `VNGenerateForegroundInstanceMaskRequest`. Fasten your seatbelts, we're ready to start!
+In my [last article](https://www.artemnovichkov.com/blog/spoiler-view) I implemented a spoiler feature from Telegram. The team at [Drawww](https://www.drawww.app) was inspired by it and asked me to recreate a new feature — [removing background from images](https://telegram.org/blog/posts-in-stories-and-more#photo-cutouts-for-stories). Luckily, it's very easy with a new iOS 17 API — `VNGenerateForegroundInstanceMaskRequest`. Fasten your seatbelts, we're ready to start!
 
 ## Preparations
 
-At first, we create a simple image and a button.
+First, we create an image and a button:
 
 ```swift
 struct ContentView: View {
@@ -38,7 +38,7 @@ struct ContentView: View {
 }
 ```
 
-I added a photo of my lovely cat Trisha to app bundle, and here is a result:
+I added a photo of my lovely cat Trisha to the app bundle, and here is the result:
 
 <Image
   alt={`Initial view`}
@@ -57,6 +57,7 @@ private func createSticker() {
         print("Failed to create CIImage")
         return
     }
+}
 ```
 
 Next, let's create a new `subjectMaskImage(from:)` function, that returns a mask image with foreground objects:
@@ -66,14 +67,14 @@ private func subjectMaskImage(from inputImage: CIImage) -> CIImage? {
 }
 ```
 
-To work with the `inputImage`, we will use `Vision` framework and two main classes:
-  - `VNImageRequestHandler` allows to perform image analysis requests to a single image;
+To work with the `inputImage`, we will use the Vision framework and two main classes:
+  - `VNImageRequestHandler` allows to perform image analysis requests pertaining to a single image;
   - `VNGenerateForegroundInstanceMaskRequest` is a special request that generates an instance mask of noticable objects.
 
 The next step is to perform the request:
 
 ```swift
-// At the top of the ContentView
+// At the top of ContentView
 import Vision
 
 // in the subjectMaskImage(from:) function
@@ -87,7 +88,7 @@ do {
 }
 ```
 
-The requests may failed. For example, `handler`` returns an error if you try to run the code on iOS Simulator:
+The requests may fail. For example, `handler` throws an error if you try to run the code on an iOS Simulator:
 
 > Error Domain=com.apple.Vision Code=9 "Could not create inference context" UserInfo={NSLocalizedDescription=Could not create inference context}
 
@@ -122,7 +123,7 @@ private func createSticker() {
 }
 ```
 
-That's what we got:
+This is what we got:
 
 <Image
   alt={`Mask image`}
@@ -133,10 +134,10 @@ That's what we got:
 
 ## Applying mask
 
-The mask is ready, therefore we're ready to apply it to the original image. With helping of `CIFilter.blendWithMask`, we can generate a final image:
+The mask is ready, therefore we're ready to apply it to the original image. With the help of `CIFilter.blendWithMask()`, we can generate a final image:
 
 ```swift
-// At the top of the ContentView
+// At the top of ContentView
 import CoreImage.CIFilterBuiltins
 
 private func apply(mask: CIImage, to image: CIImage) -> CIImage {
@@ -148,7 +149,7 @@ private func apply(mask: CIImage, to image: CIImage) -> CIImage {
 }
 ```
 
-And finally, we render the result to `UIImage`:
+Finally, we render the result to a UIImage:
 
 ```swift
 private func render(ciImage: CIImage) -> UIImage {
@@ -159,7 +160,7 @@ private func render(ciImage: CIImage) -> UIImage {
 }
 ```
 
-Put it all together and check the result! Pay attention that performing the requests is a time-consuming operation. So we'll add a separate queue to prevent main thread blocking:
+Put it all together and check the result! Note that performing the requests is a time-consuming operation. So we'll add a separate queue to prevent main thread blocking:
 
 ```swift
 
@@ -199,7 +200,7 @@ That's it! But the transition between states looks a bit boring, let's add some 
 
 # Animation and particles 💅
 
-We creates a `StickerView` with two bindings: an original image and a generated sticker.
+We create a `StickerView` with two bindings: an original image and a generated sticker.
 
 ```swift
 import SwiftUI
@@ -230,11 +231,11 @@ struct StickerView: View {
 ```
 
 When the sticker is set, we'll add some animations:
- - Hide the image
- - Bounce the sticker via scale changes
- - Show the particles
+ - Hide the image;
+ - Bounce the sticker via scale changes;
+ - Show the particles.
 
- Starting with the original image, we add a basic modifiers and opacity animation that based on sticker state:
+ Starting with the original image, we add basic modifiers and an opacity animation based on the sticker's state:
 
  ```swift
  Image(uiImage: image)
@@ -321,7 +322,7 @@ Now we can see the final result:
   height={1298}
 />
 
-If you want to see the final code, check out [StickerViewExample](https://github.com/artemnovichkov/StickerViewExample) project on Github. I added a small changes like loading state. Feel free to share your thoughts, ask questions and suggest improvements on [Twitter](https://twitter.com/iosartem). Thank you for reading!
+If you want to see the final code, check out [StickerViewExample](https://github.com/artemnovichkov/StickerViewExample) project on Github. I added small changes like a loading state. Feel free to share your thoughts, ask questions and suggest improvements on [Twitter](https://twitter.com/iosartem). Thank you for reading!
 
 ## References
 
