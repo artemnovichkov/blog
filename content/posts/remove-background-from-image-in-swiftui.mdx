@@ -49,7 +49,7 @@ I added a photo of my lovely cat Trisha to the app bundle, and here is the resul
 
 ## Handlers and requests
 
-To remove the background from the image, we will generate a mask image and apply it to the original image. Let's create a `CIImage`, we will use it next:
+To remove the background from the image, we will generate a mask image and apply it to the original image. Let's create a `CIImage`, we will use it further:
 
 ```swift
 private func createSticker() {
@@ -248,8 +248,8 @@ When the sticker is set, we'll add some animations:
 <Image
   alt={`Hide background of the image`}
   src={`/images/remove-background-from-image-in-swiftui/background-animation.gif`}
-  width={600}
-  height={1298}
+  width={500}
+  height={1084}
 />
 
 Looks better! Now we add the sticker image layout and scale it for highlighting:
@@ -281,8 +281,8 @@ private var stickerImage: some View {
 <Image
   alt={`Scale the sticker image`}
   src={`/images/remove-background-from-image-in-swiftui/sticker-animation.gif`}
-  width={600}
-  height={1298}
+  width={500}
+  height={1084}
 />
 
 It remains only to add the particles. We'll reuse a [SpoilerView](https://github.com/artemnovichkov/SpoilerViewExample/blob/main/SpoilerViewExample/SpoilerView.swift) from the previous article and add it as an overlay for `originalImage`:
@@ -318,8 +318,8 @@ Now we can see the final result:
 <Image
   alt={`Scale the sticker image`}
   src={`/images/remove-background-from-image-in-swiftui/final-animation.gif`}
-  width={600}
-  height={1298}
+  width={500}
+  height={1084}
 />
 
 If you want to see the final code, check out [StickerViewExample](https://github.com/artemnovichkov/StickerViewExample) project on Github. I added small changes like a loading state. Feel free to share your thoughts, ask questions and suggest improvements on [Twitter](https://twitter.com/iosartem). Thank you for reading!
