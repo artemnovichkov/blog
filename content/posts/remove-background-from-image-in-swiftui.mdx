@@ -1,0 +1,330 @@
+---
+title: Remove background from image in SwiftUI
+description: Recreation of photo cutout feature from Telegram in SwiftUI
+cover: /images/remove-background-from-image-in-swiftui/cover.png
+date: '2024-01-16'
+author:
+  - artem-novichkov
+---
+
+In my [last article](https://www.artemnovichkov.com/blog/spoiler-view) I implemented a spoiler feature from Telegram. The team at [Drawww](https://www.drawww.app) was inspired by it and asked me to recreate a new feature — [removing background from images](https://telegram.org/blog/posts-in-stories-and-more#photo-cutouts-for-stories). Luckily, it's very easy with a new iOS 17 API — `VNGenerateForegroundInstanceMaskRequest`. Fasten your seatbelts, we're ready to start!
+
+## Preparations
+
+First, we create an image and a button:
+
+```swift
+struct ContentView: View {
+
+    @State private var image = UIImage.cat
+
+    var body: some View {
+        VStack {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+            Button("Create a sticker") {
+                createSticker()
+            }
+        }
+        .padding()
+    }
+
+    // MARK: - Private
+
+    private func createSticker() {
+        // Main logic
+    }
+}
+```
+
+I added a photo of my lovely cat Trisha to the app bundle, and here is the result:
+
+<Image
+  alt={`Initial view`}
+  src={`/images/remove-background-from-image-in-swiftui/initial-view.png`}
+  width={685}
+  height={1366}
+/>
+
+## Handlers and requests
+
+To remove the background from the image, we will generate a mask image and apply it to the original image. Let's create a `CIImage`, we will use it further:
+
+```swift
+private func createSticker() {
+    guard let inputImage = CIImage(image: image) else {
+        print("Failed to create CIImage")
+        return
+    }
+}
+```
+
+Next, let's create a new `subjectMaskImage(from:)` function, that returns a mask image with foreground objects:
+
+```swift
+private func subjectMaskImage(from inputImage: CIImage) -> CIImage? {
+}
+```
+
+To work with the `inputImage`, we will use the Vision framework and two main classes:
+  - `VNImageRequestHandler` allows to perform image analysis requests pertaining to a single image;
+  - `VNGenerateForegroundInstanceMaskRequest` is a special request that generates an instance mask of noticable objects.
+
+The next step is to perform the request:
+
+```swift
+// At the top of ContentView
+import Vision
+
+// in the subjectMaskImage(from:) function
+let handler = VNImageRequestHandler(ciImage: inputImage)
+let request = VNGenerateForegroundInstanceMaskRequest()
+do {
+    try handler.perform([request])
+} catch {
+    print(error)
+    return nil
+}
+```
+
+The requests may fail. For example, `handler` throws an error if you try to run the code on an iOS Simulator:
+
+> Error Domain=com.apple.Vision Code=9 "Could not create inference context" UserInfo={NSLocalizedDescription=Could not create inference context}
+
+The result of the requests is an array of `VNInstanceMaskObservation` objects. We need to check them, take the first one and generate the mask:
+
+```swift
+guard let result = request.results?.first else {
+    print("No observations found")
+    return nil
+}
+do {
+    let maskPixelBuffer = try result.generateScaledMaskForImage(forInstances: result.allInstances, from: handler)
+    return CIImage(cvPixelBuffer: maskPixelBuffer)
+} catch {
+    print(error)
+    return nil
+}
+```
+
+Now we're ready to call the function and get the mask image:
+
+```swift
+private func createSticker() {
+    guard let inputImage = CIImage(image: image) else {
+        print("Failed to create CIImage")
+        return
+    }
+    guard let maskImage = subjectMaskImage(from: inputImage) else {
+        print("Failed to create mask image")
+        return
+    }
+}
+```
+
+This is what we got:
+
+<Image
+  alt={`Mask image`}
+  src={`/images/remove-background-from-image-in-swiftui/mask.png`}
+  width={1008}
+  height={1344}
+/>
+
+## Applying mask
+
+The mask is ready, therefore we're ready to apply it to the original image. With the help of `CIFilter.blendWithMask()`, we can generate a final image:
+
+```swift
+// At the top of ContentView
+import CoreImage.CIFilterBuiltins
+
+private func apply(mask: CIImage, to image: CIImage) -> CIImage {
+    let filter = CIFilter.blendWithMask()
+    filter.inputImage = image
+    filter.maskImage = mask
+    filter.backgroundImage = CIImage.empty()
+    return filter.outputImage!
+}
+```
+
+Finally, we render the result to a UIImage:
+
+```swift
+private func render(ciImage: CIImage) -> UIImage {
+    guard let cgImage = CIContext(options: nil).createCGImage(ciImage, from: ciImage.extent) else {
+        fatalError("Failed to render CGImage")
+    }
+    return UIImage(cgImage: cgImage)
+}
+```
+
+Put it all together and check the result! Note that performing the requests is a time-consuming operation. So we'll add a separate queue to prevent main thread blocking:
+
+```swift
+
+// In ContentView
+private var processingQueue = DispatchQueue(label: "ProcessingQueue")
+
+private func createSticker() {
+    guard let inputImage = CIImage(image: image) else {
+        print("Failed to create CIImage")
+        return
+    }
+    processingQueue.async {
+        guard let maskImage = subjectMaskImage(from: inputImage) else {
+            print("Failed to create mask image")
+            DispatchQueue.main.async {
+                isLoading = false
+            }
+            return
+        }
+        let outputImage = apply(maskImage: maskImage, to: inputImage)
+        let image = render(ciImage: outputImage)
+        DispatchQueue.main.async {
+            self.image = image
+        }
+    }
+}
+```
+
+That's it! But the transition between states looks a bit boring, let's add some animations and magic particles.
+
+<Image
+  alt={`Initial view`}
+  src={`/images/remove-background-from-image-in-swiftui/final-view.png`}
+  width={685}
+  height={1366}
+/>
+
+# Animation and particles 💅
+
+We create a `StickerView` with two bindings: an original image and a generated sticker.
+
+```swift
+import SwiftUI
+
+struct StickerView: View {
+
+    @Binding var image: UIImage
+    @Binding var sticker: UIImage?
+
+    var body: some View {
+        ZStack {
+            originalImage
+            stickerImage
+        }
+    }
+
+    // MARK: - Private
+
+    @ViewBuilder
+    private var originalImage: some View {
+        // Layout for image
+    }
+
+    @ViewBuilder
+    private var stickerImage: some View {
+        // Layout for sticker
+    }
+```
+
+When the sticker is set, we'll add some animations:
+ - Hide the image;
+ - Bounce the sticker via scale changes;
+ - Show the particles.
+
+ Starting with the original image, we add basic modifiers and an opacity animation based on the sticker's state:
+
+ ```swift
+ Image(uiImage: image)
+    .resizable()
+    .scaledToFit()
+    .opacity(sticker == nil ? 1 : 0)
+    .animation(.easeOut(duration: 1), value: sticker)
+ ```
+
+<Image
+  alt={`Hide background of the image`}
+  src={`/images/remove-background-from-image-in-swiftui/background-animation.gif`}
+  width={500}
+  height={1084}
+/>
+
+Looks better! Now we add the sticker image layout and scale it for highlighting:
+
+```swift
+// In StickerView
+@State private var stickerScale: Double = 1
+
+@ViewBuilder
+private var stickerImage: some View {
+    if let sticker {
+        Image(uiImage: sticker)
+            .resizable()
+            .scaledToFit()
+            .scaleEffect(stickerScale)
+            .onAppear {
+                withAnimation(.easeOut(duration: 1)) {
+                    stickerScale = 1.1
+                } completion: {
+                    withAnimation(.easeOut(duration: 1)) {
+                        stickerScale = 1
+                    }
+                }
+            }
+    }
+}
+```
+
+<Image
+  alt={`Scale the sticker image`}
+  src={`/images/remove-background-from-image-in-swiftui/sticker-animation.gif`}
+  width={500}
+  height={1084}
+/>
+
+It remains only to add the particles. We'll reuse a [SpoilerView](https://github.com/artemnovichkov/SpoilerViewExample/blob/main/SpoilerViewExample/SpoilerView.swift) from the previous article and add it as an overlay for `originalImage`:
+
+```swift
+// In StickerView
+@State private var spoilerViewOpacity: Double = 0
+
+// Add to originalImage
+.overlay {
+    SpoilerView(isOn: true)
+        .opacity(spoilerViewOpacity)
+}
+
+// Update stickerImage
+.onAppear {
+    withAnimation(.easeOut(duration: 1)) {
+        spoilerViewOpacity = 1
+        stickerScale = 1.1
+    } completion: {
+        withAnimation(.linear) {
+            spoilerViewOpacity = 0
+        }
+        withAnimation(.easeOut(duration: 1)) {
+            stickerScale = 1
+        }
+    }                    
+}
+```
+
+Now we can see the final result:
+
+<Image
+  alt={`Scale the sticker image`}
+  src={`/images/remove-background-from-image-in-swiftui/final-animation.gif`}
+  width={500}
+  height={1084}
+/>
+
+If you want to see the final code, check out [StickerViewExample](https://github.com/artemnovichkov/StickerViewExample) project on Github. I added small changes like a loading state. Feel free to share your thoughts, ask questions and suggest improvements on [Twitter](https://twitter.com/iosartem). Thank you for reading!
+
+## References
+
+- [Lift subjects from images in your app, WWDC 2023](https://developer.apple.com/videos/play/wwdc2023/10176)
+- [Applying visual effects to foreground subjects](https://developer.apple.com/documentation/vision/applying_visual_effects_to_foreground_subjects)
