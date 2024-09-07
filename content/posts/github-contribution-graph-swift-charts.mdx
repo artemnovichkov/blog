@@ -7,8 +7,8 @@ author:
   - artem-novichkov
 ---
 
-In 2022 Apple introduced a brand new SwiftUI framework — [Swift Charts](https://developer.apple.com/documentation/charts). You can use it to visualize data with rich customization and minimal code. Swift Charts is available in iOS 16+ and support watchOS and macOS as well.
-In this article I'll try to recreate Github Contribution Graph. Let's start!
+In 2022 Apple introduced a brand new SwiftUI framework — [Swift Charts](https://developer.apple.com/documentation/charts). You can use it to visualize data with rich customization and minimal code. Swift Charts is available in iOS 16+ and supports watchOS and macOS as well.
+In this article I'll guide you through recreating Github Contribution Graph. Let's start!
 
 ## Decomposing the graph
 
@@ -21,7 +21,7 @@ In this article I'll try to recreate Github Contribution Graph. Let's start!
   height={288}
 />
 
-Basically, it's a [heatmap](https://en.wikipedia.org/wiki/Heat_map) with the following parameters:
+At its core, it's a [heatmap](https://en.wikipedia.org/wiki/Heat_map), where:
 - x-axis represents the weeks, labeled with the corresponding months;
 - y-axis displays the weekdays, labeled with Mon, Wed, and Fri;
 - Value indicates the count of contributions made to repositories on GitHub, displayed using different color intensities;
@@ -47,7 +47,7 @@ struct Contribution: Identifiable {
 
 Here, the `Contribution` struct captures the `date` when a contribution was made and the `count` of contributions on that particular day.
 
-I was not so active on Github last months 😅, so let's just mock contribution data for last 60 days with random contributions:
+Since my GitHub activity has been a bit low recently 😅, let’s mock contribution data for the last 60 days using random values:
 
 ```swift
 extension Contribution {
@@ -71,7 +71,7 @@ extension Contribution {
 
 ## Creating the chart
 
-To visualize this data, we'll import Charts framework and prepare a content view:
+To bring this data to life, we’ll import the Charts framework and prepare a content view:
 
 ```swift
 import SwiftUI
@@ -100,7 +100,7 @@ Chart(contributions) { contribution in
 }
 ```
 
-`RectangleMark` has a few intializers, this one allows us to set x and y range. It's convenient for heatmap chart layout. Every parameter is a `PlottableValue`, a labeled data struct. For x values we use the date value and combine it by week of year. For y values we convert the date to a weekday. I prefer to start my week from Monday, so I'll adjust it:
+`RectangleMark` offers several initializers. In this case, we use the one that allows setting the x and y ranges. This configuration is good for a heatmap layout. Every parameter is a `PlottableValue`, a labeled data struct. For x values we use the date value and combine it by week of year. For y values we convert the date to a weekday. I prefer to start my week from Monday, so I'll adjust it:
 
 ```swift
 private func weekday(for date: Date) -> Int {
@@ -136,7 +136,7 @@ RectangleMark(/*...*/)
   height={867}
 />
 
-Much better! The chart is already useful and represents the data. It even shows a legend based on count range. To make the marks square we can use `chartPlotStyle` modifier. It allows to change frame or aspect ratio of a plot area:
+This looks much better! The chart is now functional and displays the data. It even shows a legend based on count range. To ensure the chart’s marks are square, we can apply `chartPlotStyle` modifier. It allows you to change frame or aspect ratio of a plot area:
 
 ```swift
 Chart(/*...*/)
@@ -239,7 +239,7 @@ Chart(/*...*/)
 
 ## The legend of ~~Zelda~~ the chart
 
-Finally, let's add a color-coded legend to indicate the range of contribution values, from "Less" to "More":
+Finally, let’s enhance the chart with a color-coded legend to visually indicate the range of contribution values, from 'Less' to 'More':
 
 ```swift
 Chart(/*...*/)
@@ -263,7 +263,7 @@ private var legendColors: [Color] {
 }
 ```
 
-It overrides the default legend with a custom one. You can also change the legend position like `.chartLegend(position: .bottomTrailing)`, but with this code the legend is placed at the top left corner of the plot and ovelap it. Looks like a bug for me, so let's leave a default position and see the final result:
+It overrides the default legend with a custom one. You can also change the legend position like `.chartLegend(position: .bottomTrailing)`, but with this code the legend is placed at the top left corner of the plot and ovelap it. It seems like a bug, so let's leave a default position and see the final result:
 
 <Image
   alt={`Final chart`}
@@ -274,6 +274,6 @@ It overrides the default legend with a custom one. You can also change the legen
 
 ## Conclusion
 
-Swift Charts is a truly interesting framework. It's designed in SwiftUI style: declarative syntax, some magic default behaviour and lack of documentation in some cases. True SwiftUI 😅. Thanks to the community, you can find many of chart examples, I put some materials that helped me in one place — [Awesome Swift Charts](https://github.com/artemnovichkov/awesome-swift-charts). This article is my way to explore the framework, implement production-ready design and highlight non-obvious logic. And, of course, share my experience with you!
+Swift Charts is a truly interesting framework. It's designed in SwiftUI style: declarative syntax, some magic default behaviour and lack of documentation in some cases. Classic SwiftUI 😅. Thankfully, the community has provided plenty of chart examples, and I’ve compiled the resources that helped me in one place — [Awesome Swift Charts](https://github.com/artemnovichkov/awesome-swift-charts). This article is my way to explore the framework, implement production-ready design and highlight non-obvious logic. And, of course, share my experience with you!
 
 Check [Github Contribution Graph Example](https://github.com/artemnovichkov/GithubContributionGraphExample) project to see the final result. Thanks for reading!
