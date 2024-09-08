@@ -1,6 +1,6 @@
 ---
 title: Github contribution graph with Swift Charts
-description: Recreation of the contribution graph from GitHub using Swift Charts.
+description: Recreation of the contribution graph from GitHub using Swift Charts
 cover: /images/github-contribution-graph-swift-charts/cover.png
 date: '2024-09-07'
 author:
@@ -119,7 +119,7 @@ And here's a result:
   height={867}
 />
 
-Great result for a few lines of code! Chart customization is based on modifiers, so let's add some to represent the count data:
+Great result for a few lines of code! Chart customization is based on modifiers, so let's add some to change the appearance:
 
 ```swift
 RectangleMark(/*...*/)
@@ -127,7 +127,7 @@ RectangleMark(/*...*/)
   .foregroundStyle(by: .value("Count", contribution.count))
 ```
 
-`clipShape` modifier allows to customize the appearance of the chart content, and `foregroundStyle` modifier represents the count data:
+`clipShape` modifier allows you to make a shape that fills each mark’s frame. You can use it as a mask. `foregroundStyle` modifier applies color styling. You can set a solid color, gradient, or you can pass `PlottableValue` that will change the color based on the value:
 
 <Image
   alt={`Chart with styling`}
@@ -215,19 +215,13 @@ Chart(/*...*/)
     AxisMarks(position: .leading, values: [1, 3, 5]) { value in
         if let value = value.as(Int.self) {
             AxisValueLabel {
+                // Symbols from Calendar.current starting with Monday
                 Text(shortWeekdaySymbols[value - 1])
             }
             .foregroundStyle(Color(.label))
         }
     }
 }
-
-private let shortWeekdaySymbols: [String] = {
-    var shortWeekdaySymbols = Calendar.current.shortWeekdaySymbols
-    let sunday = shortWeekdaySymbols.removeFirst()
-    shortWeekdaySymbols.append(sunday)
-    return shortWeekdaySymbols
-}()
 ```
 
 In the above code, we customize the y-axis to display only Monday, Wednesday, and Friday. To show Monday at the top and remove extra gap between 0 and 1 on x-axis, we can modify a scale of the axis via:
