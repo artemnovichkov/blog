@@ -19,7 +19,7 @@ export default function Post({ post }) {
     <Container
         title={post.frontMatter.title}
         description={post.frontMatter.description}
-        image={`https://blog-artemnovichkov.vercel.app${post.frontMatter.cover}`}
+        image={`https://www.artemnovichkov.com${post.frontMatter.cover}`}
         type="article"
     >
         <div>
