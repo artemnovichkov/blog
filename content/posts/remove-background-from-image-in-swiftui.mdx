@@ -40,12 +40,7 @@ struct ContentView: View {
 
 I added a photo of my lovely cat Trisha to the app bundle, and here is the result:
 
-<Image
-  alt={`Initial view`}
-  src={`/images/remove-background-from-image-in-swiftui/initial-view.png`}
-  width={685}
-  height={1366}
-/>
+![Initial view](/images/remove-background-from-image-in-swiftui/initial-view.png)
 
 ## Handlers and requests
 
@@ -125,12 +120,7 @@ private func createSticker() {
 
 This is what we got:
 
-<Image
-  alt={`Mask image`}
-  src={`/images/remove-background-from-image-in-swiftui/mask.png`}
-  width={1008}
-  height={1344}
-/>
+![Mask image](/images/remove-background-from-image-in-swiftui/mask.png)
 
 ## Applying mask
 
@@ -191,12 +181,7 @@ private func createSticker() {
 
 That's it! But the transition between states looks a bit boring, let's add some animations and magic particles.
 
-<Image
-  alt={`Initial view`}
-  src={`/images/remove-background-from-image-in-swiftui/final-view.png`}
-  width={685}
-  height={1366}
-/>
+![Initial view](/images/remove-background-from-image-in-swiftui/final-view.png){ width=685 height=1366 }
 
 # Animation and particles 💅
 
@@ -245,12 +230,7 @@ When the sticker is set, we'll add some animations:
     .animation(.easeOut(duration: 1), value: sticker)
  ```
 
-<Image
-  alt={`Hide background of the image`}
-  src={`/images/remove-background-from-image-in-swiftui/background-animation.gif`}
-  width={500}
-  height={1084}
-/>
+![Hide background of the image](/images/remove-background-from-image-in-swiftui/background-animation.gif){ width=500 height=1084 }
 
 Looks better! Now we add the sticker image layout and scale it for highlighting:
 
@@ -278,12 +258,7 @@ private var stickerImage: some View {
 }
 ```
 
-<Image
-  alt={`Scale the sticker image`}
-  src={`/images/remove-background-from-image-in-swiftui/sticker-animation.gif`}
-  width={500}
-  height={1084}
-/>
+![Scale the sticker image](/images/remove-background-from-image-in-swiftui/sticker-animation.gif){ width=500 height=1084 }
 
 It remains only to add the particles. We'll reuse a [SpoilerView](https://github.com/artemnovichkov/SpoilerViewExample/blob/main/SpoilerViewExample/SpoilerView.swift) from the previous article and add it as an overlay for `originalImage`:
 
@@ -315,12 +290,7 @@ It remains only to add the particles. We'll reuse a [SpoilerView](https://github
 
 Now we can see the final result:
 
-<Image
-  alt={`Scale the sticker image`}
-  src={`/images/remove-background-from-image-in-swiftui/final-animation.gif`}
-  width={500}
-  height={1084}
-/>
+![Scale the sticker image](/images/remove-background-from-image-in-swiftui/final-animation.gif){ width=500 height=1084 }
 
 If you want to see the final code, check out [StickerViewExample](https://github.com/artemnovichkov/StickerViewExample) project on Github. I added small changes like a loading state. Feel free to share your thoughts, ask questions and suggest improvements on [Twitter](https://twitter.com/iosartem). Thank you for reading!
 
