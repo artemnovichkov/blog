@@ -118,7 +118,7 @@ const partTimePositions = [
 
 export default function About() {
     return (
-        <Container title="About – Artem Novichkov" hideFooter={true}>
+        <Container>
             <div className="flex flex-col justify-center items-start max-w-2xl mx-auto">
                 <p className="font-bold text-3xl tracking-tight mb-8 text-black dark:text-white">About Me</p>
                 <Image
@@ -134,7 +134,7 @@ export default function About() {
                         Hi there! My name is Artem Novichkov. I am an iOS Developer.
                     </p>
                     <p>
-                        I work at Welltory, where I'm developing an app that enables users to sync data from other apps and gadgets to gain insights into their health and lifestyle.
+                        I work at Welltory, where I&apos;m developing an app that enables users to sync data from other apps and gadgets to gain insights into their health and lifestyle.
                     </p>
                     <p>
                         In addition to my work at Welltory, I am also a teacher at Netology, where I teach iOS development courses. My responsibilities include hosting webinars, grading homework and course assignments, and creating teaching materials.
@@ -152,7 +152,7 @@ export default function About() {
                         </a>.
                     </p>
                     <p>
-                        In my free time, I enjoy playing video games on my Nintendo Switch OLED and PS5. When I'm not at home, I like to fly my DJI mini 2 drone.
+                        In my free time, I enjoy playing video games on my Nintendo Switch OLED and PS5. When I&apos;m not at home, I like to fly my DJI mini 2 drone.
                     </p>
                 </div>
                 <p className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">

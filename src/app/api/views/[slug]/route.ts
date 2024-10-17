@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { ref, child, get, runTransaction } from 'firebase/database';
 import db from '@/lib/firebase';
 
 export async function GET(request: Request): Promise<Response> {
@@ -8,7 +9,8 @@ export async function GET(request: Request): Promise<Response> {
     return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
   }
 
-  const snapshot = await db.ref('views').child(slug).once('value');
+  const dbRef = ref(db);
+  const snapshot = await get(child(dbRef, `views/${slug}`));
   return NextResponse.json({ total: snapshot.val() });
 }
 
@@ -19,8 +21,8 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
   }
 
-  const ref = db.ref('views').child(slug);
-  const { snapshot } = await ref.transaction((views: number | null) => {
+  const dbRef = ref(db, `views/${slug}`);
+  const { snapshot } = await runTransaction(dbRef, (views: number | null) => {
     if (views === null) {
       return 1;
     }

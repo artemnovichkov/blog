@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import Date from './date'
 
 export default function PostPreview({ post }) {
     return (
@@ -17,6 +16,7 @@ export default function PostPreview({ post }) {
                             width={1200}
                             height={740}
                             src={post.cover}
+                            alt={post.title}
                     />
                 </div>
         </Link>
