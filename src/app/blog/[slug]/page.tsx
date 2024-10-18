@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
-    const posts: Post[] = await getAllPosts();
+    const posts = getAllPosts();
    
     return posts.map((post) => ({
         slug: post.slug,
@@ -64,6 +64,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
                         src={post.cover}
                         width={1200}
                         height={740}
+                        className="mb-4"
                     />
                     <div
                         className="prose dark:prose-dark"
