@@ -1,5 +1,6 @@
 import PostDate from './post-date'
 import readingTime from 'reading-time'
+import ViewCounter from './view-counter'
 
 interface PostMetaProps {
     post: {
@@ -17,6 +18,8 @@ export default function PostMeta({ post }: PostMetaProps) {
             </div>
             <p>
                 {readingTime(post.content).text}
+                { ` • ` }
+                <ViewCounter slug={post.slug} />
             </p>
         </div>
     )
