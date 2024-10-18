@@ -40,7 +40,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export default async function BlogPost({ params }: { params: { slug: string } }) {
     const post = getPostBySlug(params.slug);
+    console.log(post);
     const content = await markdownToHtml(post.content || "");
+    console.log(content);
     return (
         <Container>
             <div>
