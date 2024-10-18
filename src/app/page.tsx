@@ -178,9 +178,6 @@ export default function About() {
                         </li>
                     ))}
                 </ul>
-                <div className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
-                    <Footer />
-                </div>
             </div>
         </Container>
     )

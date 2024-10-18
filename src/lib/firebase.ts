@@ -1,15 +1,14 @@
-import { initializeApp } from 'firebase/app';
-import { getDatabase } from 'firebase/database';
+import admin from 'firebase-admin'
 
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: "blog-ad799.firebaseapp.com",
-  databaseURL: "https://blog-ad799-default-rtdb.firebaseio.com",
-  projectId: "blog-ad799",
-  storageBucket: "blog-ad799.appspot.com",
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_KEY,
-};
+if (!admin.apps.length) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        privateKey: process.env.FIREBASE_PRIVATE_KEY as string,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL as string,
+        projectId: 'blog-ad799'
+      }),
+      databaseURL: 'https://blog-ad799-default-rtdb.firebaseio.com/'
+    });
+  }
 
-const app = initializeApp(firebaseConfig);
-export default getDatabase(app);
+export default admin.database()
