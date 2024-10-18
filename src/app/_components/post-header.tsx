@@ -1,6 +1,5 @@
 import PostDate from './post-date'
 import readingTime from 'reading-time'
-import ViewCounter from './view-counter'
 
 interface PostMetaProps {
     post: {
