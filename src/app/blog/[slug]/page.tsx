@@ -6,7 +6,6 @@ import PostActions from '@/app/_components/post-actions'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import { name } from '@/lib/const'
-import { Post } from '@/interfaces/post'
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
     const post = getPostBySlug(params.slug);
