@@ -14,12 +14,7 @@ In this article I'll guide you through recreating Github Contribution Graph. Let
 
 [My graph](https://github.com/artemnovichkov) looks like:
 
-<Image
-  alt={`Github contribution graph`}
-  src={`/images/github-contribution-graph-swift-charts/contribution-graph.png`}
-  width={1466}
-  height={288}
-/>
+![Github contribution graph](/images/github-contribution-graph-swift-charts/contribution-graph.png)
 
 At its core, it's a [heatmap](https://en.wikipedia.org/wiki/Heat_map), where:
 - x-axis represents the weeks, labeled with the corresponding months;
@@ -112,12 +107,7 @@ private func weekday(for date: Date) -> Int {
 
 And here's a result:
 
-<Image
-  alt={`Base chart`}
-  src={`/images/github-contribution-graph-swift-charts/base-chart.png`}
-  width={400}
-  height={867}
-/>
+![Base chart](/images/github-contribution-graph-swift-charts/base-chart.png)
 
 Great result for a few lines of code! Chart customization is based on modifiers, so let's add some to change the appearance:
 
@@ -129,12 +119,7 @@ RectangleMark(/*...*/)
 
 `clipShape` modifier allows you to make a shape that fills each mark’s frame. You can use it as a mask. `foregroundStyle` modifier applies color styling. You can set a solid color, gradient, or you can pass `PlottableValue` that will change the color based on the value:
 
-<Image
-  alt={`Chart with styling`}
-  src={`/images/github-contribution-graph-swift-charts/color-chart.png`}
-  width={400}
-  height={867}
-/>
+![Chart with styling](/images/github-contribution-graph-swift-charts/color-chart.png)
 
 This looks much better! The chart is now functional and displays the data. It even shows a legend based on count range. To ensure the chart’s marks are square, we can apply `chartPlotStyle` modifier. It allows you to change frame or aspect ratio of a plot area:
 
@@ -159,12 +144,7 @@ private var aspectRatio: Double {
 
 Y-axis always contains 7 values, and x-axis depends on the data and based on weeks count:
 
-<Image
-  alt={`Chart with square layout`}
-  src={`/images/github-contribution-graph-swift-charts/square-chart.png`}
-  width={400}
-  height={361}
-/>
+![Chart with square layout](/images/github-contribution-graph-swift-charts/square-chart.png)
 
 And colors! Originally the contribution graph shows gray color for zero contributions and shades of green for other values. I found this solution for my case:
 
@@ -184,12 +164,7 @@ private var colors: [Color] {
 
 `chartForegroundStyleScale` modifier helps to apply foreground style scale. Pretty obvious, but tricky in real projects. You can simply use two colors like `Gradient(colors: [.white, .green])` if it fits your data representation, but it's not our case. Moreover, the colors will be related to count range. For example, if the maximum count in your data set will be 8, it will be solid green. You may ask: can we just use `colors` array as a `range` parameter? Yes, but the chart legend won't show up even if you set it explicitly. After these experiments I stopped at the variant with gradient:
 
-<Image
-  alt={`Chart with colors`}
-  src={`/images/github-contribution-graph-swift-charts/square-color-chart.png`}
-  width={400}
-  height={361}
-/>
+![Chart with colors](/images/github-contribution-graph-swift-charts/square-color-chart.png)
 
  Next, let's customize the x and y axes for better readability.
 
@@ -259,12 +234,7 @@ private var legendColors: [Color] {
 
 It overrides the default legend with a custom one. You can also change the legend position like `.chartLegend(position: .bottomTrailing)`, but with this code the legend is placed at the top left corner of the plot and ovelap it. It seems like a bug, so let's leave a default position and see the final result:
 
-<Image
-  alt={`Final chart`}
-  src={`/images/github-contribution-graph-swift-charts/cover.png`}
-  width={1200}
-  height={740}
-/>
+![Final chart](/images/github-contribution-graph-swift-charts/cover.png)
 
 ## Conclusion
 

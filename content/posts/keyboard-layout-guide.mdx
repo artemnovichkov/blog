@@ -24,21 +24,11 @@ NSLayoutConstraint.activate([buttonBottom, buttonTrailing])
 
 Now `loginButton` layout follows keyboard changes. When the keyboard is offscreen, `keyboardLayoutGuide.topAnchor` matches the view's `safeAreaLayoutGuide.bottomAnchor`.
 
-<Image
-  alt={`Works as simple as it must be`}
-  src={`/images/keyboard-layout-guide/button.png`}
-  width={946}
-  height={882}
-/>
+![Works as simple as it must be](/images/keyboard-layout-guide/button.png)
 
 That's all, thank you for coming to my TED talk! Wait, the keyboard is no so simple, especially on iPadOS. You can undock and drag it to any place. Luckily, the keyboard guide helps us to handle these cases.
 
-<Image
-  alt={`Floating keyboard on iPadOS`}
-  src={`/images/keyboard-layout-guide/floating-keyboard.png`}
-  width={1276}
-  height={1780}
-/>
+![Floating keyboard on iPadOS](/images/keyboard-layout-guide/floating-keyboard.png)
 
 ## Working with floating keyboards
 
@@ -50,11 +40,7 @@ view.keyboardLayoutGuide.followsUndockedKeyboard = true
 
 Now, loginButton starts to follow the keyboard:
 
-<Image
-  src={`/images/keyboard-layout-guide/button-follow.png`}
-  width={524}
-  height={424}
-/>
+![Button follow](../images/keyboard-layout-guide/button-follow.png){ width=524 height=424 }
 
 It works great, but here we have edge cases. When we move the keyboard at the top, `loginButton` may be outside of the view frame.
 

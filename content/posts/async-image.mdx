@@ -25,12 +25,7 @@ struct ContentView: View {
 ```
 By default, it shows a gray background and replaces it with the loaded image:
 
-<Image
-  alt={`Empty and success states of AsyncImage`}
-  src={`/images/async-image/empty-success.png`}
-  width={946}
-  height={882}
-/>
+![Empty and success states of AsyncImage](/images/async-image/empty-success.png)
 
 Optionally we can change `scale` to use for the image. In the example below the image size will be reduced by half:
 
@@ -71,12 +66,7 @@ struct ContentView: View {
 }
 ```
 
-<Image
-  alt={`Custom placeholder and resized image`}
-  src={`/images/async-image/custom-placeholder.png`}
-  width={946}
-  height={882}
-/>
+![Custom placeholder and resized image](/images/async-image/custom-placeholder.png)
 
 If we want to handle an error state, we can use another initializer with `AsyncImagePhase`. It's a simple enum with three cases: empty, success, and error.
 
@@ -117,12 +107,7 @@ struct ContentView: View {
 
 Here we show a spinner during loading, resized image if loading is successful, and an error message if something is wrong.
 
-<Image
-  alt={`Working with phases of AsyncImage`}
-  src={`/images/async-image/phases.png`}
-  width={1419}
-  height={882}
-/>
+![Working with phases of AsyncImage](/images/async-image/phases.png)
 
 To specify animations between phase changes, we can optionally add `Transition`:
 
@@ -166,12 +151,7 @@ struct ContentView: View {
 }
 ```
 
-<Image
-  alt={`Finally, we can show List without separators `}
-  src={`/images/async-image/list.png`}
-  width={946}
-  height={1764}
-/>
+![Finally, we can show List without separators](/images/async-image/list.png)
 
 If you want to play with AsyncImage by yourself, check out [AsyncImageExample](https://github.com/artemnovichkov/AsyncImageExample) project on Github.
 

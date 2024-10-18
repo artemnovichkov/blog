@@ -13,12 +13,7 @@ Two months ago my friend [@iamnalimov](https://twitter.com/iamnalimov) and I pub
 
 Let's start with the design. Popups may contain different content, but the appearance and behavior are the same. Superviews are covered with blur overlay, popups have the same background color, top left and right rounded corners, and ability to dismissing:
 
-<Image
-  alt={`Final design`}
-  src={`/images/custom-popups-in-swiftui/design.png`}
-  width={414}
-  height={896}
-/>
+![Final design](/images/custom-popups-in-swiftui/design.png)
 
 We want to implement a familiar API interface for presenting like alerts or action sheets:
 
@@ -93,12 +88,7 @@ We're ready to show popups, but we don't have any yet 😅. Let's make a basic P
 
 Let's create a simple view named NamePopupView that knows nothing about popup logic:
 
-<Image
-  alt={`NamePopupView`}
-  src={`/images/custom-popups-in-swiftui/popup-1.png`}
-  width={1044}
-  height={650}
-/>
+![NamePopupView](/images/custom-popups-in-swiftui/popup-1.png)
 
 The app may show different popups, so we create a reusable `BottomPopupView` to show different content:
 
@@ -160,12 +150,7 @@ extension View {
 
 All is now ready, and here is the result:
 
-<Image
-  alt={`Popup with extra Safe Area insets`}
-  src={`/images/custom-popups-in-swiftui/popup-2.png`}
-  width={946}
-  height={1764}
-/>
+![Popup with extra Safe Area insets](/images/custom-popups-in-swiftui/popup-2.png)
 
 Insets for Safe Area have added automatically, but we want to overlay superviews at the bottom too. To read and use Safe Area insets, we add `GeometryReader`:
 
@@ -184,21 +169,11 @@ GeometryReader { geometry in
 
 To pin our popup at the bottom, we add `.edgesIgnoringSafeArea` modifier. According to the content, we add a bottom padding with the bottom inset before `.background` modifier. With this logic background color will appear as expected.
 
-<Image
-  alt={`Popup with ignoring Safe Area insets`}
-  src={`/images/custom-popups-in-swiftui/popup-3.png`}
-  width={946}
-  height={1764}
-/>
+![Popup with ignoring Safe Area insets](/images/custom-popups-in-swiftui/popup-3.png)
 
 Since iOS 14 we even have an automatic keyboard avoidance:
 
-<Image
-  alt={`Popup with keyboard avoidance`}
-  src={`/images/custom-popups-in-swiftui/popup-4.png`}
-  width={946}
-  height={1764}
-/>
+![Popup with keyboard avoidance](/images/custom-popups-in-swiftui/popup-4.png)
 
 ## Animations
 
@@ -212,12 +187,7 @@ GeometryReader { geometry in
 .transition(.move(edge: .bottom))
 ```
 
-<Image
-  alt={`Popup with extra Safe Area insets`}
-  src={`/images/custom-popups-in-swiftui/final.gif`}
-  width={600}
-  height={1298}
-/>
+![Popup with extra Safe Area insets](/images/custom-popups-in-swiftui/final.gif)
 
 ## Source Code
 
