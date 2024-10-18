@@ -1,4 +1,4 @@
-import { getPostBySlug } from '@/lib/api'
+import { getPostBySlug, getAllPosts } from '@/lib/api'
 import markdownToHtml from '@/lib/markdownToHtml'
 import Container from '@/app/_components/container'
 import PostHeader from '@/app/_components/post-header'
@@ -6,6 +6,7 @@ import PostActions from '@/app/_components/post-actions'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import { name } from '@/lib/const'
+import { Post } from '@/interfaces/post'
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
     const post = getPostBySlug(params.slug);
@@ -36,6 +37,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
             'yandex-verification': '0dbe1f786dcb070d',
         },
     };
+}
+
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+    const posts: Post[] = await getAllPosts();
+   
+    return posts.map((post) => ({
+        slug: post.slug,
+    }));
 }
 
 export default async function BlogPost({ params }: { params: { slug: string } }) {
