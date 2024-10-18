@@ -1,6 +1,5 @@
 import Image from "next/image"
 import Container from "@/app/_components/container"
-import Footer from '@/app/_components/footer'
 
 interface PositionProps {
     position: {
