@@ -18,8 +18,6 @@ export default function PostMeta({ post }: PostMetaProps) {
             </div>
             <p>
                 {readingTime(post.content).text}
-                { ` • ` }
-                <ViewCounter slug={post.slug} />
             </p>
         </div>
     )
