@@ -1,6 +1,5 @@
 import { getPostBySlug, getAllPosts } from '@/lib/api'
 import markdownToHtml from '@/lib/markdownToHtml'
-import Container from '@/app/_components/container'
 import PostHeader from '@/app/_components/post-header'
 import PostActions from '@/app/_components/post-actions'
 import Image from 'next/image'
@@ -40,7 +39,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
     const posts = getAllPosts();
-   
+
     return posts.map((post) => ({
         slug: post.slug,
     }));
@@ -50,29 +49,27 @@ export default async function BlogPost({ params }: { params: { slug: string } })
     const post = getPostBySlug(params.slug);
     const content = await markdownToHtml(post.content || "");
     return (
-        <Container>
-            <div>
-                <article>
-                    <h1 className="mb-4 font-bold text-3xl tracking-tight text-black dark:text-white">
-                        {post.title}
-                    </h1>
-                    <PostHeader post={post} />
-                    <Image
-                        priority
-                        alt={post.title}
-                        src={post.cover}
-                        width={1200}
-                        height={740}
-                        className="mb-4"
-                    />
-                    <div
-                        className="prose dark:prose-dark"
-                        dangerouslySetInnerHTML={{ __html: content }}
-                    />
-                </article>
-                <PostActions post={post} />
-            </div>
-        </Container>
+        <div>
+            <article>
+                <h1 className="mb-4 font-bold text-3xl tracking-tight text-black dark:text-white">
+                    {post.title}
+                </h1>
+                <PostHeader post={post} />
+                <Image
+                    priority
+                    alt={post.title}
+                    src={post.cover}
+                    width={1200}
+                    height={740}
+                    className="mb-4"
+                />
+                <div
+                    className="prose dark:prose-dark"
+                    dangerouslySetInnerHTML={{ __html: content }}
+                />
+            </article>
+            <PostActions post={post} />
+        </div>
     );
 }
 
