@@ -51,7 +51,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
     return (
         <div>
             <article>
-                <h1 className="mb-4 font-bold text-3xl tracking-tight text-black dark:text-white">
+                <h1 className="mb-4 font-bold text-3xl tracking-tight text-zinc-800 dark:text-gray-100">
                     {post.title}
                 </h1>
                 <PostHeader post={post} />

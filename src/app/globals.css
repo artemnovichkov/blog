@@ -13,15 +13,13 @@
   position: sticky;
   z-index: 10;
   top: 0;
-  backdrop-filter: saturate(180%) blur(20px);
-  transition: background-color 0.1 ease-in-out;
 }
 
 .shiki {
-  background-color: rgb(17 24 39) !important;
+  background-color: rgb(31 41 55) !important;
 }
 
 /* inline code */
 .prose code:not(.shiki code) {
-  @apply px-1 py-0.5 border rounded-md bg-gray-100 dark:bg-gray-900 border-gray-100 dark:border-gray-800 dark:border-gray-800 text-gray-800 dark:text-white;
+  @apply px-1 py-0.5 border rounded-md bg-gray-100 dark:bg-gray-800 dark:border-gray-800 text-gray-800 dark:text-white;
 }

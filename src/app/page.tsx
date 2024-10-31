@@ -4,7 +4,7 @@ import Experience from "./_components/experience";
 export default function About() {
     return (
         <div className="flex flex-col justify-center items-start max-w-2xl mx-auto">
-            <p className="font-bold text-3xl tracking-tight mb-8 text-black dark:text-white">About Me</p>
+            <p className="font-bold text-3xl tracking-tight mb-8 text-zinc-800 dark:text-gray-100">About Me</p>
             <Image
                 className="rounded-full"
                 priority
@@ -13,7 +13,7 @@ export default function About() {
                 width={144}
                 alt="Artem Novichkov"
             />
-            <div className="flex flex-col gap-2 my-4 text-black dark:text-white">
+            <div className="flex flex-col gap-2 my-4 text-zinc-800 dark:text-gray-100">
                 <p>
                     Hi there! My name is Artem Novichkov. I am an iOS Developer.
                 </p>
@@ -30,7 +30,7 @@ export default function About() {
                     </a>. I am currently working on developing pet projects and writing blog posts on SwiftUI.
                 </p>
                 <p>
-                    Occasionally, I also enjoy sharing my knowledge through public speaking. You can find a playlist of my talks on &nbsp;
+                    Occasionally, I also enjoy sharing my knowledge through public speaking. You can find a playlist of my talks on&nbsp;
                     <a className="text-base underline" href="https://www.youtube.com/playlist?list=PLRSU1SC70qRudLaYKSjM14tJmA-J-dRvU" target="_blank" rel="noopener noreferrer">
                         Youtube
                     </a>.

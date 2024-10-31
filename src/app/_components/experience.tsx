@@ -3,10 +3,10 @@ import Image from "next/image"
 export default function Experience() {
     return (
         <div>
-            <p className="font-bold text-3xl tracking-tight mb-4 text-black dark:text-white">
+            <p className="font-bold text-3xl tracking-tight mb-4 text-zinc-800 dark:text-gray-100">
                 Experience
             </p>
-            <h3 className="font-bold text-2xl tracking-tight mb-4 text-black dark:text-white">
+            <h3 className="font-bold text-2xl tracking-tight mb-4 text-zinc-800 dark:text-gray-100">
                 Full-time positions
             </h3>
             <ul>
@@ -16,7 +16,7 @@ export default function Experience() {
                     </li>
                 ))}
             </ul>
-            <h3 className="font-bold text-2xl tracking-tight mb-4 text-black dark:text-white">
+            <h3 className="font-bold text-2xl tracking-tight mb-4 text-zinc-800 dark:text-gray-100">
                 Part-time positions
             </h3>
             <ul>
@@ -60,15 +60,15 @@ const Position: React.FC<PositionProps> = ({ position }) => {
                 width={40}
                 height={40}
             />
-            <div className="flex flex-col items-start">
-                <p className="text-xl text-black dark:text-white">{position.title}</p>
-                <a className="text-base underline text-black dark:text-white"
+            <div className="flex flex-col">
+                <p className="text-x font-bold text-zinc-800 dark:text-gray-100">{position.title}</p>
+                <a className="text-base underline text-zinc-800 dark:text-gray-100"
                     target="_blank"
                     rel="noopener noreferrer"
                     href={position.url}>
                     {position.company}
                 </a>
-                <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-1 text-sm text-zinc-500 dark:text-gray-400">
                     {startDateTag}
                     {`→`}
                     {finishDateTag}
