@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { Post } from '@/interfaces/post';
 import PostDate from './post-date';
 import readingTime from 'reading-time'
-import ViewCounter from './view-counter';
 
 interface PostPreviewProps {
     post: Post;
