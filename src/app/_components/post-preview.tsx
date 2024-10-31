@@ -11,8 +11,8 @@ interface PostPreviewProps {
 export default function PostPreview({ post }: PostPreviewProps) {
     return (
         <Link href={`/blog/${post.slug}`}>
-            <div className="mb-8 flex items-center bg-zinc-200 dark:bg-gray-800 p-4 rounded-lg border border-zinc-300 dark:border-gray-600">
-                <Image className="rounded mr-4"
+            <div className="mb-4 flex items-center bg-zinc-200 dark:bg-gray-800 p-4 rounded-lg border border-zinc-300 dark:border-gray-600">
+                <Image className="rounded mr-4 w-1/4 sm:w-52"
                     priority
                     width={200}
                     height={124}

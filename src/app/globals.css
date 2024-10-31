@@ -13,6 +13,7 @@
   position: sticky;
   z-index: 10;
   top: 0;
+  @apply bg-zinc-100 dark:bg-gray-900;
 }
 
 .shiki {
