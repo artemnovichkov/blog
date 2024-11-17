@@ -34,3 +34,7 @@
 .prose .react-tweet-theme {
   --tweet-container-margin: 1.5rem 1.5rem;
 }
+
+.prose .react-tweet-theme img {
+  margin-top: 0;
+}
