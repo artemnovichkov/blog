@@ -1,14 +1,12 @@
-import { useMDXComponents } from "../mdx-components";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import rehypeShiki from '@shikijs/rehype'
 import { transformerNotationHighlight } from 'shikiji-transformers'
+import { Tweet } from 'react-tweet'
 
 export default async function markdownToHtml(markdown: string) {
-    const components = useMDXComponents({});
-
-    const { content, frontmatter } = await compileMDX({
+    const { content } = await compileMDX({
         source: markdown,
         options: {
             mdxOptions: {
@@ -23,7 +21,7 @@ export default async function markdownToHtml(markdown: string) {
                 remarkPlugins: [remarkGfm],
             },
         },
-        components,
+        components: { Tweet },
     });
 
     return content;
