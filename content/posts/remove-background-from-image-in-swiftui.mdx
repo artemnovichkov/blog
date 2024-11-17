@@ -85,7 +85,7 @@ do {
 
 The requests may fail. For example, `handler` throws an error if you try to run the code on an iOS Simulator:
 
-> Error Domain=com.apple.Vision Code=9 "Could not create inference context" UserInfo={NSLocalizedDescription=Could not create inference context}
+> Error Domain=com.apple.Vision Code=9 "Could not create inference context" UserInfo=\{NSLocalizedDescription=Could not create inference context\}
 
 The result of the requests is an array of `VNInstanceMaskObservation` objects. We need to check them, take the first one and generate the mask:
 
