@@ -181,7 +181,7 @@ private func createSticker() {
 
 That's it! But the transition between states looks a bit boring, let's add some animations and magic particles.
 
-![Initial view](/images/remove-background-from-image-in-swiftui/final-view.png){ width=685 height=1366 }
+![Initial view](/images/remove-background-from-image-in-swiftui/final-view.png)
 
 # Animation and particles 💅
 
@@ -230,7 +230,7 @@ When the sticker is set, we'll add some animations:
     .animation(.easeOut(duration: 1), value: sticker)
  ```
 
-![Hide background of the image](/images/remove-background-from-image-in-swiftui/background-animation.gif){ width=500 height=1084 }
+![Hide background of the image](/images/remove-background-from-image-in-swiftui/background-animation.gif)
 
 Looks better! Now we add the sticker image layout and scale it for highlighting:
 
@@ -258,7 +258,7 @@ private var stickerImage: some View {
 }
 ```
 
-![Scale the sticker image](/images/remove-background-from-image-in-swiftui/sticker-animation.gif){ width=500 height=1084 }
+![Scale the sticker image](/images/remove-background-from-image-in-swiftui/sticker-animation.gif)
 
 It remains only to add the particles. We'll reuse a [SpoilerView](https://github.com/artemnovichkov/SpoilerViewExample/blob/main/SpoilerViewExample/SpoilerView.swift) from the previous article and add it as an overlay for `originalImage`:
 
@@ -290,7 +290,7 @@ It remains only to add the particles. We'll reuse a [SpoilerView](https://github
 
 Now we can see the final result:
 
-![Scale the sticker image](/images/remove-background-from-image-in-swiftui/final-animation.gif){ width=500 height=1084 }
+![Scale the sticker image](/images/remove-background-from-image-in-swiftui/final-animation.gif)
 
 If you want to see the final code, check out [StickerViewExample](https://github.com/artemnovichkov/StickerViewExample) project on Github. I added small changes like a loading state. Feel free to share your thoughts, ask questions and suggest improvements on [Twitter](https://twitter.com/iosartem). Thank you for reading!
 
