@@ -7,11 +7,11 @@ author:
   - artem-novichkov
 ---
 
-One of the common views in iOS apps is a editable text view. It's a versatile element that can be used for various purposes: leave a comments on social media, create a note, or even write a code. SwiftUI has a basic view for long-form text editing - `TextEditor`. To be honest, it's not as powerful as `UITextView` but it's enough for most cases. 
+One of the most commonly used views in iOS apps is an editable text view. It's a versatile element that can be used for various purposes: leave a comments on social media, create a note, or even write a code. SwiftUI has a basic view for long-form text editing - `TextEditor`. While it is not as powerful as `UITextView`, it is sufficient for most use cases.
 
 <Tweet id="1275806023236882432" />
 
-In this article, we'll explore the basic features of `TextEditor` and how to extend it with additional functionality. It will be a first article in a small series about text editing in SwiftUI. Next, we'll cover more topics like text classification and creating your own machine learning model for text analysis. Text is not just symbols, right?
+In this article, we'll explore the basic features of `TextEditor` and how to extend it with additional functionality. This is the first article in a series on text editing in SwiftUI. Next, we'll cover more topics like text classification and creating your own machine learning model for text analysis. Text is not just symbols, right?
 
 ## Basic requirements
 
@@ -25,7 +25,7 @@ Unlike `Text`, `TextEditor` doesn't support attributed strings or markdown. And 
 
 ## Base configuration
 
-Let's start with initializations. `TextEditor` requires a binding to a string:
+Let's begin with the initial setup. `TextEditor` requires a binding to a string:
 
 ```swift
 import SwiftUI
@@ -39,7 +39,7 @@ struct ContentView: View {
     }
 }
 ```
-Since iOS 18.0 you can handle selection in the text. It may be useful if you offer text suggestions. For instance, you can suggest to change text with LLM like GPT-4o: adjust the length, change reading level, etc.
+Starting from iOS 18.0, text selection can be handled directly. This feature can be useful for offering text suggestions. For instance, you can suggest to change text with LLM like GPT-4o: adjust the length, change reading level, etc.
 
 ```swift
 @State private var textSelection: TextSelection?
@@ -62,7 +62,7 @@ TextEditor(text: $text, selection: $textSelection)
   }
 ```
 
-To change the background color, you can hide the scroll content background and set the color:
+To change the background color, hide the scroll content background and apply a new color.:
 
 ```swift
 TextEditor(text: $text, selection: $textSelection)
@@ -99,7 +99,7 @@ TextEditor(text: $text, selection: $textSelection)
 
 ## Focus State
 
-With `focused` modifier we can manage the focus state. For example, if you may show the keyboard on appearance or hide it on saving action.
+The `focused` modifier allows us to manage the focus state of the text editor. For example, if you may show the keyboard on appearance or hide it on saving action.
 
 ```swift
 struct ContentView: View {
@@ -187,20 +187,20 @@ These modifiers must be added before the `.findNavigator` modifier. Otherwise, t
 
 ## Reading and editing mode
 
-That's what stops me from using `TextEditor` sometimes - it doesn't have a built-in way to disable editing. The first thing that comes to mind is to show `Text` instead of `TextEditor` in read-only mode. It may be useful but users can select only the full text, not a part of it. An other way to disable editing is to use `.constant(text)` binding. The idea looks promising, but the keyboard and the cursor are appearing on tap action, that's not what we want. 
+That's what stops me from using `TextEditor` sometimes - it doesn't have a built-in way to disable editing. The first thing that comes to mind is to show `Text` instead of `TextEditor` in read-only mode. It may be useful but users can select only the full text, not a part of it. An other way to disable editing is to use `.constant(text)` binding. However, the keyboard and cursor still appear when tapping, which is undesirable. 
 
 Here is a workaround with [Introspect](https://github.com/siteline/swiftui-introspect) framework:
 
 ```swift
 TextEditor(text: $text, selection: $textSelection)
-  .introspect(.textEditor, on: .iOS(.v17, .v18)) { textView in
+  .introspect(.textEditor, on: .iOS(.v18)) { textView in
       textView.isEditable = false
   }
 ```
 
 ## Apple Intelligence and Writing Tools
 
-Apple has introduced a new feature called Writing Tools. It's a set of tools that help users to write smarter:
+Apple introduced a feature called Writing Tools. It's a set of tools that help users to write smarter:
 
 <iframe
   width="100%"
@@ -229,7 +229,7 @@ Thinking about alternatives to `TextEditor`, we can consider:
 - Third-party frameworks like [RichTextKit](https://github.com/danielsaidi/RichTextKit) or [STTextView](https://github.com/krzyzanowskim/STTextView);
 - `UITextView` via `UIViewRepresentable`.
 
-There is no perfect solution, and you choose the best one based on your requirements. Writing a code I try to found flexibility without complexity. It may be tricky sometimes, but it's worth it.
+There is no perfect solution; choose the one that best fits your requirements. When writing code, I aim to achieve flexibility without adding unnecessary complexity. While it can be challenging at times, the results are always rewarding.
 
 ## What's next?
 
