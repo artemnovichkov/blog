@@ -7,7 +7,7 @@ author:
   - artem-novichkov
 ---
 
-One of the most commonly used views in iOS apps is an editable text view. It's a versatile element that can be used for various purposes: leave a comments on social media, create a note, or even write a code. SwiftUI has a basic view for long-form text editing - `TextEditor`. While it is not as powerful as `UITextView`, it is sufficient for most use cases.
+One of the most commonly used views in iOS apps is an editable text view. It's a versatile element that can be used for various purposes: leave a comments on social media, create a note, or even write a code. SwiftUI has a basic view for long-form text editing — `TextEditor`. While it is not as powerful as `UITextView`, it is sufficient for most use cases.
 
 <Tweet id="1275806023236882432" />
 
@@ -62,7 +62,7 @@ TextEditor(text: $text, selection: $textSelection)
   }
 ```
 
-To change the background color, hide the scroll content background and apply a new color.:
+To change the background color, hide the scroll content background and apply a new color:
 
 ```swift
 TextEditor(text: $text, selection: $textSelection)
@@ -158,7 +158,7 @@ var body: some View {
 }
 ```
 
-![Find and replace](/images/using-text-editor-in-swiftui/find-and-replace.png)
+![Find and replace](/images/mastering-text-editor-in-swiftui/find-and-replace.png)
 
 To enable this interface, we can add a toolbar item with a toggle:
 
@@ -187,7 +187,7 @@ These modifiers must be added before the `.findNavigator` modifier. Otherwise, t
 
 ## Reading and editing mode
 
-That's what stops me from using `TextEditor` sometimes - it doesn't have a built-in way to disable editing. The first thing that comes to mind is to show `Text` instead of `TextEditor` in read-only mode. It may be useful but users can select only the full text, not a part of it. An other way to disable editing is to use `.constant(text)` binding. However, the keyboard and cursor still appear when tapping, which is undesirable. 
+That's what stops me from using `TextEditor` sometimes — it doesn't have a built-in way to disable editing. The first thing that comes to mind is to show `Text` instead of `TextEditor` in read-only mode. It may be useful but users can select only the full text, not a part of it. An other way to disable editing is to use `.constant(text)` binding. However, the keyboard and cursor still appear when tapping, which is undesirable. 
 
 Here is a workaround with [Introspect](https://github.com/siteline/swiftui-introspect) framework:
 
@@ -210,7 +210,7 @@ Apple introduced a feature called Writing Tools. It's a set of tools that help u
   allowFullScreen
 />
 
-`TextEditor` supports Writing Tools by default. There is a new modifier `writingToolsBehavior` that allows you to change the behavior. For example, `.complete` behavior completes current phrase.
+`TextEditor` supports Writing Tools by default. There is a new `writingToolsBehavior` modifier that allows you to change the behavior. For example, `.complete` behavior completes current phrase.
 
 ```swift
 TextEditor(text: $text, selection: $textSelection)
@@ -219,7 +219,7 @@ TextEditor(text: $text, selection: $textSelection)
 
 I didn't find a way to run Writing Tools in the simulator, and my iPhone 14 Pro doesn't support it. So I just ran the example on macOS:
 
-![Writing tools](/images/using-text-editor-in-swiftui/writing-tools.png)
+![Writing tools](/images/mastering-text-editor-in-swiftui/writing-tools.png)
 
 ## TextEditor alternatives
 
