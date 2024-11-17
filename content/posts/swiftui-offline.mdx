@@ -89,9 +89,9 @@ func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 
 Remember zero frame of the web view? Because of it, we have an unknown error here:
 
-> Error Domain=WKErrorDomain Code=1 "An unknown error occurred" UserInfo={NSLocalizedDescription=An unknown error occurred}
+> Error Domain=WKErrorDomain Code=1 "An unknown error occurred" UserInfo=\{NSLocalizedDescription=An unknown error occurred\}
 
-![Initial preview](https://media.giphy.com/media/S5n7Wkhhw5A2IrfKER/giphy.gif){ width=480 height=198 }
+![Initial preview](https://media.giphy.com/media/S5n7Wkhhw5A2IrfKER/giphy.gif)
 
 To fix it, we can get a `contentSize` and set it to config's rect:
 
@@ -214,4 +214,4 @@ I don't mind it (yet 😅), but I'm planning to add features for clearing saved 
 
 If you want to play with examples and test your URLs, an example project with all three saving options is available [here](https://github.com/artemnovichkov/OfflineDataExample).
 
-![Example preview](/images/swiftui-offline/example-preview.png){ width=946 height=1764 }
+![Example preview](/images/swiftui-offline/example-preview.png)

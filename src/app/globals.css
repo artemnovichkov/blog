@@ -20,7 +20,21 @@
   background-color: rgb(31 41 55) !important;
 }
 
+.highlighted {
+  background-color: rgb(68, 76, 86);
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
 /* inline code */
 .prose code:not(.shiki code) {
   @apply px-1 py-0.5 border rounded-md bg-gray-100 dark:bg-gray-800 dark:border-gray-800 text-gray-800 dark:text-white;
+}
+
+.prose .react-tweet-theme {
+  --tweet-container-margin: 1.5rem 1.5rem;
+}
+
+.prose .react-tweet-theme img {
+  margin-top: 0;
 }

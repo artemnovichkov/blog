@@ -63,13 +63,11 @@ export default async function BlogPost({ params }: { params: { slug: string } })
                     height={740}
                     className="mb-4"
                 />
-                <div
-                    className="prose dark:prose-dark"
-                    dangerouslySetInnerHTML={{ __html: content }}
-                />
+                <div className="prose dark:prose-dark">
+                  {content}
+                </div>
             </article>
             <PostActions post={post} />
         </div>
     );
 }
-
