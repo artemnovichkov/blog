@@ -20,8 +20,8 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @State private var notes: [String] = ["Day was good",
-                                          "Day is not so good"]
+    @State private var notes: [String] = ["My day was good",
+                                          "My day is not so good"]
     @State private var searchText: String = ""
 
     var body: some View {
@@ -40,7 +40,7 @@ struct ContentView: View {
             return notes
         }
         return notes.filter { note in
-            return note.lowercased().contains(searchText.lowercased())
+            note.lowercased().contains(searchText.lowercased())
         }
     }
 }
@@ -52,8 +52,8 @@ Here is `List` with notes and a `searchable` modifier. When the user starts typi
 
 Pay attention to the notes:
 
-- "The day was good"
-- "The day was not so good"
+- "My day was good"
+- "My day is not so good"
 
 The search works as expected, but it doesn't take into account the meaning of the text. But what if the user wants to find notes with a positive meaning?
 
@@ -69,12 +69,12 @@ import NaturalLanguage
 let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english)!
 ```
 
-`NLEmbedding` is language-specific, so we must set the language. The set of supported languages is limited, for instance, it doesn't support Russian or Kazakh languages. If you try to create an embedding for an unsupported language, you'll get a runtime error. We'll handle it in the next section, so let's continue with English. We can check the vectors of our notes:
+`NLEmbedding` is language-specific, so we must set the language. The set of supported languages is limited, for instance, it doesn't support Russian or Kazakh languages. We'll handle it in the next section, so let's continue with English. We can check the vectors of our notes:
 
 ```swift
-print(sentenceEmbedding.vector(for: "Day was good"))
+print(sentenceEmbedding.vector(for: "My day was good"))
 // prints [-0.15248329937458038, 0.4077046811580658...0.32297080755233765, 0.2538180649280548]
-print(sentenceEmbedding.vector(for: "Day is not so good"))
+print(sentenceEmbedding.vector(for: "My day is not so good"))
 // prints [-0.13080675899982452, -0.05954701825976372...0.2555568516254425, 0.1614433228969574]
 ```
 
@@ -127,9 +127,10 @@ guard let sentimentTag else {
 }
 let score = Double(sentimentTag.rawValue) ?? 0
 print(score)
+// prints -0.4 for "My day was good"
 ```
 
-The score is a double value from -1 to 1. The negative value means a negative sentiment, the positive value means a positive sentiment. It may be useful for various cases like analyzing reviews, comments, or social media posts. Let's try to visualize the score. 
+The score is a double value from -1 to 1. It may be useful for various cases like analyzing reviews, comments, or social media posts. Let's try to visualize the score. 
 
 ## Visualizing sentiment score with MeshGradient
 
@@ -232,7 +233,7 @@ If you want to try the full code, you can find it in [NaturalLanguageExample](ht
 
 ## Conclusion
 
-The Natural Language framework is a powerful tool for text analysis, but it is rarely used (I don't know why 🤷). It's free, fast and works offline. A small flaw that spoils the whole thing is supported languages. If you have a worldwide audience and want to add sentiment analysis, you'll face limitations due to language support. However, it's a good opportunity to use CoreML and train your own models! We will be exploring it in a text post. Stay tuned and thanks for reading!
+The Natural Language framework is a powerful tool for text analysis, but it is rarely used (I don't know why 🤷). It's free, fast and works offline. A small flaw that spoils the whole thing is supported languages. If you have a worldwide audience and want to add sentiment analysis, you'll face limitations due to language support. However, it's a good opportunity to use Core ML and train your own models! We will be exploring it in a text post. Stay tuned and thanks for reading!
 
 ## References
 
