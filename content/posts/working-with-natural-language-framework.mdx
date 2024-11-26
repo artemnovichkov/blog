@@ -1,7 +1,7 @@
 ---
 title: 'Working with Natural Language framework'
 description: Learn how to use the Natural Language framework to analyze text in real time.
-cover: /images/mastering-text-editor-in-swiftui/cover.png
+cover: /images/working-with-natural-language-framework/cover.png
 date: '2024-11-24'
 author:
   - artem-novichkov
@@ -9,9 +9,11 @@ author:
 
 In a [previous post](https://www.artemnovichkov.com/blog/mastering-text-editor-in-swiftui) we explored the features of `TextEditor` in SwiftUI. In this article, we'll dive into the Natural Language framework and how to use it to analyze text in real time.
 
-## Searching text content
+[Natural Language](https://developer.apple.com/documentation/naturallanguage/) is a framework that provides a set of tools for analyzing and processing text. It can be used to detect the language of a text, tokenize it, find similarities between pieces of text, etc. It is particularly useful when working with user inputs that require natural language processing. Let's start with searching.
 
-Let's imagine that we have a note-taking app and we want to implement a search feature. How can we do it? The simplest way is to use search the exact match of the text. Let's start with a simple view:
+## Smart text searching with context understanding
+
+Let's imagine that we have a note-taking app and we want to implement a search feature. How can we do it? The simplest way is to search for an exact match of the text. Let's start with a simple view:
 
 ```swift
 import SwiftUI
@@ -46,20 +48,18 @@ struct ContentView: View {
 
 Here is `List` with notes and a `searchable` modifier. When the user starts typing in the search bar, the list will be filtered by the search text:
 
-![Match search](/images/natural-language/match-search.png)
+![Match search](/images/working-with-natural-language-framework/match-search.png)
 
 Pay attention to the notes:
 
 - "The day was good"
 - "The day was not so good"
 
-The search works as expected, but it doesn't take into account the meaning of the text. But what if user want to find notes with the positive meaning? Here's a work for Natural Language framework.
+The search works as expected, but it doesn't take into account the meaning of the text. But what if the user wants to find notes with a positive meaning?
 
-## Find similarities with sentence embedding
+`NLEmbedding` class finds similar strings based on the proximity of their vectors. Every word or sentence can be represents as a vector, it's an array of 512 double values. This vector encodes the meaning of the string in the vector space:
 
-[Natural Language](https://developer.apple.com/documentation/naturallanguage/) is a framework that provides a set of tools for analyzing and processing text. It can be used to detect the language of a text, tokenize it, find similarities between pieces of text etc. The last feature is what we are looking for! `NLEmbedding` class finds similar strings based on the proximity of their vectors. Every word or sentence may be represents as a vector, it's an array of 512 double values. This vector encodes the meaning of the string in the vector space:
-
-![Match search](/images/natural-language/word-embedding.png)
+![Word embedding](/images/working-with-natural-language-framework/word-embedding.png)
 
 Let's create a sentence embedding, it's available from iOS 14.0.
 
@@ -69,11 +69,13 @@ import NaturalLanguage
 let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english)!
 ```
 
-`NLEmbedding` is language-specific, so we must set the language. The set of supported languages is limited, for instance, it doesn't support Russian or Kazakh languages. If you try to create an embedding for an unsupported language, you'll get a runtime error. So we'll continue with English. We can check the vector of the "good" string:
+`NLEmbedding` is language-specific, so we must set the language. The set of supported languages is limited, for instance, it doesn't support Russian or Kazakh languages. If you try to create an embedding for an unsupported language, you'll get a runtime error. We'll handle it in the next section, so let's continue with English. We can check the vectors of our notes:
 
 ```swift
-print(sentenceEmbedding.vector(for: "good"))
-// prints [-0.3705592751502991, 0.013567393645644188...0.11897461861371994, 0.826911211013794]
+print(sentenceEmbedding.vector(for: "Day was good"))
+// prints [-0.15248329937458038, 0.4077046811580658...0.32297080755233765, 0.2538180649280548]
+print(sentenceEmbedding.vector(for: "Day is not so good"))
+// prints [-0.13080675899982452, -0.05954701825976372...0.2555568516254425, 0.1614433228969574]
 ```
 
 Now it's time to improve the searching:
@@ -85,13 +87,13 @@ return notes.filter { note in
 }
 ```
 
-The embedding can calculate a distance between two strings. The algorythm is based on [cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity). Checking the distance may vary for different content. Here's the result:
+The embedding can calculate the distance between two strings. The algorithm is based on [cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity). Checking the distance here is very naive. It really depends on content types and may be different. Here's the result:
 
-![Embedding search](/images/natural-language/embedding-search.png)
+![Embedding search](/images/working-with-natural-language-framework/embedding-search.png)
 
 ## Checking sentiment score
 
-The next useful feature is a sentiment score. How did the user feel when he wrote the note? Was it positive or negative? `NLTagger` class can help us with this. It's a class that provides a way to analyze text and tag it with information like part of speech, named entities, or sentiment score.
+The next useful feature is a sentiment score. How did the user feel when they wrote the note? Was it positive or negative? `NLTagger` class can help us with this. It's a class that provides a way to analyze text and tag it with information like part of speech, named entities, or sentiment score.
 
 Before using `NLTagger`, we need to check if the sentiment score is available for the language of the text:
 
@@ -114,7 +116,7 @@ let tagger = NLTagger(tagSchemes: [.sentimentScore])
 tagger.string = text
 ```
 
-The tagger has different functions for working with tags like getitng a tag for index of enumerate all tags. We'll check the tag in the first paragraph:
+The tagger provides functions to get a tag for a specific index or to enumerate all tags. We'll check the tag in the first paragraph:
 
 ```swift
 let (sentimentTag, _) = tagger.tag(at: text.startIndex,
@@ -131,7 +133,7 @@ The score is a double value from -1 to 1. The negative value means a negative se
 
 ## Visualizing sentiment score with MeshGradient
 
-Since iOS 18.0 we can use mesh gradients to create complex gradients and mix colors in a more flexible and efficient way. Let's start with an example from the documetation:
+Since iOS 18.0 we can use mesh gradients to create complex gradients and mix colors in a more flexible and efficient way. Let's start with an example from the documentation:
 
 ```swift
 MeshGradient(width: 3, height: 3, points: [
@@ -147,7 +149,7 @@ MeshGradient(width: 3, height: 3, points: [
 
 Here we have 3x3 size with 9 control points and 9 colors:
 
-![Mesh gradient](/images/natural-language/mesh-gradient.png)
+![Mesh gradient](/images/working-with-natural-language-framework/mesh-gradient.png)
 
 Looks great! Let's create an enum for the sentiment score. We'll calculates it based on the sentiment score and update the colors of the mesh gradient.
 
@@ -179,28 +181,39 @@ struct NoteView: View {
                     [0, 0.25], [0.25, 0.25], [0.5, 0.25], [1, 0.25],
                     [0, 0.75], [0.25, 0.75], [0.5, 0.75], [1, 0.75],
                     [0, 1],    [0.25, 1],    [0.5, 1],    [1, 1]
-                ], colors: sentimentColors)// [!code highlight]
+                ], colors: sentimentColors)
             }
             .ignoresSafeArea()
             .onAppear {
-                sentiment = sentiment(for: note)// [!code highlight]
+                sentiment = sentiment(for: note)
             }
             .onChange(of: note) {
                 sentiment = sentiment(for: note)
             }
     }
+
+    private var sentimentColors: [Color] {
+        // Different colors for sentiments
+    }
+
+    private func sentiment(for text: String) -> Sentiment {
+        // Calculating sentiment with NSTagger's sentiment score
+    }
 }
 ```
 
-I played with different contol points and colors and created `sentimentColors` with red, blue, and green gamut. `sentiment(for:)` function uses `NLTagger` to calculate related `Sentiment` value. I tried to find the best ranges and choosed the following:
+I played with different control points and colors and created `sentimentColors` with red, blue, and green gamut. `sentiment(for:)` function uses `NLTagger` to determine the corresponding `Sentiment` value. I tried to find the best ranges and chose the following:
 
 ```swift
-if score < -0.6 {
-    return .negative
-} else if score >= 0.2 {
-    return  .positive
-} else {
-    return .neutral
+private func sentiment(for text: String) -> Sentiment {
+    let score = ... // Calculating sentiment score with NSTagger
+    if score < -0.6 {
+        return .negative
+    } else if score >= 0.2 {
+        return  .positive
+    } else {
+        return .neutral
+    }
 }
 ```
 
@@ -219,7 +232,7 @@ If you want to try the full code, you can find it in [NaturalLanguageExample](ht
 
 ## Conclusion
 
-The Natural Language framework is a powerful tool for text analysis, but it is rarely used (I don't know why 🤷). It's free, fast and works offline. A small flaw that spoils the whole thing is supported languages. If you have worldwide audience and want to add sentiment score calculation, you'll be limited. But's it's a good chance to use CoreML and train your own models! We will be exploring it in a text post. Stay tuned and thanks for reading!
+The Natural Language framework is a powerful tool for text analysis, but it is rarely used (I don't know why 🤷). It's free, fast and works offline. A small flaw that spoils the whole thing is supported languages. If you have a worldwide audience and want to add sentiment analysis, you'll face limitations due to language support. However, it's a good opportunity to use CoreML and train your own models! We will be exploring it in a text post. Stay tuned and thanks for reading!
 
 ## References
 
