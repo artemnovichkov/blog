@@ -17,7 +17,7 @@ Create ML has different project templates. There are two types of the templates 
 - Text classification. Identifying the main topic, theme, or sentiment in text;
 - Word tagging. Splitting text into classified phrases or words based on their context.
 
-![Create ML text templates](/images/create-ml/create-ml-text-templates.png)
+![Create ML text templates](/images/create-ml/text-templates.png)
 
 We'll create a sentiment analysis model for Russian and Kazakh languages. Let's choose the `Text classification` template and call it `SentimentTextClassifier`. You can also add author name, license and description for your model. The next step is to choose a dataset. You can use your own dataset or download one from the internet. For example, you can find sentiment datasets on [Kaggle](https://www.kaggle.com/search?q=sentiment+in%3Adatasets) or [HuggingFace](https://huggingface.co/datasets?modality=modality:text&sort=trending&search=sentiment). I didn't find good datasets for my languages, so I created my own by generating sample texts with ChatGPT. It's a JSON file with the following structure:
 
@@ -67,22 +67,22 @@ The only algorithm that supports multilingual models is BERT embeddings. It's a 
 
 Next, we'll choose the language family. In our case, it's Cyrillic for Bulgarian, Kazakh, Russian, and Ukrainian languages. Now we're ready to go, just press the `Train` button.
 
-![Create ML text project](/images/create-ml/create-ml-text-project.png)
+![Create ML text project](/images/create-ml/text-project.png)
 
 After training, you can see the training results of the model. It shows the training and validation accuracy:
 
-![Create ML training](/images/create-ml/create-ml-training.png)
+![Create ML training](/images/create-ml/training.png)
 
 Good dataset quality is crucial for the model. If you have a small dataset, you can use data augmentation. It's a technique that generates new data from existing data. For example, you can replace words with synonyms, or change the order of words in the sentence. My accuracy is good enough, so let's check the model in Preview tab. I'll use an example: "I finished the article and I'm so happy". Here is the result for Russian language:
 
-![Create ML preview Russian](/images/create-ml/create-ml-preview-russian.png)
+![Create ML preview Russian](/images/create-ml/preview-russian.png)
 
 And the same example for Kazakh language:
-![Create ML preview Kazakh](/images/create-ml/create-ml-preview-kazakh.png)
+![Create ML preview Kazakh](/images/create-ml/preview-kazakh.png)
 
 It's definitely a positive sentiment, and the model works as expected. The last step is to save the model. In `Output` tab you can theck the model parameters and save it with `Get` button:
 
-![Create ML preview Kazakh](/images/create-ml/create-ml-output.png)
+![Create ML preview Kazakh](/images/create-ml/output.png)
 
 We get `SentimentTextClassifier.mlmodel` file which can be integrated into your app. The dataset size is 46 Kb, and the model size is 1.4 Mb, if you're wondering.
 
@@ -116,7 +116,7 @@ Futhermore, you can use Preview right in Xcode, just select the imported model a
 
 Speed of the model is also important. You can check the performance of the model in `Performance` tab. It shows the timings for different devices:
 
-![Performance](/images/create-ml/create-ml-performance.png)
+![Performance](/images/create-ml/performance.png)
 
 Performance reports may be exported in `.mlperf` format. It's a JSON file with a specific structure. You can use it for further analysis or sharing with your team.
 
