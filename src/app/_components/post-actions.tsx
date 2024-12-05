@@ -7,7 +7,7 @@ interface PostActionsProps {
 }
 
 const twitterShareUrl = (post: Post): string => {
-  return `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+  return `https://x.com/intent/tweet?text=${encodeURIComponent(
     `https://artemnovichkov.com/blog/${post.slug} by @iosartem`
   )}`;
 };
@@ -17,13 +17,13 @@ const editUrl = (slug: string): string =>
 
 export default function PostActions({ post }: PostActionsProps) {
   return (
-    <div className="mb-8 text-sm text-gray-500 dark:text-gray-400">
+    <div className="mb-8 mt-4 text-sm text-gray-500 dark:text-gray-400">
       <a
         href={twitterShareUrl(post)}
         target="_blank"
         rel="noopener noreferrer"
       >
-        {'Share on Twitter'}
+        {'Share on X'}
       </a>
       {` • `}
       <a
@@ -31,7 +31,7 @@ export default function PostActions({ post }: PostActionsProps) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        {'Edit on GitHub'}
+        {'Found a typo? Edit this post on GitHub'}
       </a>
     </div>
   );
