@@ -7,9 +7,9 @@ author:
   - artem-novichkov
 ---
 
-In a [previous post](https://www.artemnovichkov.com/blog/working-with-natural-language-framework) we talked about Natural Language framework. It's a powerful tool for text analysis, but supported languages are limited. In this post, we will learn how to create our own machine learning model for sentiment analysis for new languages. Without a single line of code. Well, almost 😏.
+In a [previous post](https://www.artemnovichkov.com/blog/working-with-natural-language-framework) we talked about Natural Language framework. It's a powerful tool for text analysis, but it currently supports only a limited set of languages. In this post, we will learn how to create our own machine learning model for sentiment analysis for new languages. Without a single line of code. Well, almost 😏.
 
-## Create ML
+## Using Create ML
 
 [Create ML](https://developer.apple.com/machine-learning/create-ml/) is a tool that helps you train models for image classification, object detection, sound or text classification, etc. If you have Xcode installed, you already have Create ML, it's a part of the Xcode app bundle. You can find it in the `Xcode` menu -> `Open Developer Tool` -> `Create ML`. The final result of working with Create ML is a Core ML model. It can be integrated into your app and run on the simulators or the devices.
 
@@ -19,7 +19,7 @@ Create ML has different project templates. There are two types of the templates 
 
 ![Create ML text templates](/images/create-ml/create-ml-text-templates.png)
 
-We'll create a sentiment analysis model for Russian and Kazakh languages. Let's choose the `Text classification` template and call it `SentimentTextClassifier`. You can also add author name, license and description for your model. The next step is to choose a dataset. You can use your own dataset or download one from the internet. For example, you can find sentiment datasets on [Kaggle](https://www.kaggle.com/search?q=sentiment+in%3Adatasets) or [HuggingFace](https://huggingface.co/datasets?modality=modality:text&sort=trending&search=sentiment). I didn't find good datasets for my languages, so I created my own with helping of ChatGPT. It's a JSON file with the following structure:
+We'll create a sentiment analysis model for Russian and Kazakh languages. Let's choose the `Text classification` template and call it `SentimentTextClassifier`. You can also add author name, license and description for your model. The next step is to choose a dataset. You can use your own dataset or download one from the internet. For example, you can find sentiment datasets on [Kaggle](https://www.kaggle.com/search?q=sentiment+in%3Adatasets) or [HuggingFace](https://huggingface.co/datasets?modality=modality:text&sort=trending&search=sentiment). I didn't find good datasets for my languages, so I created my own by generating sample texts with ChatGPT. It's a JSON file with the following structure:
 
 ```json
 [
