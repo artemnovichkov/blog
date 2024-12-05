@@ -1,5 +1,6 @@
 import React from 'react';
-import { FaTwitter, FaGithub, FaTelegramPlane } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
+import { FaGithub, FaTelegramPlane } from 'react-icons/fa'
 
 export default function Footer() {
     return (
@@ -9,9 +10,9 @@ export default function Footer() {
             <a
               rel="noopener noreferrer"
               target="_blank"
-              href="https://twitter.com/iosartem"
+              href="https://x.com/iosartem"
             >
-              <FaTwitter className="dark:invert"/>
+              <FaXTwitter className="dark:invert"/>
             </a>
             <a
               rel="noopener noreferrer"

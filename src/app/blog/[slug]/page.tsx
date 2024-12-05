@@ -55,13 +55,12 @@ export default async function BlogPost({ params }: { params: { slug: string } })
                     {post.title}
                 </h1>
                 <PostHeader post={post} />
-                <Image
+                <Image className="mb-4 rounded"
                     priority
                     alt={post.title}
                     src={post.cover}
                     width={1200}
                     height={740}
-                    className="mb-4"
                 />
                 <div className="prose dark:prose-dark">
                   {content}
