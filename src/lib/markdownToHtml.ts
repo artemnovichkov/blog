@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import rehypeShiki from '@shikijs/rehype'
 import { transformerNotationHighlight } from 'shikiji-transformers'
 import { Tweet } from 'react-tweet'
+import Callout from '../app/_components/callout';
 
 export default async function markdownToHtml(markdown: string) {
     const { content } = await compileMDX({
@@ -21,7 +22,7 @@ export default async function markdownToHtml(markdown: string) {
                 remarkPlugins: [remarkGfm],
             },
         },
-        components: { Tweet },
+        components: { Tweet, Callout },
     });
 
     return content;

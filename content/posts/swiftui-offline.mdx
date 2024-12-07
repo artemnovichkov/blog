@@ -13,7 +13,9 @@ I continue developing an app for saving and reading articles. In my [previous po
 
 There are situations when users are unable to download web content: bad connection, airplane mode, etc. `WKWebView` has useful APIs for saving its content in different formats. Let's check it out!
 
-> Note: Examples are written in Swift 5.4 and tested on iOS 14.5 with Xcode 12.5 (12E262).
+<Callout type="info" emoji="️ℹ️">
+  Examples are written in Swift 5.4 and tested on iOS 14.5 with Xcode 12.5 (12E262).
+</Callout>
 
 ## Preparation
 
@@ -89,7 +91,9 @@ func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 
 Remember zero frame of the web view? Because of it, we have an unknown error here:
 
-> Error Domain=WKErrorDomain Code=1 "An unknown error occurred" UserInfo=\{NSLocalizedDescription=An unknown error occurred\}
+<Callout type="error" emoji="️🚫">
+  Domain=WKErrorDomain Code=1 "An unknown error occurred" UserInfo=\{NSLocalizedDescription=An unknown error occurred\}
+</Callout>
 
 ![Initial preview](https://media.giphy.com/media/S5n7Wkhhw5A2IrfKER/giphy.gif)
 

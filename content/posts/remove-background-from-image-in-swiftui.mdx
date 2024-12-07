@@ -7,6 +7,8 @@ author:
   - artem-novichkov
 ---
 
+🏆 Featured in [iOS Dev Weekly - Issue 644](https://iosdevweekly.com/issues/644)
+
 In my [last article](https://www.artemnovichkov.com/blog/spoiler-view) I implemented a spoiler feature from Telegram. The team at [Drawww](https://www.drawww.app) was inspired by it and asked me to recreate a new feature — [removing background from images](https://telegram.org/blog/posts-in-stories-and-more#photo-cutouts-for-stories). Luckily, it's very easy with a new iOS 17 API — `VNGenerateForegroundInstanceMaskRequest`. Fasten your seatbelts, we're ready to start!
 
 ## Preparations
@@ -85,7 +87,9 @@ do {
 
 The requests may fail. For example, `handler` throws an error if you try to run the code on an iOS Simulator:
 
-> Error Domain=com.apple.Vision Code=9 "Could not create inference context" UserInfo=\{NSLocalizedDescription=Could not create inference context\}
+<Callout type="error" emoji="️🚫">
+  Domain=com.apple.Vision Code=9 "Could not create inference context" UserInfo=\{NSLocalizedDescription=Could not create inference context\}
+</Callout>
 
 The result of the requests is an array of `VNInstanceMaskObservation` objects. We need to check them, take the first one and generate the mask:
 

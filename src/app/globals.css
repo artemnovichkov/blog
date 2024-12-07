@@ -38,3 +38,9 @@
 .prose .react-tweet-theme img {
   margin-top: 0;
 }
+
+.callout p {
+  margin-top: 0;
+  margin-bottom: 0;
+  @apply text-gray-800 dark:text-white;
+}
