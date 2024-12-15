@@ -14,7 +14,7 @@ With Xcode Library you can search and discover SwiftUI views and modifiers. You 
 ![Xcode library](/images/xcode-library-customization-with-spm-plugin/xcode-library.png)
 
 <Callout type="info" emoji="️ℹ️">
-  If you can't find Views or Modifiers tabs, try to enable Canvas in Editor > Canvas menu or by pressing ⌥ + ⌘ + ⏎.
+  If you don't see Views or Modifiers tabs, try to enable Canvas in Editor&nbsp;>&nbsp;Canvas menu or by pressing ⌥ + ⌘ + ⏎.
 </Callout>
 
 It also contains tabs for Snippets, Media, and SF Symbols. You can double-click on any item or just drag-n-drop it to the code editor. Moreover, you can extend the library with your custom views and modifiers:
@@ -279,7 +279,7 @@ final class ViewStructVisitor: SyntaxVisitor {
 }
 ```
 
-In `viewNodes` we save `StructDeclSyntax` nodes. It's a representation of struct declaration. Now we're ready to generate the code snippet for the library content. I'll not stop in the details of the implementation. Honestly, SwiftSyntax is a bit complex and and hard to understand. Many APIs have no documentation, open source examples use old interfaces, and LLM tools generate wrong code. Here is my final code:
+In `viewNodes` we save `StructDeclSyntax` nodes. It's a representation of struct declaration. Now we're ready to generate the code snippet for the library content. I'll skip over the details of the implementation. Honestly, SwiftSyntax is a bit complex and and hard to understand. Many APIs have no documentation, open source examples use old interfaces, and LLM tools generate wrong code. Here is my final code:
 
 ```swift
 import SwiftSyntaxBuilder
@@ -384,13 +384,13 @@ You may notice there is no documentation or examples in the right section. Xcode
 
 ## Final thoughts
 
-Swift Package Manager plugins are a powerful tool to extend the functionality of your packages. Big advantage is installation, you don't need to install any additional tools like Homebrew or Mint. But what's require improvements and additional documentation is SwiftSyntax. I used [Swift AST Explorer](https://swift-ast-explorer.com) to visualize the syntax tree and understand the structure of nodes:
+Swift Package Manager plugins are a powerful tool to extend the functionality of your packages. Big advantage is installation, you don't need to install any additional tools via Homebrew or Mint. But what's require improvements and additional documentation is SwiftSyntax. I used [Swift AST Explorer](https://swift-ast-explorer.com) to visualize the syntax tree and understand the structure of nodes:
 
 ![Swift AST Explorer](/images/xcode-library-customization-with-spm-plugin/swift-ast-explorer.png)
 
 And just [search on Github repositories](https://github.com/search?q=FunctionCallExprSyntax+language%3ASwift&type=code&l=Swift) to explore open-source examples.
 
-Also, Xcode Library is one of the underrated and forgotten Xcode features. It may replace some documenation and simplify code reusing. With `LibraryContentProvider` code snippets will be up-to-date, because they use real views and will fail build process in case of any break changes in view interfaces. I hope Apple will improve Xcode Library in hext releases.
+Also, Xcode Library is one of the underrated and forgotten Xcode features. It may replace some documenation and simplify code reusing. With `LibraryContentProvider` code snippets will be up-to-date, because they use real views and will fail build process in case of any break changes in view interfaces. I hope Apple will improve Xcode Library in next releases.
 
 As usual you can find the final project on [Github](https://github.com/artemnovichkov/LibraryContentExample). Feel free to ask questions or share your feedback on [X](https://x.com/iosartem). Thanks for reading!
 
