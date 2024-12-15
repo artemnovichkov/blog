@@ -1,0 +1,402 @@
+---
+title: 'Xcode Library customization with SPM plugin'
+description: Learn how to extend Xcode Library with Swift Package Manager plugin
+cover: /images/xcode-library-customization-with-spm-plugin/cover.png
+date: '2024-12-15'
+author:
+  - artem-novichkov
+---
+
+Cover Source: [Apple](https://developer.apple.com/news/?id=uyp21www)
+
+With Xcode Library you can search and discover SwiftUI views and modifiers. You can find it by clicking on Plus sign in the top right or by pressing ⌘ + ⇧ + L shortcut:
+
+![Xcode library](/images/xcode-library-customization-with-spm-plugin/xcode-library.png)
+
+<Callout type="info" emoji="️ℹ️">
+  If you can't find Views or Modifiers tabs, try to enable Canvas in Editor > Canvas menu or by pressing ⌥ + ⌘ + ⏎.
+</Callout>
+
+It also contains tabs for Snippets, Media, and SF Symbols. You can double-click on any item or just drag-n-drop it to the code editor. Moreover, you can extend the library with your custom views and modifiers:
+
+```swift
+import DeveloperToolsSupport
+import SwiftUI
+
+struct LibraryContent: @preconcurrency LibraryContentProvider {
+
+    @MainActor @LibraryContentBuilder
+    var views: [LibraryItem] {
+        LibraryItem(TitleView(), category: .control)
+    }
+
+    @MainActor @LibraryContentBuilder
+    func modifiers(base: Text) -> [LibraryItem] {
+        LibraryItem(base.customModifier(), category: .effect)
+    }
+}
+```
+
+We use [LibraryContentProvider](https://developer.apple.com/documentation/developertoolssupport/librarycontentprovider) protocol to provide views and/or modifiers for the library. Every [LibraryItem](https://developer.apple.com/documentation/developertoolssupport/libraryitem/init(_:visible:title:category:matchingsignature:)) must contains a code snippet, optionally  you can specify a category to place it in a corresponding section.
+
+Xcode Library extends the discoverability of your components and makes it easier to reuse them across the project. It also may be useful for third-party Swift packages with UI components. One downside is that you need to write and update the code manually. Initially I thought about using Swift Macro to simplify Library customization:
+
+```swift
+import SwiftUI
+
+struct TitleView: View {
+
+    var body: some View {
+        Text("Title")
+    }
+}
+
+#Preview {
+    TitleView()
+}
+
+#LibraryContent(category: .control) {
+    TitleView()
+}
+```
+
+I like this approach because it's declarative, flexible and doesn't require additional boilerplate. But unfortunately, Xcode Library doesn't see the code inside Swift Macro.
+
+![Macro](/images/xcode-library-customization-with-spm-plugin/macro.png)
+
+Another way to generate code is to use Swift Package Manager plugin. There are two types of plugins:
+- Build tools. They can be integrated into the build process, but can't modify the package source code;
+- Commands. They can be run from Xcode interface or from the command line, and can modify the package source code.
+
+The second type is suitable for our task. Let's create a new Swift Package with the following structure:
+
+```swift
+// swift-tools-version: 6.0
+// The swift-tools-version declares the minimum version of Swift required to build this package.
+
+import PackageDescription
+
+let package = Package(
+    name: "Components",
+    platforms: [.iOS(.v18), .macOS(.v15)],
+    products: [
+        .library(name: "Components", targets: ["Components"]),
+    ],
+    targets: [
+        .target(name: "Components"),
+    ]
+)
+```
+
+In `Source/Components` create a title view:
+
+```swift
+import SwiftUI
+
+public struct TitleView: View {
+
+    public init() {}
+
+    public var body: some View {
+        Text("Title")
+    }
+}
+```
+
+How to get all views from the package and generate a code snippet with them? We can use regular expressions, but it's not a very flexible solution. Apple provides [SwiftSyntax](https://github.com/swiftlang/swift-syntax) package to parse the source code and extract the necessary information. Source code is represented as a tree of nodes for inspecting and modifying.
+
+Command plugins often perform their work by invoking to command line tools as subprocesses. Moreover, current plugins can import only standard libraries. That's why we need to create two targets: one for the plugin and another for the executable.
+
+```swift
+/* Previous configurations */
+dependencies: [
+    .package(url: "https://github.com/swiftlang/swift-syntax.git", exact: "600.0.0"),
+],
+targets: [
+    .target(name: "Components"),
+    .plugin(
+        name: "GenerateLibraryContent",
+        capability: .command(
+            intent: .custom(
+                verb: "generate-library-content",
+                description: "Generate LibraryContent"),
+            permissions: [.writeToPackageDirectory(reason: "Generate LibraryContent")]),
+        dependencies: [
+            .target(name: "generate-library-content")
+        ]),
+    .executableTarget(
+        name: "generate-library-content",
+        dependencies: [
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]),
+]
+```
+
+For the command plugin we need to specify the `intent` and `permissions`. The `intent` is a intended use case of the plugin. The `permissions` is a list of permissions that the plugin requires. In our case, we need to write to the package directory to generate the code snippet. And here is a files structure:
+
+```
+Components
+├── Package.swift
+├── Plugins
+│   ├── LibraryContentPlugin
+│   │   ├── LibraryContentPlugin.swift
+├── Sources
+│   ├── Components
+│   │   ├── TitleView.swift
+│   ├── generate-library-content
+│   │   ├── GenerateLibraryContent.swift
+```
+
+In `LibraryContentPlugin.swift` we need to implement the `CommandPlugin` protocol:
+
+```swift
+import Foundation
+import PackagePlugin
+
+@main
+struct LibraryContentPlugin: CommandPlugin {
+
+    func performCommand(context: PluginContext, arguments: [String]) async throws {
+        
+    }
+}
+```
+
+If you right-click on `Components` package in Xcode, you'll see a new menu item `GenerateLibraryContent` that runs the plugin:
+
+![Plugin in menu](/images/xcode-library-customization-with-spm-plugin/plugin-in-menu.png)
+
+Clicking on it will shows a menu with input selection:
+
+![Input selection](/images/xcode-library-customization-with-spm-plugin/input-selection.png)
+
+That's why we need to handle selected targets in the plugin:
+
+```swift
+func performCommand(context: PluginContext, arguments: [String]) async throws {
+    var argumentExtractor = ArgumentExtractor(arguments)
+    let targetNames = argumentExtractor.extractOption(named: "target")
+    if targetNames.isEmpty {
+        return
+    }
+    for target in try context.package.targets(named: targetNames) {
+        // Working with tragets
+    }
+}
+```
+
+`PluginContext` provides information about the package and the environment in which the plugin is running, and `ArgumentExtractor` helps to extract options from arguments.
+
+Next, we need to check the target and work only with generic targets (not a test nor an executable):
+
+```swift
+guard let target = target as? SwiftSourceModuleTarget else {
+    continue
+}
+guard target.kind == .generic else {
+    continue
+}
+```
+
+Now it's time to run the executable with arguments for source code and output file:
+
+```swift
+let tool = try context.tool(named: "generate-library-content")
+let toolExec = URL(fileURLWithPath: tool.url.path())
+let process = try Process.run(toolExec, arguments: ["--input", target.directoryURL.path,
+                                                    "--output", target.directoryURL.appending(path: "LibraryContent.swift").path])
+process.waitUntilExit()
+if process.terminationReason == .exit && process.terminationStatus == 0 {
+    print("LibraryContent.swift has been generated successfully")
+}
+else {
+    let problem = "\(process.terminationReason):\(process.terminationStatus)"
+    Diagnostics.error("Failed to generate LibraryContent.swift: \(problem)")
+}
+```
+
+In the executable we need to parse the source code and extract the necessary information. For argument parsing we'll use [Swift Argument Parser](https://github.com/apple/swift-argument-parser) framework, it's a convenience tool for creating command-line interfaces:
+
+```swift
+import Foundation
+import ArgumentParser
+
+@main
+struct GenerateLibraryContent: ParsableCommand {
+
+    @Option(help: "Target directory URL")
+    var input: String
+
+    @Option(help: "The URL for generated file")
+    var output: String
+
+    func run() throws {
+        let fileNames = try FileManager.default.contentsOfDirectory(atPath: input)
+        for fileName in fileNames {
+            let contents = FileManager.default.contents(atPath: input + "/" + fileName)
+            let source = String(data: contents!, encoding: .utf8)!
+            print(source)
+        }
+    }
+}
+```
+
+To simplify the logic we'll check files in a root directory, but in a real project you need to check all subfolders. The next step is to parse the source code with `SwiftSyntax`:
+
+```swift
+import SwiftSyntax
+import SwiftParser
+
+func run() throws {
+    /* Previous code */
+    let sourceFile = Parser.parse(source: source)
+    let visitor = ViewStructVisitor(viewMode: .fixedUp)
+    visitor.walk(sourceFile)
+}
+
+final class ViewStructVisitor: SyntaxVisitor {
+}
+```
+
+in `ViewStructVisitor` we'll search for structs that support `View` protocol:
+
+```swift
+final class ViewStructVisitor: SyntaxVisitor {
+
+    var viewNodes: [StructDeclSyntax] = []
+
+    override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
+        if let inheritanceClause = node.inheritanceClause {
+            for inheritance in inheritanceClause.inheritedTypes {
+                if inheritance.type.description.trimmingCharacters(in: .whitespacesAndNewlines) == "View" {
+                    viewNodes.append(node)
+                }
+            }
+        }
+        return .visitChildren
+    }
+}
+```
+
+In `viewNodes` we save `StructDeclSyntax` nodes. It's a representation of struct declaration. Now we're ready to generate the code snippet for the library content. I'll not stop in the details of the implementation. Honestly, SwiftSyntax is a bit complex and and hard to understand. Many APIs have no documentation, open source examples use old interfaces, and LLM tools generate wrong code. Here is my final code:
+
+```swift
+import SwiftSyntaxBuilder
+
+func makeLibraryContent(nodes: [StructDeclSyntax]) -> SourceFileSyntax {
+    SourceFileSyntax {
+        ImportDeclSyntax(path: .init { ImportPathComponentSyntax(name: "DeveloperToolsSupport") })
+        ImportDeclSyntax(path: .init { ImportPathComponentSyntax(name: "SwiftUI") })
+            .with(\.trailingTrivia, .newlines(2))
+
+        let attributes = AttributeListSyntax {
+            .attribute(AttributeSyntax(attributeName: TypeSyntax("preconcurrency")))
+        }
+        let attributedTypeSyntax = AttributedTypeSyntax(specifiers: [],
+                                                        attributes: attributes,
+                                                        baseType: TypeSyntax("LibraryContentProvider"))
+        let inheritanceClause = InheritanceClauseSyntax {
+            InheritedTypeSyntax(type: attributedTypeSyntax)
+        }
+        StructDeclSyntax(name: "LibraryContent", inheritanceClause: inheritanceClause) {
+            let attributes = AttributeListSyntax {
+                AttributeListSyntax.Element.attribute(AttributeSyntax(attributeName: TypeSyntax("MainActor")))
+                AttributeListSyntax.Element.attribute(AttributeSyntax(attributeName: TypeSyntax("LibraryContentBuilder")))
+            }
+                .with(\.trailingTrivia, .newline)
+            let accessorBlock = AccessorBlockSyntax(accessors: AccessorBlockSyntax.Accessors(
+                CodeBlockItemListSyntax {
+                    nodes.map(makeLibraryItem)
+                })
+            )
+            let bindings = PatternBindingListSyntax {
+                PatternBindingSyntax(
+                    pattern: IdentifierPatternSyntax(identifier: .identifier("views")),
+                    typeAnnotation: TypeAnnotationSyntax(type: ArrayTypeSyntax(element: TypeSyntax("LibraryItem"))),
+                    accessorBlock: accessorBlock
+                )
+            }
+            VariableDeclSyntax(attributes: attributes,
+                               bindingSpecifier: .keyword(.var),
+                               bindings: bindings)
+            .with(\.leadingTrivia, .newlines(2))
+        }
+    }
+}
+
+func makeLibraryItem(node: StructDeclSyntax) -> FunctionCallExprSyntax {
+    let viewExpression = FunctionCallExprSyntax(callee: DeclReferenceExprSyntax(baseName: node.name))
+    let categoryExpression = MemberAccessExprSyntax(name: "control")
+
+    let callee = DeclReferenceExprSyntax(baseName: .identifier("LibraryItem"))
+    return FunctionCallExprSyntax(callee: callee) {
+        LabeledExprSyntax(label: nil, expression: viewExpression)
+        LabeledExprSyntax(label: "category", expression: categoryExpression)
+    }
+}
+```
+
+I'm sure the code is not perfect, but it works. It generates `SourceFileSyntax` with the following content:
+
+```swift
+import DeveloperToolsSupport
+import SwiftUI
+
+struct LibraryContent: @preconcurrency LibraryContentProvider {
+
+    @MainActor @LibraryContentBuilder
+    var views: [LibraryItem] {
+        LibraryItem(TitleView(), category: .control)
+    }
+}
+```
+
+My view example has only one initializer without parameters, but with the power of SwiftSyntax we can insprect any kinds of declarations and generate the necessary code with default values if needed.
+
+The last step here is to save it to output file:
+
+```swift
+let finalCode = makeLibraryContent(nodes: viewNodes).formatted().description
+let url = URL(fileURLWithPath: output)
+try finalCode.write(to: url, atomically: true, encoding: .utf8)
+```
+
+If you run the plugin from the Xcode interface, you'll see a warning:
+
+![Warning](/images/xcode-library-customization-with-spm-plugin/warning.png)
+
+Another way to run it is via command line:
+
+```bash
+> swift package generate-library-content --target Components --allow-writing-to-package-directory
+Building for debugging...
+[7/7] Applying generate-library-content-tool
+Build of product 'generate-library-content' complete! (2.19s)
+LibraryContent.swift has been generated successfully
+```
+
+Finally, generated file is added to the package and Xcode Library automatically update Views section:
+
+![Updated Xcode Library](/images/xcode-library-customization-with-spm-plugin/updated-xcode-library.png)
+
+You may notice there is no documentation or examples in the right section. Xcode Library doesn't support this feature for custom components.
+
+## Final thoughts
+
+Swift Package Manager plugins are a powerful tool to extend the functionality of your packages. Big advantage is installation, you don't need to install any additional tools like Homebrew or Mint. But what's require improvements and additional documentation is SwiftSyntax. I used [Swift AST Explorer](https://swift-ast-explorer.com) to visualize the syntax tree and understand the structure of nodes:
+
+![Swift AST Explorer](/images/xcode-library-customization-with-spm-plugin/swift-ast-explorer.png)
+
+And just [search on Github repositories](https://github.com/search?q=FunctionCallExprSyntax+language%3ASwift&type=code&l=Swift) to explore open-source examples.
+
+Also, Xcode Library is one of the underrated and forgotten Xcode features. It may replace some documenation and simplify code reusing. With `LibraryContentProvider` code snippets will be up-to-date, because they use real views and will fail build process in case of any break changes in view interfaces. I hope Apple will improve Xcode Library in hext releases.
+
+As usual you can find the final project on [Github](https://github.com/artemnovichkov/LibraryContentExample). Feel free to ask questions or share your feedback on [X](https://x.com/iosartem). Thanks for reading!
+
+## References
+
+- [Add custom views and modifiers to the Xcode Library](https://developer.apple.com/videos/play/wwdc2020/10649/) from WWDC2020
+- [Xcode library customization](https://developer.apple.com/documentation/swiftui/xcode-library-customization)
+- [Getting Started with Plugins](https://github.com/swiftlang/swift-package-manager/blob/main/Documentation/Plugins.md)
+- [Swift AST Explorer](https://swift-ast-explorer.com)
