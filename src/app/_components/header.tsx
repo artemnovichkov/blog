@@ -13,6 +13,9 @@ export default function Header() {
                 <Link href="/feed.xml" className="p-4 text-gray-900 hover:text-gray-600 dark:text-gray-100">
                     RSS
                 </Link>
+                <a href="https://buymeacoffee.com/artemnovichkov" className="p-4 text-gray-900 hover:text-gray-600 dark:text-gray-100" target="_blank" rel="noopener noreferrer">
+                    Buy me a coffee
+                </a>
             </nav>
         </header>
     )
