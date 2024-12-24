@@ -22,6 +22,7 @@ export default function PostActions({ post }: PostActionsProps) {
         href={twitterShareUrl(post)}
         target="_blank"
         rel="noopener noreferrer"
+        className="underline"
       >
         {'Share on X'}
       </a>
@@ -30,6 +31,7 @@ export default function PostActions({ post }: PostActionsProps) {
         href={editUrl(post.slug)}
         target="_blank"
         rel="noopener noreferrer"
+        className="underline"
       >
         {'Found a typo? Edit this post on GitHub'}
       </a>
