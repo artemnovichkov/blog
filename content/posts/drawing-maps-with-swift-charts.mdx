@@ -1,0 +1,277 @@
+---
+title: 'Drawing maps with Swift Charts'
+description: Drawing Kazakhstan map with Swift Charts
+cover: /images/xcode-library-customization-with-spm-plugin/cover.png
+date: '2025-02-04'
+author:
+  - artem-novichkov
+---
+
+In a [previous post](https://www.artemnovichkov.com/blog/github-contribution-graph-swift-charts) we drawed Github contribution graph with Swift Charts. Swift Charts is a really powerful framework that allows you to visualize data in different ways. In [Swift Charts: Vectorized and function plots](https://developer.apple.com/videos/play/wwdc2024/10155/) WWDC session I saw an interesting example — drawing maps:
+
+![US map](/images/drawing-maps-with-swift-charts/us-map.png)
+
+I was inspired by this example and decided to draw a different map. I live in Kazakhstan, so let's visualize population data of Kazakhstan regions. Here's a reference chart from an official statistics site:
+
+![Kazakhstan map](/images/drawing-maps-with-swift-charts/kazakhstan-map.png)
+Source: [gov.kz](https://stat.gov.kz/en/region/)
+
+## Getting data
+
+Initially we need to get an information about region coordinates, names and population. The best format for it is GeoJSON — an open standard format designed for representing simple geographical features. I used [overpass turbo](http://overpass-turbo.eu/) service to get a relevant coordinates and information. You can use a special query language to get data. Here's a query to get all regions of Kazakhstan:
+
+```
+[out:json];
+{{geocodeArea:Kazakhstan}}->.searchArea;
+relation["admin_level"="4"](area.searchArea);
+out geom;
+```
+
+As a result you will get a JSON file with all regions of Kazakhstan in a special format. I changed it a little bit, removed cities to simplify drawing and update population with actial values.
+
+To map this file we can use [MKGeoJSONDecoder](https://developer.apple.com/documentation/mapkit/mkgeojsondecoder) from MapKit framework. It allows to decode GeoJSON data into a collection of `MKGeoJSONFeature` objects.
+
+```swift
+import MapKit
+
+func loadFeatureData() throws -> [FeatureData] {
+    let url = Bundle.main.url(forResource: "kazakhstan",
+                              withExtension: "geojson")!
+    let kazakhstanData = try Data(contentsOf: url)
+    let features = try MKGeoJSONDecoder()
+        .decode(kazakhstanData)
+        .compactMap { geoJSONObject in
+            if let feature = geoJSONObject as? MKGeoJSONFeature {
+                return FeatureData(feature: feature)
+            }
+            return nil
+        }
+    return features
+}
+```
+
+Additionally we need to create `FeatureData` struct to get information about each region. Apple engineers recommend to prepare all data before drawing charts to prevent performance issues.
+
+```swift
+import MapKit
+
+struct FeatureData {
+
+    let identifier: String?
+    let coordinates: [CLLocationCoordinate2D]
+    let center: CLLocationCoordinate2D
+    let name: String?
+    let population: Int?
+
+    init?(feature: MKGeoJSONFeature) {
+        guard let properties = feature.properties,
+              let polygon = feature.geometry.first as? MKPolygon else {
+            return nil
+        }
+        identifier = feature.identifier
+        coordinates = polygon.coordinates
+        center = polygon.center
+        let propertiesData = try? JSONDecoder().decode([String: String].self, from: properties)
+        name = propertiesData?["name:en"]
+        population = Int(propertiesData?["population"] ?? "0")
+    }
+}
+```
+
+In our case all features contains only one geometry object — `MKPolygon`. With a small extension we can get all coordinates and center of the region:
+
+```swift
+extension MKPolygon {
+
+    var coordinates: [CLLocationCoordinate2D] {
+        var coordinates = [CLLocationCoordinate2D](repeating: kCLLocationCoordinate2DInvalid,
+                                                   count: pointCount)
+        getCoordinates(&coordinates, range: NSRange(location: 0, length: pointCount))
+        return coordinates
+    }
+
+    /// The algorithm of center calculation is trivial and may not work for regions with complex shapes
+    var center: CLLocationCoordinate2D {
+        let coordinates = coordinates
+        let minLong = coordinates.min(by: { $0.longitude < $1.longitude })!
+        let maxLong = coordinates.max(by: { $0.longitude < $1.longitude })!
+        let minLat = coordinates.min(by: { $0.latitude < $1.latitude })!
+        let maxLat = coordinates.max(by: { $0.latitude < $1.latitude })!
+        return CLLocationCoordinate2D(latitude: (minLat.latitude + maxLat.latitude) / 2,
+                                      longitude: (minLong.longitude + maxLong.longitude) / 2)
+    }
+}
+```
+
+Also we use `feature.properties` to get a name and population of the region. Now we can draw a chart with map data.
+
+## Drawing chart
+
+Let's prepare a content view:
+
+```swift
+import SwiftUI
+import Charts
+import MapKit
+
+struct ContentView: View {
+
+    @State private var features: [FeatureData] = []
+
+    var body: some View {
+        Chart {
+            // Chart code goes here
+        }
+        .onAppear {
+            do {
+                features = try loadFeatureData()
+            } catch {
+                print("Error parsing GeoJSON: \(error)")
+            }
+        }
+    }
+}
+```
+
+To mimic the reference chart, we'll draw a different components:
+
+- Colored areas with `AreaPlot`;
+- White lines with `LinePlot`;
+- Points with `PointMark`.
+
+
+<Callout type="info" emoji="️ℹ️">
+  `AreaPlot` and `LinePlot` are available since iOS 18. If you use an older version, you can use `AreaMark` and `LineMark` instead.
+</Callout>
+
+For each component we create a separate `ChartContent` view to decompose drawing logic. Let's start with colored areas:
+
+```swift
+import Charts
+
+struct FeatureAreaPlot: ChartContent {
+
+    let featureData: FeatureData
+
+    var body: some ChartContent {
+        AreaPlot(featureData.coordinates,
+                 x: .value("Longitude", \.longitude),
+                 y: .value("Latitude", \.latitude),
+                 stacking: .unstacked)
+        .foregroundStyle(by: .value("Population", featureData.population ?? 0))
+    }
+}
+```
+
+We set x and y values as `PlottableValue` with key paths to `CLLocationCoordinate2D` properties. Also we set a `stacking` parameter to `unstacked` to draw each region separately. To set a color we use `foregroundStyle(by:)` modifier with a `PlottableValue` for population. Let's add these views to the chart:
+
+```swift
+Chart {
+    ForEach(features, id: \.identifier) { featureData in
+        FeatureAreaPlot(featureData: featureData)
+    }
+}
+.chartYScale(domain: 40...56)
+.chartXScale(domain: 40...95)
+.chartXAxis(.hidden)
+.chartYAxis(.hidden)
+.chartLegend(.hidden)
+.chartPlotStyle {
+    $0.aspectRatio(2, contentMode: .fit)
+}
+```
+
+Additionally we change scales to center our map, hides unnecessary axes and legend, and set a fixed aspect ratio. Here's a result:
+
+![Area](/images/drawing-maps-with-swift-charts/area.png)
+
+You may notice a strage artifacts of drawing — two lines at the right. As I understood during debugging, different areas somehow affect each other. I did't find a solution to fix it, I almost sure it depends on the coordinates. But it's hard to find a mistake in such a big dataset.
+
+The next part is to draw white lines. We can use `LinePlot` for this:
+
+```swift
+import Charts
+
+struct FeatureLinePlot: ChartContent {
+
+    let featureData: FeatureData
+
+    var body: some ChartContent {
+        LinePlot(featureData.coordinates,
+                 x: .value("Longitude", \.longitude),
+                 y: .value("Latitude", \.latitude)
+        )
+        .lineStyle(.init(lineWidth: 1, lineCap: .round, lineJoin: .round))
+        .foregroundStyle(by: .value("Feature", featureData.identifier ?? "id"))
+    }
+}
+```
+
+The code looks similar to the previous one. We use `LinePlot` to draw a line with a specified line style. Foreground style prevents the line from being connected for a separate regions. Let's add this view to the chart:
+
+```swift
+Chart {
+    ForEach(features, id: \.identifier) { featureData in
+        FeatureAreaPlot(featureData: featureData)
+    }
+    ForEach(features, id: \.identifier) { featureData in
+        FeatureLinePlot(featureData: featureData)
+    }
+}
+```
+
+We splitted the marks into two parts to draw lines above the areas. Since iOS 17 you can use `zIndex` modifier for each mark to control the order of drawing. But it doesn't work in this case. If you know how to fix it, feel free to share your solution on [X](http://x.com/iosartem).
+
+Now we have a map with colored areas and white lines:
+
+![Lines](/images/drawing-maps-with-swift-charts/lines.png)
+
+The last part is to draw points. We can use `PointMark` for this:
+
+```swift
+import SwiftUI
+import Charts
+
+struct FeaturePointMark: ChartContent {
+
+    let featureData: FeatureData
+
+    var body: some ChartContent {
+        PointMark(x: .value("x", featureData.center.longitude),
+                  y: .value("y", featureData.center.latitude))
+        .symbol {
+            Circle()
+                .stroke(.white, lineWidth: 8)
+                .fill(.blue)
+                .frame(width: 20, height: 20)
+
+        }
+        .annotation(position: .top, alignment: .center, spacing: 4) {
+            if let name = featureData.name {
+                Text(name)
+                    .font(.caption2)
+            }
+        }
+        .annotation(position: .bottom, alignment: .center, spacing: 4) {
+            if let population = featureData.population {
+                Text(population, format: .number)
+                    .font(.caption2)
+            }
+        }
+    }
+}
+```
+
+Here we use three modifiers for customization:
+
+- `symbol` to set a custom view for the point;
+- `annotation` to add a top text with the region name;
+- `annotation` to add a bottom text with the population.
+
+Adding to the chart is similar to the previous steps, so let's check the result:
+
+![Points](/images/drawing-maps-with-swift-charts/points.png)
+
+## Conclusion
+
+Swift Charts. Moreover, charts are intereactive, we can enhanse the example above and add a region selection. Also Swift Charts support accesibility, we can add VoiceOver to make the map more accessible. I hope you enjoyed this example and will try to draw your own maps with Swift Charts. If you have any questions or suggestions, feel free to share them in the comments below. Thanks for reading!
