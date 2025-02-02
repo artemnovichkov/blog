@@ -27,7 +27,7 @@ relation["admin_level"="4"](area.searchArea);
 out geom;
 ```
 
-As a result you will get a JSON file with all regions of Kazakhstan in a special format. I changed it a little bit, removed cities to simplify drawing and update population with actial values.
+As a result you will get [a JSON file](https://github.com/artemnovichkov/KazakhstanMapExample/blob/main/KazakhstanMapExample/kazakhstan.geojson) with all regions of Kazakhstan in a special format. I changed it a little bit, removed cities to simplify drawing and update population with actial values.
 
 To map this file we can use [MKGeoJSONDecoder](https://developer.apple.com/documentation/mapkit/mkgeojsondecoder) from MapKit framework. It allows to decode GeoJSON data into a collection of `MKGeoJSONFeature` objects.
 
@@ -55,25 +55,27 @@ Additionally we need to create `FeatureData` struct to get information about eac
 ```swift
 import MapKit
 
-struct FeatureData {
+struct FeatureData: Identifiable {
 
-    let identifier: String?
+    let id: String
     let coordinates: [CLLocationCoordinate2D]
     let center: CLLocationCoordinate2D
     let name: String?
-    let population: Int?
+    var population: Int = 0
 
     init?(feature: MKGeoJSONFeature) {
         guard let properties = feature.properties,
               let polygon = feature.geometry.first as? MKPolygon else {
             return nil
         }
-        identifier = feature.identifier
+        id = feature.identifier ?? UUID().uuidString
         coordinates = polygon.coordinates
         center = polygon.center
         let propertiesData = try? JSONDecoder().decode([String: String].self, from: properties)
         name = propertiesData?["name:en"]
-        population = Int(propertiesData?["population"] ?? "0")
+        if let rawPopulation = propertiesData?["population"], let population = Int(rawPopulation) {
+            self.population = population
+        }
     }
 }
 ```
@@ -92,13 +94,19 @@ extension MKPolygon {
 
     /// The algorithm of center calculation is trivial and may not work for regions with complex shapes
     var center: CLLocationCoordinate2D {
-        let coordinates = coordinates
-        let minLong = coordinates.min(by: { $0.longitude < $1.longitude })!
-        let maxLong = coordinates.max(by: { $0.longitude < $1.longitude })!
-        let minLat = coordinates.min(by: { $0.latitude < $1.latitude })!
-        let maxLat = coordinates.max(by: { $0.latitude < $1.latitude })!
-        return CLLocationCoordinate2D(latitude: (minLat.latitude + maxLat.latitude) / 2,
-                                      longitude: (minLong.longitude + maxLong.longitude) / 2)
+        var minLat = CLLocationDegrees.greatestFiniteMagnitude
+        var minLng = CLLocationDegrees.greatestFiniteMagnitude
+        var maxLat = -CLLocationDegrees.greatestFiniteMagnitude
+        var maxLng = -CLLocationDegrees.greatestFiniteMagnitude
+
+        for coordinate in coordinates {
+            minLat = min(minLat, coordinate.latitude)
+            minLng = min(minLng, coordinate.longitude)
+            maxLat = max(maxLat, coordinate.latitude)
+            maxLng = max(maxLng, coordinate.longitude)
+        }
+        return CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2,
+                                      longitude: (minLng + maxLng) / 2)
     }
 }
 ```
@@ -167,7 +175,7 @@ We set x and y values as `PlottableValue` with key paths to `CLLocationCoordinat
 
 ```swift
 Chart {
-    ForEach(features, id: \.identifier) { featureData in
+    ForEach(features) { featureData in
         FeatureAreaPlot(featureData: featureData)
     }
 }
@@ -211,10 +219,10 @@ The code looks similar to the previous one. We use `LinePlot` to draw a line wit
 
 ```swift
 Chart {
-    ForEach(features, id: \.identifier) { featureData in
+    ForEach(features) { featureData in
         FeatureAreaPlot(featureData: featureData)
     }
-    ForEach(features, id: \.identifier) { featureData in
+    ForEach(features) { featureData in
         FeatureLinePlot(featureData: featureData)
     }
 }
@@ -253,10 +261,8 @@ struct FeaturePointMark: ChartContent {
             }
         }
         .annotation(position: .bottom, alignment: .center, spacing: 4) {
-            if let population = featureData.population {
-                Text(population, format: .number)
-                    .font(.caption2)
-            }
+            Text(featureData.population, format: .number)
+                .font(.caption2)
         }
     }
 }
@@ -274,4 +280,6 @@ Adding to the chart is similar to the previous steps, so let's check the result:
 
 ## Conclusion
 
-Swift Charts. Moreover, charts are intereactive, we can enhanse the example above and add a region selection. Also Swift Charts support accesibility, we can add VoiceOver to make the map more accessible. I hope you enjoyed this example and will try to draw your own maps with Swift Charts. If you have any questions or suggestions, feel free to share them in the comments below. Thanks for reading!
+In this post we learned how to draw maps with Swift Charts. The final result is not perfect, but I discovered a lot of interesting and unobvious cases that can be useful in the future. Swift Charts has a lot of potential. Charts may be intereactive, we can enhanse the example above and add a region selection. Moreover, Swift Charts support accesibility, we can add VoiceOver to make the map more accessible. 
+
+I hope you enjoyed this example and will try to draw your own maps. As usual you can find the final project on [Github](http://x.com/iosartem). If you have any questions or suggestions, feel free to share them on [X](http://x.com/iosartem). Thanks for reading!
