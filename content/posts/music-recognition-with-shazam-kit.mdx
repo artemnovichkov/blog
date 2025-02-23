@@ -7,7 +7,7 @@ author:
   - artem-novichkov
 ---
 
-ShazamKit makes it easy to add music recognition to your iOS apps. First version of this framework was introduced at WWDC 2021. It was a bit complicated: working with `AVAudioEngine` and streaming buffers, getting results via `SHSessionDelegate`. Since iOS 17, ShazamKit has been simplified and now works with modern concurrency. In this guide, you'll learn how to set up ShazamKit, recognize songs, and manage a library of identified tracks.
+ShazamKit makes it easy to add music recognition to your iOS apps. The first version of this framework was introduced at WWDC 2021. It was a bit complicated: working with `AVAudioEngine` and streaming buffers, getting results via `SHSessionDelegate`. Since iOS 17, ShazamKit has been simplified and now works with modern concurrency. In this guide, you'll learn how to set up ShazamKit, recognize songs, and manage a library of identified tracks.
 
 ## Preparation
 
@@ -16,7 +16,7 @@ Before importing the framework, you'll need to enable the ShazamKit service. In 
 ![App Services](/images/music-recognition-with-shazam-kit/app-services.png)
 
 <Callout type="info" emoji="️ℹ️">
-  In case of missing service you'll get an error: `The operation couldn't be completed. (com.apple.ShazamKit error 202.)`
+  In case the service is missing, you’ll get an error: `The operation couldn't be completed. (com.apple.ShazamKit error 202.)`
 </Callout>
 
 For working with a microphone, you need to add the `NSMicrophoneUsageDescription` key to the `Info.plist` file.
@@ -94,7 +94,7 @@ final class ShazamViewModel: ObservableObject {
 }
 ```
 
-Calling this function is automatically requested permission to use the microphone.
+Calling this function automatically requests permission to use the microphone.
 
 `SHManagedSession` allows two ways to get the result:
 
@@ -111,7 +111,7 @@ func match() async {
     case .match(let match):
         print(match.mediaItems.first)
     case .noMatch(_):
-        print("Mo match")
+        print("No match")
     case .error(let error, _):
         print(error.localizedDescription)
     }
@@ -150,7 +150,7 @@ func match() async {
 
 Adding and removing items also affect the library in Shazam app.
 
-`SHLibrary` confirms to `Observable` protocol, so we can observe changes in the library and show them in the interface:
+`SHLibrary` conforms to the `Observable` protocol, so we can observe changes in the library and show them in the interface:
 
 ```swift
 struct ShazamView: View {
@@ -298,7 +298,7 @@ extension SHMediaItem {
 }
 ```
 
-These urls open a related search query in a browser. If an app is installed, the system will open it via an universal link.
+These URLs open a related search query in a browser. If an app is installed, the system will open it via an universal link.
 
 3. The remove button calls the `removeAction` closure to remove the media item from the library.
 4. The share button opens Shazam web page or app with the media item.
@@ -344,7 +344,7 @@ private var shazamButton: some View {
 
 ## Conclusion
 
-ShazamKit provides a unique opportunity to recognize music in your app. It's may be useful for apps with audio content:
+ShazamKit provides a unique opportunity to recognize music in your app. It may be useful for apps with audio content:
 
 - Recognizing songs in podcasts, radio, or user-generated content; 
 - Applying filters to videos or photos based on background music;
