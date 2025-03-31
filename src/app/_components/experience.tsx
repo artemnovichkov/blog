@@ -81,10 +81,18 @@ const Position: React.FC<PositionProps> = ({ position }) => {
 const fullTimePositions = [
     {
         title: "iOS Developer",
+        company: "Salmon Group Ltd",
+        image: "/images/companies/salmon.png",
+        url: "https://https://salmon.ph",
+        startDate: "2025-03",
+    },
+    {
+        title: "iOS Developer",
         company: "Welltory",
         image: "/images/companies/welltory.png",
         url: "https://welltory.com",
         startDate: "2022-06",
+        finishDate: "2025-03",
     },
     {
         title: "iOS Developer",
