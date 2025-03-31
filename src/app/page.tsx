@@ -18,7 +18,7 @@ export default function About() {
                     Hi there! My name is Artem Novichkov. I am an iOS Developer.
                 </p>
                 <p>
-                    I work at Welltory, where I&apos;m developing an app that enables users to sync data from other apps and gadgets to gain insights into their health and lifestyle.
+                    I work at Salmon Group Ltd, developing the Salmon app — a super app designed to connect millions of Filipinos with reliable financial services, making finance accessible and easy.
                 </p>
                 <p>
                     Besides my main work, I focus on individual mentoring and consultations for developers and companies, helping them solve their challenges in iOS development. I also worked with the online platform Netology, where I created teaching materials, reviewed student assignments, and conducted over 100 online lectures.
