@@ -1,0 +1,162 @@
+---
+title: How to inspect .ipa files and secure your iOS app from common mistakes
+description: Improve your app security with 3 simple rules
+cover: /images/how-to-inspect-ipa-files/cover.png
+date: '2025-04-09'
+author:
+  - artem-novichkov
+---
+
+Do you wonder what's inside your favorite iOS app? Which third-party frameworks are used? What hidden resources are added to the app bundle?
+
+In this guide, you'll learn how to inspect .ipa files — the package format for iOS apps — and explore their internal structure. We'll also highlight common security mistakes and offer three essential rules to help you avoid exposing sensitive data.
+
+## Getting .ipa file
+
+There are several ways to get .ipa file:
+
+- [Apple Configurator](https://apps.apple.com/en/app/apple-configurator/id1037126344). An official Apple app for managing iOS devices, you can download it from the App Store.
+- [iMazing](https://imazing.com). A third-party tool with .ipa exporting features (requires a paid license).
+- [ipatools](https://github.com/majd/ipatool). A command-line tool that allows you to download .ipa files from the App Store.
+- Jailbreaking. Advanced method requiring technical knowledge and a modified device. Not recommended.
+
+I prefer Apple Configurator for its simplicity. After installing the app and connecting your iPhone:
+
+1. Launch Apple Configurator.
+
+2. Click Add → Apps, then search for the app you want. As an example we will use [Headspace](https://apps.apple.com/en/app/headspace-sleep-meditation/id493145008), an app for meditation and mindfulness.
+
+3. Select the app and click Add.
+
+![Apple Configurator Search](/images/how-to-inspect-ipa-files/search.png)
+
+If the app is already installed, a warning appears after a few minutes:
+
+![Apple Configurator Replace](/images/how-to-inspect-ipa-files/replace.png)
+
+Ignore it and open the following folder to locate the .ipa file:
+
+```
+~/Library/Group Containers/K36BKF7T3D.group.com.apple.configurator/Library/Caches/Assets/TemporaryItems
+```
+
+Change the file extension to .zip and unarchive it. The contents may resemble:
+
+```
+Headspace
+├── iTunesArtwork
+│  ├── iTunesMetadata.plist
+├── META-INF
+│  ├── com.apple.FixedZipMetadata.bin
+│  ├── com.apple.ZipMetadata.plist
+├── Payload
+│  ├── Headspace Mobile
+```
+
+The `Payload` folder contains the actual app bundle. Right-click the app and select **Show Package Contents**.
+
+## Inspecting app bundle content
+
+Let's dive into the contents of the app bundle and highlight what developers — and attackers — can find.
+
+### Info.plist
+
+The first thing we check is the `Info.plist` file. It's a full copy of `Info.plist` file from Xcode project:
+
+![Info.plist](/images/how-to-inspect-ipa-files/info-plist.png)
+
+Here you can find all the app's metadata, such as bundle identifier, version, build number, and more. Moreover, you can find queried URL schemes. Some banking apps use URL schemes to check installed apps on your device. In Headspace we also see custom keys like `REMOTE_LOGGING_JWT` or `STRIPE_AUTH_KEY`.
+
+<Callout type="warning" emoji="️⚠️">
+  Rule #1. Don't add any sensitive data to Info.plist. It's not encrypted and can be easily read by anyone.
+</Callout>
+
+### Frameworks
+
+The Frameworks directory contains dynamic libraries and third-party SDKs used by the app. From the names, we can infer that Headspace integrates Flutter modules:
+
+```
+...
+flutter_email_sender.framework
+flutter_keyboard_visibility.framework
+flutter_secure_storage_darwin.framework
+...
+```
+
+### Resources
+
+You can also find resources that added to app targets: fonts, images, videos, etc. But sometimes developers add resources to the app bundle that are not used in the app itself. These resources can be used for testing or developing purposes. In Headspace app you can found `.swiftlint.yml` that is used for linting Swift code. Here is one custom rule from it. Good one!
+```
+constants_use_enums:
+    name: "Constants use enums"
+    regex: "struct Constants"
+    message: "Prefer enums over structs for Constants"
+```
+
+The next interesting file is `Accounts.json`. It's a set of test accounts:
+
+![Accounts](/images/how-to-inspect-ipa-files/accounts.png)
+
+Luckily, it doesn’t work in the production app. The next file is `config.yml`. It's a file for CI/CD pipelines:
+
+![config.yml](/images/how-to-inspect-ipa-files/config.png)
+
+<Callout type="warning" emoji="️⚠️">
+  Rule #2. Don't add development or testing data to app targets.
+</Callout>
+
+Headspace uses Lottie for animations, according to added `Lottie.framework`. Usually, Lottie animations are stored in plain json files. Look at this cute caterpillar!
+
+![Lottie](/images/how-to-inspect-ipa-files/lottie.png)
+
+### Assets.car
+
+The app bundle also contains a file called `Assets.car`. This file contains the images and other resources used in the app. It's a compiled version of the asset catalog, you can use [AssetCatalogTinkerer](https://github.com/insidegui/AssetCatalogTinkerer) to inspect it:
+
+![Assets](/images/how-to-inspect-ipa-files/assets.png)
+
+### Strings
+
+macOS has a built-in tool called `strings` that can extract strings from binary files. To use `strings`, open Terminal and run the following command:
+
+```bash
+> strings Headspace\ Mobile > strings.txt
+```
+Nothing criminal here, we can found strings that look like in-app purchase identifiers:
+```
+...
+IOSIAP1M
+STAY10
+IOSIAP12M
+STAY10_12MPLAN
+STAY10
+STAY10
+STAY50_2
+IOSIAP1M
+STAY50_2
+IOSIAPINTRO40
+IOSIAP12M
+STAY10
+IOSIAP12M
+...
+```
+
+And a warning to the development team:
+
+```
+Accessing Environment<%s>'s value outside of being installed on a View. This will always read the default value and will not update.
+```
+
+Pay attention to the string literals in your code. They can contain sensitive data, such as API keys, tokens, or other information that should not be exposed.
+
+<Callout type="warning" emoji="️⚠️">
+  Rule #3. Don't store sensitive keys and secrets in string literals. Use obfuscation or encryption techniques.
+</Callout>
+
+## Conclusion
+
+Inspecting .ipa files can reveal a surprising amount of internal information — both useful and risky. Following the three security rules outlined above will help ensure that your iOS app avoids common pitfalls and protects user data.
+
+But remember: attackers use reverse engineering tools like [Hopper](https://www.hopperapp.com/) or [IDA Pro](https://hex-rays.com/ida-pro) to decompile and analyze app internals. Don't make their job easier.
+
+If you've never examined your own .ipa files — now's the perfect time. Stay curious, stay secure, and thanks for reading!

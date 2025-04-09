@@ -44,3 +44,7 @@
   margin-bottom: 0;
   @apply text-gray-800 dark:text-white;
 }
+
+.prose strong {
+  @apply text-gray-800 dark:text-white;
+}
