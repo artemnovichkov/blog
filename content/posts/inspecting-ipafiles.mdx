@@ -1,8 +1,8 @@
 ---
 title: Inspecting ipa files
 description: Improve your app security with 3 simple rules
-cover: /images/github-contribution-graph-swift-charts/cover.png
-date: '2025-07-10'
+cover: /images/inspecting-ipafiles/cover.png
+date: '2025-04-09'
 author:
   - artem-novichkov
 ---
@@ -15,26 +15,32 @@ In this guide, you'll learn how to inspect .ipa files — the package format for
 
 There are several ways to get .ipa file:
 
-- Using [Apple Configurator](https://apps.apple.com/en/app/apple-configurator/id1037126344). An official Apple app for managing iOS devices, you can download it from the App Store.
-- Using [iMazing](https://imazing.com). A third-party app with similar functionality, but it requires a paid subscription.
-- Using [ipatools](https://github.com/majd/ipatool). A command-line tool that allows you to download .ipa files from the App Store.
-- Jailbreaking device. This is the most complex method and requires a lot of effort. I don't recommend it.
+- [Apple Configurator](https://apps.apple.com/en/app/apple-configurator/id1037126344). An official Apple app for managing iOS devices, you can download it from the App Store.
+- [iMazing](https://imazing.com). A third-party tool with .ipa exporting features (requires a paid license).
+- [ipatools](https://github.com/majd/ipatool). A command-line tool that allows you to download .ipa files from the App Store.
+- Jailbreaking. Advanced method requiring technical knowledge and a modified device. Not recommended.
 
-I prefer using Apple Configurator. It's free and easy to use. Download it, run and connect your device. For example we will use [Headspace](https://apps.apple.com/en/app/headspace-sleep-meditation/id493145008), an app for meditation and mindfulness. Make sure to have it installed on your iPhone first. Click Add -> Apps and find the app. Click on it and then click Add.
+I prefer Apple Configurator for its simplicity. After installing the app and connecting your iPhone:
+
+1. Launch Apple Configurator.
+
+2. Click Add → Apps, then search for the app you want. As an example we will use [Headspace](https://apps.apple.com/en/app/headspace-sleep-meditation/id493145008), an app for meditation and mindfulness.
+
+3. Select the app and click Add.
 
 ![Apple Configurator Search](/images/inspecting-ipafiles/search.png)
 
-Because we already have the app installed, we see this warning in a few minutes:
+If the app is already installed, a warning appears after a few minutes:
 
 ![Apple Configurator Replace](/images/inspecting-ipafiles/replace.png)
 
-Ignore it and go to a folder:
+Ignore it and open the following folder to locate the .ipa file:
 
 ```
 ~/Library/Group Containers/K36BKF7T3D.group.com.apple.configurator/Library/Caches/Assets/TemporaryItems
 ```
 
-Here you can find the .ipa file. Change an extension to `.zip` and unarchive it. The structure may look like this: 
+Change the file extension to .zip and unarchive it. The contents may resemble:
 
 ```
 Headspace
@@ -47,11 +53,11 @@ Headspace
 │  ├── Headspace Mobile
 ```
 
-The most interesting part is `Payload` folder, it contains an app bundle. Right-click on it and select `Show Package Contents`.
+The `Payload` folder contains the actual app bundle. Right-click the app and select `Show Package Contents`.
 
 ## Inspecting app bundle content
 
-Let's check the content and see what we can find there.
+Let's dive into the contents of the app bundle and highlight what developers — and attackers — can find.
 
 ### Info.plist
 
@@ -67,9 +73,8 @@ Here you can find all the app's metadata, such as bundle identifier, version, bu
 
 ### Frameworks
 
-Frameworks folder contains dynamic libraries that are linked to the app at runtime. They can be used to share code between different targets or to provide additional functionality to the app. For example, the app might use a third-party library for networking or image processing.
+The Frameworks directory contains dynamic libraries and third-party SDKs used by the app. From the names, we can infer that Headspace integrates Flutter modules:
 
-According to framework names, Headspace team use Flutter for some screens:
 ```
 ...
 flutter_email_sender.framework
@@ -150,6 +155,8 @@ Pay attention to the string literals in your code. They can contain sensitive da
 
 ## Conclusion
 
-In this article, we learned how to inspect .ipa files and what to look for. Following the rules above, you can avoid exposing sensitive data and make your app more secure. Despite this, there are some tools for reverse engineering iOS apps, such as [Hopper](https://www.hopperapp.com/) or [IDA Pro](https://hex-rays.com/ida-pro). They let you disassemble, decompile and debug apps. Attackers may also use it to reverse engineer your app, find vulnerabilities, disable jailbreak detection, etc. If you've read this far, now is the best time to check out your app! Thanks for reading!
+Inspecting .ipa files can reveal a surprising amount of internal information — both useful and risky. Following the three security rules outlined above will help ensure that your iOS app avoids common pitfalls and protects user data.
 
-## References
+But remember: attackers use reverse engineering tools like [Hopper](https://www.hopperapp.com/) or [IDA Pro](https://hex-rays.com/ida-pro) to decompile and analyze app internals. Don't make their job easier.
+
+If you've never examined your own .ipa files — now's the perfect time. Stay curious, stay secure, and thanks for reading!
