@@ -135,18 +135,24 @@ targets: [
 
 For the command plugin we need to specify the `intent` and `permissions`. The `intent` is a intended use case of the plugin. The `permissions` is a list of permissions that the plugin requires. In our case, we need to write to the package directory to generate the code snippet. And here is a files structure:
 
-```
-Components
-├── Package.swift
-├── Plugins
-│   ├── LibraryContentPlugin
-│   │   ├── LibraryContentPlugin.swift
-├── Sources
-│   ├── Components
-│   │   ├── TitleView.swift
-│   ├── generate-library-content
-│   │   ├── GenerateLibraryContent.swift
-```
+<FileTree>
+  <FileTree.Folder name="Components">
+    <FileTree.File name="Package.swift" iconType="swift" />
+    <FileTree.Folder name="Plugins">
+      <FileTree.Folder name="LibraryContentPlugin">
+        <FileTree.File name="LibraryContentPlugin.swift" iconType="swift" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+    <FileTree.Folder name="Sources">
+      <FileTree.Folder name="Components">
+        <FileTree.File name="TitleView.swift" iconType="swift" />
+      </FileTree.Folder>
+      <FileTree.Folder name="generate-library-content">
+          <FileTree.File name="GenerateLibraryContent.swift" iconType="swift" />
+        </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
 
 In `LibraryContentPlugin.swift` we need to implement the `CommandPlugin` protocol:
 
