@@ -41,17 +41,21 @@ Ignore it and open the following folder to locate the .ipa file:
 ```
 
 Change the file extension to .zip and unarchive it. The contents may resemble:
-
-```
-Headspace
-├── iTunesArtwork
-│  ├── iTunesMetadata.plist
-├── META-INF
-│  ├── com.apple.FixedZipMetadata.bin
-│  ├── com.apple.ZipMetadata.plist
-├── Payload
-│  ├── Headspace Mobile
-```
+ 
+<FileTree>
+  <FileTree.Folder name="Headspace">
+    <FileTree.Folder name="iTunesArtwork">
+      <FileTree.File name="iTunesMetadata.plist" />
+    </FileTree.Folder>
+    <FileTree.Folder name="META-INF">
+      <FileTree.File name="com.apple.FixedZipMetadata.bin" />
+      <FileTree.File name="com.apple.ZipMetadata.plist" />
+    </FileTree.Folder>
+    <FileTree.Folder name="Payload">
+      <FileTree.File name="Headspace Mobile" />
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
 
 The `Payload` folder contains the actual app bundle. Right-click the app and select **Show Package Contents**.
 

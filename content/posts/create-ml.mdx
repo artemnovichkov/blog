@@ -44,15 +44,19 @@ We'll create a sentiment analysis model for Russian and Kazakh languages. Let's 
 ```
 
 Also, you can use CSV files or use matching folders with text files:
-```
-Training Data
-├── Positive
-│   ├── dataset1.txt
-│   ├── dataset2.txt
-├── Negative
-│   ├── dataset3.txt
-│   ├── dataset4.txt
-```
+
+<FileTree>
+  <FileTree.Folder name="Training Data">
+    <FileTree.Folder name="Positive">
+      <FileTree.File name="dataset1.txt" />
+      <FileTree.File name="dataset2.txt" />
+    </FileTree.Folder>
+    <FileTree.Folder name="Negative">
+      <FileTree.File name="dataset3.txt" />
+      <FileTree.File name="dataset4.txt" />
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
 
 Optionally, you can split your dataset into training and validation parts. If you leave the validation data empty, Create ML will do it for you. 
 
