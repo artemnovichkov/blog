@@ -1,0 +1,239 @@
+---
+title: Creating MCP Servers in Swift
+description: Learn how to create a Model Context Protocol server in Swift
+cover: /images/creating-mcp-servers-in-swift/cover.png
+date: '2025-04-17'
+author:
+  - artem-novichkov
+---
+
+**Model Context Protocol (MCP)** is an open standard that defines how software applications can deliver contextual information to large language models (LLMs). It's intended for integration across a wide range of tools — such as code editors, IDEs, and other applications. By leveraging natural language, MCP allows seamless interaction with multiple tools and data sources.
+
+In this article, we will create a simple MCP server in Swift that returns the current Swift version on your machine.
+
+## Creating a server
+
+We'll start with a package:
+
+```bash
+> mkdir swift-version-mcp
+> cd swift-version-mcp
+> swift package init --type executable
+```
+
+Next, add the official Swift SDK for Model Context Protocol servers and clients. Update the `Package.swift` file to include the SDK as a dependency:
+
+```swift
+// swift-tools-version:6.1
+// The swift-tools-version declares the minimum version of Swift required to build this package.
+
+import PackageDescription
+
+let package = Package(
+    name: "swift-version-mcp",
+    platforms: [
+        .macOS(.v13),
+    ],
+    products: [
+        .executable(name: "swift-version-mcp", targets: ["SwiftVersionMCP"]),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/modelcontextprotocol/swift-sdk", from: "0.7.1"),
+    ],
+    targets: [
+        .executableTarget(name: "SwiftVersionMCP", dependencies: [
+            .product(name: "MCP", package: "swift-sdk")
+        ]),
+    ]
+)
+```
+
+Open `main.swift` and add the following code:
+
+```swift
+import Foundation
+import MCP
+
+let server = Server(
+    name: "Swift Version Server",
+    version: "1.0.0",
+    capabilities: .init(tools: .init(listChanged: false))
+)
+
+let transport = StdioTransport()
+try await server.start(transport: transport)
+```
+
+Here we are creating a server with a name and version. The `capabilities` parameter is used to define the capabilities of the server. In this case, we are only defining the tools capability. To start the server, we are using the `StdioTransport` class, which is a transport layer for the server. It allows the server to communicate with the client via standard input and output.
+
+Next, we need to implement the tools. The server will have one tool that returns the current Swift version:
+
+```swift
+let tool = Tool(name: "swift_version",
+                description: "Returns the current Swift version")
+
+await server.withMethodHandler(ListTools.self) { params in
+    ListTools.Result(tools: [tool])
+}
+```
+
+During the experiments with the SDK, I found that the tool name should be in snake case format. Otherwise, you may face errors during the tool call. Tools also may have input schema for input parameters, it's optional by specification. But experimenting with different clients, I found that some of them don't see the tool if it doesn't have input schema. This quick fix helps to make the tool visible:
+
+```swift
+let tool = Tool(name: "swift_version",
+                description: "Returns the current Swift version",
+                inputSchema: .object([
+                    "type": .string("object")
+                ]))
+```
+
+To make the server respond to the tool, we need to implement the `withMethodHandler(CallTool.self)` function. It will be called when the client requests the tool. The method should return a `Result` object with the result of the tool:
+
+```swift
+await server.withMethodHandler(CallTool.self) { params in
+    guard params.name == tool.name else {
+        throw MCPError.invalidParams("Wrong tool name: \(params.name)")
+    }
+    return CallTool.Result(content: [.text(swiftVersion() ?? "No version")])
+}
+
+func swiftVersion() -> String? {
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+    process.arguments = ["swift", "--version"]
+
+    let outputPipe = Pipe()
+    process.standardOutput = outputPipe
+
+    do {
+        try process.run()
+        process.waitUntilExit()
+
+        let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
+        return String(data: data, encoding: .utf8)
+    } catch {
+        return "Error running swift-version: \(error)"
+    }
+}
+```
+
+Because the server may contain several tools, we check the tool name here.
+
+In the end of the file, add a call to `waitUntilCompleted()` to keep the server running:
+
+```swift
+await server.waitUntilCompleted()
+```
+
+Build the package with the following command to generate the executable:
+
+```bash
+> swift build
+```
+
+Interfaces in the SDK look a bit strange, because it was highly inspired by TypeScript implementation. It uses the same naming conventions and patterns. Sometimes you need to use dictionaries without strong types, but it is not a big deal. But hopefully it supports structured concurrency, so you can use `async/await` syntax.
+
+Now, we are ready to test the server. With a new Agent mode available in last releases of Visual Studio Code, you can use any MCP server in the editor. Let's configure it.
+
+## Using MCP servers in Visual Studio Code
+
+ Here is how to add the server. Make sure you install [Github Copilot extension](https://marketplace.visualstudio.com/items/?itemName=GitHub.copilot) first.
+
+1. Open `Command Palette...` via ⌘+⇧+P shortcut and search for `MCP: List Servers`
+2. Click on `Add Server`
+3. There are two options:
+- Command (Stdio)
+- HTTP (server-sent events)
+
+Select the first one because we are using Stdio transport.
+
+4. Add a path to the executable:
+
+```bash
+/Users/artemnovichkov/Developer/swift-version-mcp/.build/arm64-apple-macosx/debug/swift-version-mcp
+```
+
+5. Select a server name, for example, `swift-version-server`
+6. Select settings to save the server:
+- User settings (available in all workspaces). The server will be added to `settings.json`.
+- workspace settings (available in this workspace). The server will be added to `.vscode/mcp.json` in workspace folder.
+
+After finishing the setup, you will see the server in the list:
+```json
+{
+    "mcp": {
+        "servers": {
+            "swift-version-server": {
+                "type": "stdio",
+                "command": "/Users/artemnovichkov/Developer/swift-version-mcp/.build/arm64-apple-macosx/debug/swift-version-mcp",
+                "args": []
+            }
+        }
+    },
+}
+```
+
+Above the server name you will see a `Start` button. Click on it to start the server:
+```
+▷ Start | 1 cached tools
+```
+
+In the output you will see the following logs:
+```bash
+2025-04-16 23:13:15.438 [info] Starting server swift-version-server
+2025-04-16 23:13:15.439 [info] Connection state: Starting
+2025-04-16 23:13:15.439 [info] Starting server from LocalProcess extension host
+2025-04-16 23:13:15.443 [info] Connection state: Starting
+2025-04-16 23:13:15.448 [info] Connection state: Running
+2025-04-16 23:13:15.482 [info] Discovered 1 tools
+```
+
+Now open a chat via ^+⌘+I shortcut. In the top left corner you will see `Select Tools...` button with a count of available tools. Click on it to see a list of available tools.
+
+![Chat](/images/creating-mcp-servers-in-swift/chat.png)
+
+That's it! Now you can use the tool in the chat. Try to ask a question about Swift version and you will see a response from the server:
+
+![Result](/images/creating-mcp-servers-in-swift/result.png)
+
+## Using MCP servers in other clients
+
+You can use the server in other MCP clients like Cursor, Windsurf, Claude Desktop, etc. The configuration may vary, but the idea is the same.
+
+Here is the configuration for Cursor in `.cursor/mcp.json` :
+
+```json
+{
+  "mcpServers": {
+    "swift-version-server": {
+      "type": "stdio",
+      "command": "/Users/artemnovichkov/Developer/swift-version-mcp/.build/arm64-apple-macosx/debug/swift-version-mcp"
+    }
+  }
+}
+```
+
+And here is the result:
+
+![Cursor](/images/creating-mcp-servers-in-swift/cursor.png)
+
+For Claude Desktop, you can use the same configuration as for Cursor, but you need to add the server in `claude_desktop_config.json`.
+
+And here is the result:
+
+![Claude](/images/creating-mcp-servers-in-swift/claude.png)
+
+Make sure to restart Claude Desktop after adding the server.
+
+## Conclusion
+
+During the development of the server, I learned a lot about Model Context Protocol. I'm sure it will evolve over time and will become more powerful. Who knows, maybe this year we will see MCP integration in Xcode 😏.
+
+The final code is available on [Github](https://github.com/artemnovichkov/swift-version-mcp).
+
+## References
+
+- [Model Context Protocol. Introduction](https://modelcontextprotocol.io/introduction)
+- [Agent mode: available to all users and supports MCP](https://code.visualstudio.com/blogs/2025/04/07/agentMode) by VS Code Team
+- [Model Context Protocol](https://docs.cursor.com/context/model-context-protocol) by Cursor Team
+- [Awesome MCP Servers](https://mcpservers.org)
