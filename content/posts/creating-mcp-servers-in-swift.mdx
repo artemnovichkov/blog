@@ -69,7 +69,7 @@ Here we are creating a server with a name and version. The `capabilities` parame
 Next, we need to implement the tools. The server will have one tool that returns the current Swift version:
 
 ```swift
-let tool = Tool(name: "swift-version",
+let tool = Tool(name: "swift_version",
                 description: "Returns the current Swift version")
 
 await server.withMethodHandler(ListTools.self) { params in
@@ -77,12 +77,22 @@ await server.withMethodHandler(ListTools.self) { params in
 }
 ```
 
+During the experiments with the SDK, I found that the tool name should be in snake case format. Otherwise, you may face errors during the tool call. Tools also may have input schema for input parameters, it's optional by specification. But experimenting with different clients, I found that some of them don't see the tool if it doesn't have input schema. This quick fix helps to make the tool visible:
+
+```swift
+let tool = Tool(name: "swift_version",
+                description: "Returns the current Swift version",
+                inputSchema: .object([
+                    "type": .string("object")
+                ]))
+```
+
 To make the server respond to the tool, we need to implement the `withMethodHandler(CallTool.self)` function. It will be called when the client requests the tool. The method should return a `Result` object with the result of the tool:
 
 ```swift
 await server.withMethodHandler(CallTool.self) { params in
     guard params.name == tool.name else {
-        throw MCPError.invalidParams("Wrong tool name")
+        throw MCPError.invalidParams("Wrong tool name: \(params.name)")
     }
     return CallTool.Result(content: [.text(swiftVersion() ?? "No version")])
 }
@@ -186,7 +196,34 @@ That's it! Now you can use the tool in the chat. Try to ask a question about Swi
 
 ![Result](/images/creating-mcp-servers-in-swift/result.png)
 
-Moreover, you can use the server in other MCP clients like Cursor, Windsurf, Claude Desktop, etc.
+## Using MCP servers in other clients
+
+You can use the server in other MCP clients like Cursor, Windsurf, Claude Desktop, etc. The configuration may vary, but the idea is the same.
+
+Here is the configuration for Cursor in `.cursor/mcp.json` :
+
+```json
+{
+  "mcpServers": {
+    "swift-version-server": {
+      "type": "stdio",
+      "command": "/Users/artemnovichkov/Developer/swift-version-mcp/.build/arm64-apple-macosx/debug/swift-version-mcp"
+    }
+  }
+}
+```
+
+And here is the result:
+
+![Cursor](/images/creating-mcp-servers-in-swift/cursor.png)
+
+For Claude Desktop, you can use the same configuration as for Cursor, but you need to add the server in `claude_desktop_config.json`.
+
+And here is the result:
+
+![Claude](/images/creating-mcp-servers-in-swift/claude.png)
+
+Make sure to restart Claude Desktop after adding the server.
 
 ## Conclusion
 
