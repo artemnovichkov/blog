@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Post } from '@/interfaces/post';
 import PostDate from './post-date';
 import readingTime from 'reading-time'
+import PostCategories from './post-categories';
 
 interface PostPreviewProps {
     post: Post;
@@ -24,9 +25,10 @@ export default function PostPreview({ post }: PostPreviewProps) {
                         <h4 className="text-xl font-medium text-zinc-800 dark:text-gray-100">
                             {post.title}
                         </h4>
-                        <h4 className="mb-4 text-base font-normal text-zinc-500 dark:text-gray-400">
+                        <h4 className="mb-2 text-base font-normal text-zinc-500 dark:text-gray-400">
                             {post.description}
                         </h4>
+                        {post.categories && <PostCategories categories={post.categories} />}
                     </div>
                     <div className="text-sm font-normal font-xs text-zinc-500 dark:text-gray-400">
                         <PostDate dateString={post.date} />
