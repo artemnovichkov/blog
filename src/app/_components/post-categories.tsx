@@ -8,9 +8,10 @@ interface PostCategoriesProps {
 
 export default function PostCategories({ categories }: PostCategoriesProps) {
     return (
-        <div>
+        <div className="flex flex-wrap gap-2 mb-2">
             {categories.map((category) => (
-                <Link key={category} href={`/blog/category/${encodeURIComponent(category)}`}>
+                <Link key={category} href={`/blog/category/${encodeURIComponent(category)}`} 
+                    className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
                     {category}
                 </Link>
             ))}
