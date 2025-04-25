@@ -83,7 +83,7 @@ const fullTimePositions = [
         title: "iOS Developer",
         company: "Salmon Group Ltd",
         image: "/images/companies/salmon.png",
-        url: "https://https://salmon.ph",
+        url: "https://salmon.ph",
         startDate: "2025-03",
     },
     {
