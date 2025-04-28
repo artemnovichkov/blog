@@ -127,13 +127,14 @@ const partTimePositions = [
         image: "/images/companies/netology.png",
         url: "https://netology.ru/programs/ios-developer",
         startDate: "2020-08",
+        finishDate: "2022-12",
     },
     {
         title: "iOS Mentor",
         company: "Solvery",
         image: "/images/companies/solvery.png",
         url: "https://solvery.io/ru/mentor/artemnovichkov",
-        startDate: "2021-07",
+        startDate: "2021-08",
     },
     {
         title: "iOS Mentor",
@@ -141,13 +142,14 @@ const partTimePositions = [
         image: "/images/companies/codementor.png",
         url: "https://www.codementor.io/@artemnovichkov",
         startDate: "2017-12",
+        finishDate: "2022-02",
     },
     {
         title: "Freelance iOS Developer",
         company: "Upwork",
         image: "/images/companies/upwork.png",
         url: "https://www.upwork.com/freelancers/~01be851609bdb126f7",
-        startDate: "2015-09",
-        finishDate: "2018-09",
+        startDate: "2014-07",
+        finishDate: "2019-07",
     },
 ]
