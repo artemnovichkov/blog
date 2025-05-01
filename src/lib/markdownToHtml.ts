@@ -5,7 +5,8 @@ import rehypeShiki from '@shikijs/rehype'
 import { transformerNotationHighlight } from 'shikiji-transformers'
 import { Tweet } from 'react-tweet'
 import Callout from '../app/_components/callout';
-import { FileTree } from "@/app/_components/filetree";
+import { FileTree } from "../app/_components/filetree";
+import AudioPlayer from '../app/_components/audio-player';
 
 export default async function markdownToHtml(markdown: string) {
     const { content } = await compileMDX({
@@ -23,7 +24,7 @@ export default async function markdownToHtml(markdown: string) {
                 remarkPlugins: [remarkGfm],
             },
         },
-        components: { Tweet, Callout, FileTree },
+        components: { Tweet, Callout, FileTree, AudioPlayer },
     });
 
     return content;
