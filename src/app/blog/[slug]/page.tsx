@@ -7,7 +7,8 @@ import type { Metadata } from 'next'
 import { name } from '@/lib/const'
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-    const post = getPostBySlug(params.slug);
+    const { slug } = await params;
+    const post = getPostBySlug(slug);
     return {
         title: post.title,
         description: post.description,
@@ -46,7 +47,8 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 }
 
 export default async function BlogPost({ params }: { params: { slug: string } }) {
-    const post = getPostBySlug(params.slug);
+    const { slug } = await params;
+    const post = getPostBySlug(slug);
     const content = await markdownToHtml(post.content || "");
     return (
         <div>
