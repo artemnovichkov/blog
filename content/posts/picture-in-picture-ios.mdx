@@ -1,0 +1,226 @@
+---
+title: Demystifying Picture in Picture on iOS
+description: A deep dive into implementing and using the Picture-in-Picture feature in iOS applications.
+cover: /images/creating-mcp-servers-in-swift/cover.png
+date: '2025-05-03'
+author:
+  - artem-novichkov
+---
+
+Scrolling through Instagram Reels, I saw this crazy iPhone case:
+
+<iframe src="https://www.instagram.com/reel/DIRt0HLJRDp/embed" width="80%" height="800" allowFullScreen></iframe>
+
+I've never implemented Picture in Picture mode in my apps, so I decided to give it a try.
+
+## Showing camera feed
+
+Use `AVCaptureSession` to capture the camera feed.
+
+Request access to the camera:
+
+```swift
+import UIKit
+import AVKit
+
+final class ViewController: UIViewController {
+
+    private lazy var captureSession = AVCaptureSession()
+    private lazy var sessionQueue = DispatchQueue(label: "video.preview.session")
+
+    private var isAuthorized: Bool {
+        get async {
+            let status = AVCaptureDevice.authorizationStatus(for: .video)
+            var isAuthorized = status == .authorized
+            if status == .notDetermined {
+                isAuthorized = await AVCaptureDevice.requestAccess(for: .video)
+            }
+            return isAuthorized
+        }
+    }
+}
+```
+
+Configure the capture session:
+
+```swift
+private func configureSession() {
+    let systemPreferredCamera = AVCaptureDevice.default(for: .video)
+    guard let systemPreferredCamera,
+          let deviceInput = try? AVCaptureDeviceInput(device: systemPreferredCamera) else {
+        return
+    }
+
+    captureSession.beginConfiguration()
+    defer {
+        captureSession.commitConfiguration()
+    }
+
+    let videoOutput = AVCaptureVideoDataOutput()
+    // 1. Set the sample buffer delegate
+    videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
+
+    guard captureSession.canAddInput(deviceInput),
+        captureSession.canAddOutput(videoOutput) else {
+        return
+    }
+
+    captureSession.addInput(deviceInput)
+    captureSession.addOutput(videoOutput)
+
+    // 2. Set the video rotation angle
+    videoOutput.connection(with: .video)?.videoRotationAngle = 90
+}
+```
+
+Here are some important things to note:
+
+1. Set the sample buffer delegate to receive the video frames.
+2. Set the video rotation angle to `90` degrees to rotate the video.
+
+To show the camera feed, we'll use `AVSampleBufferDisplayLayer`. Let's create a view that will use it:
+
+```swift
+final class SampleBufferDisplayView: UIView {
+
+    override class var layerClass: AnyClass {
+        AVSampleBufferDisplayLayer.self
+    }
+
+    var sampleBufferDisplayLayer: AVSampleBufferDisplayLayer {
+        layer as! AVSampleBufferDisplayLayer
+    }
+}
+```
+
+In the `ViewController`, we'll load the `SampleBufferDisplayView` as the root view:
+
+```swift
+final class ViewController: UIViewController {
+
+    private lazy var sampleBufferDisplayView = SampleBufferDisplayView()
+
+    override func loadView() {
+        view = sampleBufferDisplayView
+    }
+}
+```
+
+Implement the `AVCaptureVideoDataOutputSampleBufferDelegate` protocol to receive the video frames:
+
+```swift
+extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
+
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        DispatchQueue.main.async {
+            self.sampleBufferDisplayView.sampleBufferDisplayLayer.sampleBufferRenderer.enqueue(sampleBuffer)
+        }
+    }
+}
+```
+
+Start the capture session:
+
+```swift
+override func viewDidLoad() {
+    super.viewDidLoad()
+
+    Task {
+        guard await isAuthorized else {
+            return
+        }
+        configureSession()
+        sessionQueue.async {
+            self.captureSession.startRunning()
+        }
+    }
+}
+```
+
+## Implementing Picture in Picture
+
+To enable Picture in Picture mode, we need to:
+
+- Add `NSCameraUsageDescription` in `Info.plist` with a message to request access to the camera
+- Add `Background Modes` in `Signing & Capabilities`
+  - `Audio, AirPlay, and Picture in Picture`
+  - `Voice over IP`
+
+Next, we need to enable the capture session's `isMultitaskingCameraAccessEnabled` property:
+
+```swift
+if captureSession.isMultitaskingCameraAccessSupported {
+    captureSession.isMultitaskingCameraAccessEnabled = true
+}
+```
+
+<Callout type="info" emoji="️ℹ️">
+This property is available in iOS 16 and later. Apps that have a deployment target earlier than iOS 16 require the `com.apple.developer.avfoundation.multitasking-camera-access` entitlement to use the camera in PiP mode.
+</Callout>
+
+```swift
+private var pipController: AVPictureInPictureController?
+
+override func viewDidLoad() {
+    super.viewDidLoad()
+
+    if AVPictureInPictureController.isPictureInPictureSupported() {
+        let source = AVPictureInPictureController.ContentSource(sampleBufferDisplayLayer: sampleBufferDisplayView.sampleBufferDisplayLayer,
+                                                                playbackDelegate: self)
+        let pipController = AVPictureInPictureController(contentSource: source)
+        self.pipController = pipController
+    }
+
+    // Configure the capture session
+}
+```
+
+By default, the PiP controller shows playback controls: fast forward, rewind, and play/pause. According to docs, you need to set `requiresLinearPlayback` to `true`:
+
+```swift
+pipController.requiresLinearPlayback = true
+```
+
+I don't know why, but it doesn't affect the playback controls. So, I found [a workaround](https://stackoverflow.com/a/72824490/3514372) to hide the playback controls:
+
+```swift
+// Hides playback controls
+pipController.setValue(1, forKey: "controlsStyle")
+// Hides close and fullscreen buttons
+pipController.setValue(2, forKey: "controlsStyle")
+```
+
+Implement the `AVPictureInPictureSampleBufferPlaybackDelegate` protocol to handle the playback:
+
+```swift
+extension ViewController: AVPictureInPictureSampleBufferPlaybackDelegate {
+
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, setPlaying playing: Bool) {}
+
+    func pictureInPictureControllerTimeRangeForPlayback(_ pictureInPictureController: AVPictureInPictureController) -> CMTimeRange {
+        // For live content, return a time range with a duration of positiveInfinity.
+        CMTimeRange(start: .zero, duration: .positiveInfinity)
+    }
+
+    func pictureInPictureControllerIsPlaybackPaused(_ pictureInPictureController: AVPictureInPictureController) -> Bool {
+        false
+    }
+
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, didTransitionToRenderSize newRenderSize: CMVideoDimensions) {}
+
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, skipByInterval skipInterval: CMTime) async {}
+}
+```
+
+And the last step is to configure the audio session:
+
+```swift
+try? AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .videoChat)
+```
+
+Without this, the app will not start PiP mode and will not show any error. And that's all, no we can run the app and... swipe up to start PiP mode.
+
+## Conclusion 
+
+- [Setting Up a Capture Session](https://developer.apple.com/documentation/avfoundation/setting-up-a-capture-session) by Apple
+- [Adopting Picture in Picture for video calls](https://developer.apple.com/documentation/avkit/adopting-picture-in-picture-for-video-calls) by Apple
