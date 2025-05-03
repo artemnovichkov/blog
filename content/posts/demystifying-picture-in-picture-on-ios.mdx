@@ -7,7 +7,7 @@ author:
   - artem-novichkov
 ---
 
-Scrolling through Instagram Reels, I saw this crazy iPhone case:
+Scrolling through Instagram Reels, I came across this crazy iPhone case:
 
 <div style={{ display: 'flex', justifyContent: 'center' }}>
   <div style={{ width: '70%', aspectRatio: '9/16' }}>
@@ -21,9 +21,9 @@ Scrolling through Instagram Reels, I saw this crazy iPhone case:
 
 Picture in Picture (PiP) allows users to continue watching video content in a small, movable window while using other apps. It's particularly useful for video calls, streaming, etc. 
 
-I've never implemented Picture in Picture mode in my apps, so I decided to recreate eyePhone app from the reel. Initially, I thought it's a simple task. I checked the documentation and open-sourced examples, and thought I vibe-coded it easily. But it turned out to be quite challenging.
+I've never implemented Picture in Picture mode in my apps, so I decided to recreate the eyePhone app from the reel. Initially, I thought it would be a simple task. I checked the documentation and open-source examples, and thought I could just vibe-code it and get it working easily. However, it turned out to be quite challenging.
 
-I decided to start with a UIKit implementation, because there is no native support of camera capture in SwiftUI.
+I decided to start with a UIKit implementation, because there is no native support for camera capture in SwiftUI.
 
 ## Showing camera feed
 
@@ -94,7 +94,7 @@ Here are some important things to note:
 1. Set the sample buffer delegate to receive the video frames.
 2. Set the video rotation angle and mirror the video so it appears correctly in PiP mode.
 
-To show the camera feed, we'll use `AVSampleBufferDisplayLayer`, which is optimized for displaying live video. Let's create a view that will use it:
+To display the camera feed, we'll use `AVSampleBufferDisplayLayer`, which is optimized for live video. Let's create a view that uses it:
 
 ```swift
 final class SampleBufferDisplayView: UIView {
@@ -157,7 +157,7 @@ override func viewDidLoad() {
 }
 ```
 
-We're using `Task` to handle the asynchronous permission check. Once we have permission, we configure the session and start it running on a dedicated queue.
+We're using `Task` to handle the asynchronous permission check. Once we have permission, we configure the session and start it on a dedicated queue.
 
 If we run the app now, we should see the camera feed.
 
@@ -183,7 +183,7 @@ if captureSession.isMultitaskingCameraAccessSupported {
 ```
 
 <Callout type="info" emoji="️ℹ️">
-This property is available in iOS 16 and later. Apps that have a deployment target earlier than iOS 16 require the `com.apple.developer.avfoundation.multitasking-camera-access` entitlement to use the camera in PiP mode.
+This property is available in iOS 16 and later. Apps with a deployment target earlier than iOS 16 require the `com.apple.developer.avfoundation.multitasking-camera-access` entitlement to use the camera in PiP mode.
 </Callout>
 
 Without enabling this property, your camera feed will stop as soon as the app goes to the background.
@@ -210,13 +210,13 @@ override func viewDidLoad() {
 
 The `ContentSource` takes our `sampleBufferDisplayLayer` and a playback delegate. The delegate is required to handle PiP playback events.
 
-By default, the PiP controller shows playback controls: fast forward, rewind, and play/pause. For a camera feed, these don't make sense, so we'll hide them. According to documentation, you should set `requiresLinearPlayback` to `true`:
+By default, the PiP controller shows playback controls: fast forward, rewind, and play/pause. For a camera feed, these controls don't make sense, so we'll hide them. According to the documentation, you should set `requiresLinearPlayback` to `true`:
 
 ```swift
 pipController.requiresLinearPlayback = true
 ```
 
-I don't know why, but it doesn't affect the playback controls. So, I found [a workaround](https://stackoverflow.com/a/72824490/3514372) to hide the playback controls:
+However, this does not seem to affect the playback controls. Instead, I found [a workaround](https://stackoverflow.com/a/72824490/3514372) to hide the playback controls:
 
 ```swift
 // Hides playback controls
@@ -225,7 +225,7 @@ pipController.setValue(1, forKey: "controlsStyle")
 pipController.setValue(2, forKey: "controlsStyle")
 ```
 
-Now we need to implement the `AVPictureInPictureSampleBufferPlaybackDelegate` protocol to handle the playback:
+Now we need to implement the `AVPictureInPictureSampleBufferPlaybackDelegate` protocol to handle playback:
 
 ```swift
 extension ViewController: AVPictureInPictureSampleBufferPlaybackDelegate {
@@ -264,7 +264,7 @@ Now, let's run the app and swipe up to start PiP mode.
 
 ## Conclusion
 
-Implementing PiP mode in iOS is a bit tricky, there are a lot of nuances to consider. I hope this post will save you some time if you need to implement it in your app.
+Implementing PiP mode in iOS can be tricky, as there are many nuances to consider. I hope this post will save you some time if you ever need to implement it in your own app.
 
 The final code is available [on GitHub](https://github.com/artemnovichkov/eyePhone).
 
