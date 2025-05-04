@@ -23,13 +23,13 @@ Picture in Picture (PiP) allows users to continue watching video content in a sm
 
 I've never implemented Picture in Picture mode in my apps, so I decided to recreate the eyePhone app from the reel. Initially, I thought it would be a simple task. I checked the documentation and open-source examples, and thought I could just vibe-code it and get it working easily. However, it turned out to be quite challenging.
 
-I decided to start with a UIKit implementation, because there is no native support for camera capture in SwiftUI.
+I decided to start with a UIKit implementation, because there is no native support for camera capture in SwiftUI. Before implementing PiP, we need to set up the camera feed.
 
 ## Showing camera feed
 
-Before implementing PiP, we need to set up the camera feed. `AVFoundation` framework provides everything we need through `AVCaptureSession`.
+Let's create a new UIKit project, add `NSCameraUsageDescription` in `Info.plist` with a message for user.
 
-Let's start by requesting access to the camera:
+Next, we need to request access to the camera:
 
 ```swift
 import UIKit
@@ -50,7 +50,7 @@ final class ViewController: UIViewController {
 }
 ```
 
-This checks if we have permission to use the camera and requests it if necessary. The `async` property allows us to use modern Swift concurrency for this permission check.
+This checks if we have permission to use the camera and requests it if necessary. The `async` property allows us to use Swift concurrency for this permission check.
 
 Next, we need to configure the capture session:
 
@@ -94,7 +94,7 @@ Here are some important things to note:
 1. Set the sample buffer delegate to receive the video frames.
 2. Set the video rotation angle and mirror the video so it appears correctly in PiP mode.
 
-To display the camera feed, we'll use `AVSampleBufferDisplayLayer`, which is optimized for live video. Let's create a view that uses it:
+To display the camera feed, we'll use `AVSampleBufferDisplayLayer`. Let's create a view that uses it:
 
 ```swift
 final class SampleBufferDisplayView: UIView {
@@ -163,12 +163,7 @@ If we run the app now, we should see the camera feed.
 
 ## Implementing Picture in Picture
 
-Now that our camera feed is working, let's implement the PiP feature. First, we need to configure our app to support PiP mode.
-
-To enable it, we need to:
-
-- Add `NSCameraUsageDescription` in `Info.plist` with a message to request access to the camera;
-- Enable `Background Modes` in `Signing & Capabilities`:
+Now that our camera feed is working, let's implement the PiP feature. First, we need to enable `Background Modes` in `Signing & Capabilities`:
   - `Audio, AirPlay, and Picture in Picture`;
   - `Voice over IP`.
 
@@ -258,9 +253,13 @@ A critical step that's easy to miss is configuring the audio session:
 try? AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .videoChat)
 ```
 
-This is essential for PiP to work correctly. Without this configuration, the app won't start PiP mode and won't show any error - it simply won't work.
+This is essential for PiP to work correctly. Without this configuration, the app won't start PiP mode and won't show any error — it simply won't work.
 
-Now, let's run the app and swipe up to start PiP mode.
+Let's run the app and swipe up to start PiP mode. Now you'll never miss a TV plot twist — even while watching reels!
+
+![PiP](/images/demystifying-picture-in-picture-on-ios/pip.png)
+
+*Thanks to my wife for the photo and eyeshadow palette with a mirror 🙃* 
 
 ## Conclusion
 
