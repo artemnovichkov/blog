@@ -1,12 +1,21 @@
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
-import rehypeShiki from '@shikijs/rehype'
-import { transformerNotationHighlight } from 'shikiji-transformers'
+import rehypePrettyCode from "rehype-pretty-code";
 import { Tweet } from 'react-tweet'
 import Callout from '../app/_components/callout';
 import { FileTree } from "../app/_components/filetree";
 import AudioPlayer from '../app/_components/audio-player';
+
+
+const options = {
+    theme: {
+        dark: "github-dark",
+        light: "github-light",
+    },
+    keepBackground: false,
+    defaultLang: "swift",
+}
 
 export default async function markdownToHtml(markdown: string) {
     const { content } = await compileMDX({
@@ -14,12 +23,7 @@ export default async function markdownToHtml(markdown: string) {
         options: {
             mdxOptions: {
                 rehypePlugins: [
-                    [rehypeShiki, {
-                        theme: 'github-dark',
-                        transformers: [transformerNotationHighlight()],
-                        inline: 'tailing-curly-colon',
-                        defaultLanguage: 'swift',
-                    }],
+                    [rehypePrettyCode, options],
                     rehypeSlug],
                 remarkPlugins: [remarkGfm],
             },
