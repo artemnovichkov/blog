@@ -101,18 +101,18 @@ TextEditor(text: $text, selection: $textSelection)
 
 The `focused` modifier allows us to manage the focus state of the text editor. For example, if you may show the keyboard on appearance or hide it on saving action.
 
-```swift
+```swift /isFocused/ /$isFocused/
 struct ContentView: View {
 
     @State private var text = "It was a great day!"
     @State private var textSelection: TextSelection?
-    @FocusState private var isFocused: Bool // [!code highlight]
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         TextEditor(text: $text, selection: $textSelection)
-            .focused($isFocused) // [!code highlight]
+            .focused($isFocused)
             .onAppear {
-                isFocused = true // [!code highlight]
+                isFocused = true
             }
     }
 }

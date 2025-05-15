@@ -5,7 +5,7 @@ export default function Blog() {
   const posts = getAllPosts();
   return (
     <main>
-      <p className="font-bold text-3xl tracking-tight mb-8 text-zinc-800 dark:text-gray-100">Blog</p>
+      <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Blog</p>
       <section>
         <ul>
           {posts.map((post) => (

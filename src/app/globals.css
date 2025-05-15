@@ -13,22 +13,7 @@
   position: sticky;
   z-index: 10;
   top: 0;
-  @apply bg-zinc-100 dark:bg-gray-900;
-}
-
-.shiki {
-  background-color: rgb(31 41 55) !important;
-}
-
-.highlighted {
-  background-color: rgb(68, 76, 86);
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-/* inline code */
-.prose code:not(.shiki code) {
-  @apply px-1 py-0.5 border rounded-md bg-gray-100 dark:bg-gray-800 dark:border-gray-800 text-gray-800 dark:text-white;
+  @apply bg-zinc-100 dark:bg-gray-900 border-b border-zinc-200 dark:border-gray-800;
 }
 
 .prose .react-tweet-theme {
@@ -53,4 +38,38 @@
 
 .prose strong {
   @apply text-gray-800 dark:text-white;
+}
+
+/* rehype-pretty-code block styles */
+
+[data-rehype-pretty-code-figure] pre {
+  @apply bg-slate-200 dark:bg-gray-800;
+}
+
+[data-rehype-pretty-code-title] {
+  @apply pl-4;
+}
+
+[data-highlighted-line] {
+  @apply bg-zinc-200 dark:bg-zinc-800;
+}
+
+[data-highlighted-chars] {
+  @apply bg-zinc-200 dark:bg-zinc-800;
+}
+
+[data-line] {
+  @apply px-1;
+}
+/* rehype-pretty-code theme */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+}
+ 
+@media (prefers-color-scheme: dark) {
+  code[data-theme*=" "],
+  code[data-theme*=" "] span {
+    color: var(--shiki-dark);
+  }
 }

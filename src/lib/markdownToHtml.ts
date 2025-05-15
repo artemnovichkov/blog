@@ -9,8 +9,12 @@ import AudioPlayer from '../app/_components/audio-player';
 
 
 const options = {
-    theme: 'github-dark',
+    theme: {
+        dark: "github-dark",
+        light: "github-light",
+    },
     keepBackground: false,
+    defaultLang: "swift",
 }
 
 export default async function markdownToHtml(markdown: string) {
