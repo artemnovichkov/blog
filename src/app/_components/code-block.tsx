@@ -21,9 +21,14 @@ export default function CodeBlock({ children, ...props }: CodeBlockProps) {
     const text = extractText(children);
     navigator.clipboard.writeText(text);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    const timer = setTimeout(() => setCopied(false), 1500);
+
+    return () => clearTimeout(timer);
   };
 
+  React.useEffect(() => {
+    return () => clearTimeout(timer);
+  },[copied])
   return (
     <div className="relative">
       <button
