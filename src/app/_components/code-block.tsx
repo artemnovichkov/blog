@@ -38,7 +38,7 @@ export default function CodeBlock({ children, ...props }: CodeBlockProps) {
         {copied ? <GoCheck /> : <GoCopy />}
       </button>
       <pre {...props}>
-        <code>{children}</code>
+        {children}
       </pre>
     </div>
   );
