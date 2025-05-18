@@ -6,7 +6,7 @@ import { Tweet } from 'react-tweet'
 import Callout from '../app/_components/callout';
 import { FileTree } from "../app/_components/filetree";
 import AudioPlayer from '../app/_components/audio-player';
-
+import CodeBlock from '../app/_components/code-block';
 
 const options = {
     theme: {
@@ -28,7 +28,7 @@ export default async function markdownToHtml(markdown: string) {
                 remarkPlugins: [remarkGfm],
             },
         },
-        components: { Tweet, Callout, FileTree, AudioPlayer },
+        components: { Tweet, Callout, FileTree, AudioPlayer, pre: CodeBlock },
     });
 
     return content;
