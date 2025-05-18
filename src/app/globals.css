@@ -42,16 +42,24 @@
 
 /* rehype-pretty-code block styles */
 
+[data-rehype-pretty-code-figure] {
+  @apply bg-slate-200 dark:bg-gray-800 rounded;
+}
+
 [data-rehype-pretty-code-figure] pre {
-  @apply bg-slate-200 dark:bg-gray-800;
+  margin-top: 0 !important;
 }
 
 [data-rehype-pretty-code-title] {
-  @apply pl-4;
+  @apply pl-6 pt-4 pb-0;
+}
+
+figcaption[data-rehype-pretty-code-title] {
+  margin-bottom: 0 !important;
 }
 
 [data-highlighted-line] {
-  @apply bg-slate-300 dark:bg-slate-600 rounded;
+  @apply bg-slate-300 dark:bg-slate-600;
 }
 
 [data-highlighted-chars] {
@@ -72,4 +80,15 @@ code[data-theme*=" "] span {
   code[data-theme*=" "] span {
     color: var(--shiki-dark);
   }
+}
+
+/* line numbers */
+code[data-line-numbers] {
+  counter-reset: line;
+}
+ 
+code[data-line-numbers] > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  @apply inline-block w-4 mr-2 text-right text-gray-400 dark:text-gray-700;
 }
