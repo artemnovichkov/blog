@@ -1,0 +1,56 @@
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6
+
+**Bold text**
+_italic text_
+*italic text*
+
+- List item 1
+- List item 2
+
+[Link](https://example.com)
+
+## Callout
+
+<Callout emoji="ℹ️" type="info">This is an info callout.</Callout>
+<Callout emoji="⚠️" type="warning">This is a warning callout.</Callout>
+<Callout emoji="❌" type="error">This is an error callout.</Callout>
+
+## Audio Player
+
+<AudioPlayer src="/audio/sample.mp3" />
+
+## File Tree
+
+<FileTree>
+  <FileTree.Folder name="src">
+    <FileTree.File name="index.tsx" />
+    <FileTree.Folder name="components">
+      <FileTree.File name="header.tsx" />
+      <FileTree.File name="footer.tsx" />
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+## Code Example (with Highlight)
+
+```swift
+print("Hello, world!")
+```
+
+```swift title="main.swift"
+print("Hello, world!")
+```
+
+```swift {1} title="fibonacci.swift" showLineNumbers /fibonacci/
+func fibonacci(_ n: Int) -> Int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+```

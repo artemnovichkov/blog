@@ -39,7 +39,7 @@ const FileTree: React.FC<{ children: React.ReactNode }> & {
   File: typeof File
   Folder: typeof Folder
 } = ({ children }) => {
-  return <div className="font-mono text-sm border-2 border-gray-300 dark:border-white/50 rounded p-4 w-fit">{children}</div>
+  return <div className="font-mono text-sm border border-gray-300 dark:border-white/50 rounded p-4 w-fit">{children}</div>
 }
 
 FileTree.File = File
