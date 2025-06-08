@@ -89,3 +89,8 @@ code[data-line-numbers] > [data-line]::before {
   content: counter(line);
   @apply inline-block w-4 mr-2 text-right text-gray-400 dark:text-gray-700;
 }
+
+/* Remove default prose background for code blocks */
+.prose pre {
+  background-color: transparent !important;
+}
