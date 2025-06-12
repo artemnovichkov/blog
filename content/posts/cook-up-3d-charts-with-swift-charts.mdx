@@ -7,7 +7,7 @@ author:
   - artem-novichkov
 ---
 
-WWDC 2025 introduced new tools for data visualization in SwiftUI, and one of great additions is Chart3D. With this new API, you can now create interactive and customizable 3D charts directly in SwiftUI — no third-party libraries or complex SceneKit setups required.
+WWDC 2025 introduced new changes in SwiftUI, and one of great additions is Chart3D. With this new API, you can now create interactive and customizable 3D charts directly in SwiftUI — no third-party libraries or complex SceneKit setups required.
 
 In this post, I'll guide you through building 3D charts. If you're not familiar with Swift Charts, you can check my previous posts:
 
@@ -133,7 +133,7 @@ private let xLabel = "Petal Length (cm)"
 private let yLabel = "Petal Width (cm)"
 private let zLabel = "Sepal Length (cm)"
 
-Chart3D {}
+Chart3D(irisData) { ... }
 .chartXAxisLabel(xLabel)
 .chartYAxisLabel(yLabel)
 // New in iOS 26.0 beta
@@ -144,7 +144,7 @@ The interesting thing here is that we can't set string literals directly, the la
 
 ![Axis](/images/cook-up-3d-charts-with-swift-charts/axis.png)
 
-There are also some unique modifiers for 3D charts. `chart3DCameraProjection` modifier allows to change the projection of the chart:
+There are also some brand new modifiers for 3D charts. `chart3DCameraProjection` modifier allows to change the projection of the chart:
 
 ```swift
 .chart3DCameraProjection(.perspective)
@@ -172,10 +172,10 @@ PointMark(...)
 
 ## Changing the position
 
-The perspective of 3D charts is very important. It allows to see the chart from different angles and emphasize the depth of the chart. With a new `chart3DPose` modifier we can change the position of the chart. You can use one of the predefined poses:
+The perspective of 3D charts is very important. It allows to see the chart from different angles and emphasize the correlation between the data. With a new `chart3DPose` modifier we can change the position of the chart. You can use one of the predefined poses:
 
 ```swift
-Chart3D {}
+Chart3D(irisData) { ... }
 .chart3DPose(.front)
 ```
 
@@ -210,7 +210,7 @@ import Spatial
 @State private var azimuthAngle: Angle2D = .degrees(0)
 private let timer = Timer.publish(every: 0.03, on: .main, in: .common).autoconnect()
 
-Chart3D {}
+Chart3D(irisData) { ... }
 .chart3DPose($pose)
 .onReceive(timer) { _ in
     azimuthAngle += .degrees(1)
@@ -237,7 +237,7 @@ The new Chart3D in SwiftUI opens new possibilities for data visualization. Wheth
 
 Moreover, if you're developing a visionOS app, you can use Chart3D to visualize the data as well.
 
-![visionOS](/images/cook-up-3d-charts-in-swiftui/visionos.png)
+![visionOS](/images/cook-up-3d-charts-with-swift-charts/visionos.png)
 
 The full code is available on [GitHub](https://github.com/artemnovichkov/Chart3DExample).
 
