@@ -1,7 +1,7 @@
 ---
-title: Cook up 3D charts in SwiftUI
+title: Cook up 3D charts with Swift Charts
 description: Learn how to use Chart3D from iOS 26.0
-cover: /images/cook-up-3d-charts-in-swiftui/cover.png
+cover: /images/cook-up-3d-charts-with-swift-charts/cover.png
 date: '2025-06-12'
 author:
   - artem-novichkov
@@ -113,7 +113,7 @@ Chart3D(irisData) { iris in
 
 The dataset has 4 parameters, but we'll show only 3 of them.
 
-![Default chart](/images/cook-up-3d-charts-in-swiftui/default.png)
+![Default chart](/images/cook-up-3d-charts-with-swift-charts/default.png)
 
 ## Customizing the chart
 
@@ -142,7 +142,7 @@ Chart3D {}
 
 The interesting thing here is that we can't set string literals directly, the labels won't be displayed. It looks like a bug for me, but I found this workaround in Code section of related WWDC session. I'll check it in next betas and update this post if needed.
 
-![Axis](/images/cook-up-3d-charts-in-swiftui/axis.png)
+![Axis](/images/cook-up-3d-charts-with-swift-charts/axis.png)
 
 There are also some unique modifiers for 3D charts. `chart3DCameraProjection` modifier allows to change the projection of the chart:
 
@@ -151,7 +151,7 @@ There are also some unique modifiers for 3D charts. `chart3DCameraProjection` mo
 ```
 The default projection is `.orthographic`, we can change it to `.perspective` to emphasize depth of the chart:
 
-![Perspective](/images/cook-up-3d-charts-in-swiftui/perspective.png)
+![Perspective](/images/cook-up-3d-charts-with-swift-charts/perspective.png)
 
 You may notice that some points are grouped together. We can change the foreground style of point marks to highlight the species:
 
@@ -168,7 +168,7 @@ PointMark(...)
 .symbolSize(0.05)
 ```
 
-![Marks](/images/cook-up-3d-charts-in-swiftui/marks.png)
+![Marks](/images/cook-up-3d-charts-with-swift-charts/marks.png)
 
 ## Changing the position
 
@@ -179,7 +179,7 @@ Chart3D {}
 .chart3DPose(.front)
 ```
 
-![Pose](/images/cook-up-3d-charts-in-swiftui/pose.png)
+![Pose](/images/cook-up-3d-charts-with-swift-charts/pose.png)
 
 You can also create your own pose by using `Chart3DPose` struct:
 
