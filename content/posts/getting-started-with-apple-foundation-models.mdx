@@ -9,7 +9,7 @@ author:
 
 In a [previous blog post](https://www.artemnovichkov.com/blog/using-model-context-protocol-in-ios-apps), we covered the basics of using Anthropic API and Model Context Protocol to create a chat application. At WWDC 2025, Apple introduced Foundation Models — a new way to integrate AI capabilities directly into your apps. The framework gives developers access to Apple's on-device large language models (LLMs) that power Apple Intelligence. The text-based model generates new text that's appropriate for the request you make, and can intelligently decide when to invoke your app's custom tools to perform specialized tasks.
 
-In this blog post, we'll try to rewrite the project from the previous blog post using Foundation Models framework.
+In this blog post, we'll try to rewrite the project from the previous blog post using the Foundation Models framework.
 
 ## Checking for availability
 
@@ -21,8 +21,8 @@ Foundation Models are available across all Apple platforms starting with version
 
 Additionally, the model may take some time to download and initialize after Apple Intelligence is enabled.
 
-<Callout type="info" emoji="️ℹ️">
-  For testing purposes, I use MacBook Pro with M1 Pro chip and installed macOS Tahoe 26.0 Beta (25A5295e) and Xcode 26.0 beta 2 (17A5241o).
+<Callout type="info" emoji="ℹ️">
+  For testing purposes, I used a MacBook Pro with an M1 Pro chip, running macOS Tahoe 26.0 Beta (25A5295e) and Xcode 26.0 beta 2 (17A5241o).
 </Callout>
 
 Let's start with a simple view and check for model availability. We'll use `SystemLanguageModel.default.availability` to check if the model is available:
@@ -58,7 +58,7 @@ If the model is not available, users will see a message about it:
 
 ![Availability](/images/getting-started-with-apple-foundation-models/availability.png)
 
-Otherwise, we can start using the session.
+Otherwise, we can start using a session.
 
 ## Creating session
 
@@ -87,7 +87,7 @@ Let's define custom instructions for the session:
 }
 ```
 
-With `InstructionsBuilder` you can configure the instructions in a declarative way, adding more context, rules, and examples.
+With `InstructionsBuilder`, you can configure the instructions in a declarative way, adding more context, rules, and examples.
 
 You can also prewarm the session to improve the response time:
 
@@ -115,7 +115,7 @@ struct ContentView: View {
 }
 ```
 
-Now we're ready to create a interface to send messages to the model.
+Now we're ready to create an interface to send messages to the model.
 
 ## Creating inputs
 
@@ -186,7 +186,7 @@ Response<String>(userPrompt: "Check my last blood pressure and suggest recommend
                  content: "I\'m sorry, but as a chatbot created by Apple, I\'m unable to access or analyze your personal health data, including your last blood pressure reading...)"
 ```
 
-According to the response, the duration of the request is around 14 seconds. You can also stream the response to get a partial response as it's being generated:
+According to the response, the duration of the request is around 14 seconds. You can also stream the response to get a partial result as it's being generated:
 
 ```swift
 let stream = session.streamResponse(to: prompt)
@@ -282,7 +282,7 @@ Arguments with no parameters will produce a warning:
 
 Without `@Generable` macro, you'll need to implement the code above manually, so it's better to use it and ignore the warning.
 
-Let's reuse the code for Apple Health using from the previous blog post. Here is a final version of the tool:
+Let's reuse the code for Apple Health from the previous blog post. Here is the final version of the tool:
 
 ```swift
 import FoundationModels
@@ -351,7 +351,7 @@ Let's add the tool to the session:
 }
 ```
 
-Let's run the app and send a message to the model. This time the session will use the tool to get the blood pressure data. First time running the app, you'll see a permission dialog to access Apple Health:
+Let's run the app and send a message to the model. This time, the session will use the tool to get the blood pressure data. The first time you run the app, you'll see a permission dialog to access Apple Health:
 
 ![Apple Health](/images/getting-started-with-apple-foundation-models/apple-health.png)
 
@@ -439,8 +439,8 @@ struct SegmentsView: View {
 }
 ```
 
-<Callout type="info" emoji="️ℹ️">
-  The response may return a content in Markdown format. It may contain links, bold, italic, and other formatting. You can use `LocalizedStringKey` to show the content.
+<Callout type="info" emoji="ℹ️">
+  The response may return content in Markdown format. It may contain links, bold, italic, and other formatting. You can use `LocalizedStringKey` to show the content.
 </Callout>
 
 Let's update the `List` to show the transcript:
@@ -463,13 +463,13 @@ List(session.transcript) { entry in
 .listStyle(.plain)
 ```
 
-Here is a final result:
+Here is the final result:
 
 ![Final result](/images/getting-started-with-apple-foundation-models/final-result.png)
 
 ## Conclusion
 
-The Foundation Models framework is a powerful new addition to the Apple ecosystem. It allows you to use AI in your apps without sending data to the cloud. Of course, it's not a silver bullet and you still need to think about the context size and guardrails. Moreover, Apple recommends to avoid using it for some tasks like code generation or math calculations. Despite this, I believe it will significantly shape how we build apps moving forward.
+The Foundation Models framework is a powerful new addition to the Apple ecosystem. It allows you to use AI in your apps without sending data to the cloud. Of course, it's not a silver bullet, and you still need to consider the context size and guardrails. Moreover, Apple recommends avoiding its use for some tasks like code generation or math calculations. Despite this, I believe it will significantly shape how we build apps moving forward.
 
 You can find the complete code in the [GitHub repository](https://github.com/artemnovichkov/FoundationModelsExample). Thanks for reading!
 
