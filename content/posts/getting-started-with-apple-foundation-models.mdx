@@ -1,7 +1,7 @@
 ---
-title: Exploring Foundation Models framework
+title: Getting Started with Apple's Foundation Models
 description: Learn how to use Foundation models in iOS apps
-cover: /images/foundation-models/cover.png
+cover: /images/getting-started-with-apple-foundation-models/cover.png
 date: '2025-06-29'
 author:
   - artem-novichkov
@@ -56,7 +56,7 @@ struct ContentView: View {
 
 If the model is not available, users will see a message about it:
 
-![Availability](/images/foundation-models/availability.png)
+![Availability](/images/getting-started-with-apple-foundation-models/availability.png)
 
 Otherwise, we can start using the session.
 
@@ -148,7 +148,7 @@ private func sendMessage() {
 
 The session takes time to respond. You can check the `isResponding` property to show a loading indicator or disable elements.
 
-![Input](/images/foundation-models/input.png)
+![Input](/images/getting-started-with-apple-foundation-models/input.png)
 
 Now we can send messages to the session.
 
@@ -353,7 +353,7 @@ Let's add the tool to the session:
 
 Let's run the app and send a message to the model. This time the session will use the tool to get the blood pressure data. First time running the app, you'll see a permission dialog to access Apple Health:
 
-![Apple Health](/images/foundation-models/apple-health.png)
+![Apple Health](/images/getting-started-with-apple-foundation-models/apple-health.png)
 
 When the tool is finished, the session will return the output like:
 
@@ -466,7 +466,7 @@ List(session.transcript) { entry in
 
 Here is a final result:
 
-![Final result](/images/foundation-models/final-result.png)
+![Final result](/images/getting-started-with-apple-foundation-models/final-result.png)
 
 ## Conclusion
 
