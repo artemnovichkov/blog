@@ -36,7 +36,7 @@ export default function About() {
                     </a>.
                 </p>
                 <p>
-                    In my free time, I enjoy flying FPV drones and editing the videos I capture. I also like playing video games on my Nintendo Switch OLED and PS 5.
+                    In my free time, I enjoy flying FPV drones and editing the videos I capture. I also like playing video games on my Nintendo Switch 2 and PS 5.
                 </p>
             </div>
            <Experience />
