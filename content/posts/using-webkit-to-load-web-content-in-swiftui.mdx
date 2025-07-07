@@ -112,7 +112,7 @@ struct ContentView: View {
                     Picker("Content Type", selection: $contentType) {
                         ForEach(ContentType.allCases, id: \.self) { contentType in
                             Text(contentType.rawValue)
-                                .tag(contentType.rawValue)
+                                .tag(contentType)
                         }
                     }
                     Spacer()
