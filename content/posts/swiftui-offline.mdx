@@ -7,15 +7,13 @@ author:
   - artem-novichkov
 ---
 
-🏆 Featured in [iOS Dev Weekly - Issue 505](https://iosdevweekly.com/issues/505)
+<Callout type="info" emoji="️ℹ️">
+  Since iOS 18.4, Apple introduced `WebView` and `WebPage` to simplify web content handling in SwiftUI. You can read more about them in my [new blog post](https://www.artemnovichkov.com/blog/using-webkit-to-load-web-content-in-swiftui).
+</Callout>
 
 I continue developing an app for saving and reading articles. In my [previous post](https://artemnovichkov.com/blog/sheet-happens), I covered interesting cases of using sheets in SwiftUI. Now I want to describe my journey with offline mode.
 
 There are situations when users are unable to download web content: bad connection, airplane mode, etc. `WKWebView` has useful APIs for saving its content in different formats. Let's check it out!
-
-<Callout type="info" emoji="️ℹ️">
-  Examples are written in Swift 5.4 and tested on iOS 14.5 with Xcode 12.5 (12E262).
-</Callout>
 
 ## Preparation
 
