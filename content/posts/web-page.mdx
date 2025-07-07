@@ -1,0 +1,220 @@
+---
+title: Web page
+description: Learn how to create a web page in SwiftUI
+cover: /images/web-page/cover.png
+date: '2025-07-07'
+author:
+  - artem-novichkov
+---
+
+In my [previous blog post](https://www.artemnovichkov.com/blog/swiftui-offline), I've shown how to get web content offline in SwiftUI apps. The implementation was a bit tricky, because I've used `WKWebView` to load web content. On WWDC25, Apple introduced `WebView` and `WebPage` to simplify web content handling in SwiftUI. Surprisingly, the new APIs are available in iOS 18.4. Let's try to use them.
+
+
+## Loading web content
+
+Starting with a simple example:
+
+```swift
+import SwiftUI
+import WebKit
+
+struct ContentView: View {
+    @State private var url: URL = URL(string: "https://www.artemnovichkov.com")!
+
+    var body: some View {
+        WebView(url: url)
+    }
+}
+```
+
+WebView works with URL directly, but it doesn't have any loading or error handling. Add `WebPage` to handle loading the content:
+
+```swift
+import SwiftUI
+import WebKit
+
+struct ContentView: View {
+    @State private var url: URL = URL(string: "https://www.artemnovichkov.com")!
+    @State private var webPage = WebPage()
+
+    var body: some View {
+        WebView(webPage)
+            .onAppear {
+                let request = URLRequest(url: url)
+                webPage.load(request)
+            }
+            .onDisappear {
+                webPage.stopLoading()
+            }
+    }
+}
+```
+
+Moreover, `WebPage` has a loading state and estimated progress:
+
+```swift {9} {19-29}
+import SwiftUI
+import WebKit
+
+struct ContentView: View {
+    @State private var url: URL = URL(string: "https://www.artemnovichkov.com")!
+    @State private var webPage = WebPage()
+
+    var body: some View {
+        content
+            .onAppear {
+                let request = URLRequest(url: url)
+                webPage.load(request)
+            }
+            .onDisappear {
+                webPage.stopLoading()
+            }
+    }
+
+    private var content: some View {
+        ZStack {
+            Color.white
+            if webPage.isLoading {
+                ProgressView("Loading", value: webPage.estimatedProgress)
+                    .padding()
+            } else {
+                WebView(webPage)
+            }
+        }
+    }
+}
+```
+
+To handle different states, like errors or redirects, you can use `currentNavigationEvent` property. Let's add a controls to save the content, it will be a picker for content types:
+
+```swift
+enum ContentType: String, CaseIterable {
+    case snapshot = "Snapshot"
+    case pdf = "PDF"
+    case webarchive = "Web Archive"
+}
+```
+
+And add a picker to the content:
+
+```swift {21, 26-33}
+struct ContentView: View {
+    // Other states
+    @State private var contentType: ContentType = .snapshot
+
+    var body: some View {
+        content
+            .safeAreaInset(edge: .bottom) {
+                HStack {
+                    Picker("Content Type", selection: $contentType) {
+                        ForEach(ContentType.allCases, id: \.self) { contentType in
+                            Text(contentType.rawValue)
+                                .tag(contentType.rawValue)
+                        }
+                    }
+                    Spacer()
+                    Button("Save") {
+                        // Save content
+                    }
+                }
+                .padding()
+                .disabled(disabled)
+            }
+            // Other modifiers
+    }
+
+    private var disabled: Bool {
+        switch webPage.currentNavigationEvent?.kind {
+        case .finished:
+            false
+        default:
+            true
+        }
+    }
+}
+```
+
+The picker is disabled until the content is loaded. Now, let's add saving the content.
+
+
+## Saving web content locally
+
+As before, we have 3 types of content:
+- snapshot;
+- PDF;
+- Web archive.
+
+For snapshots, the web page returns optional `Image`:
+
+```swift
+Task {
+    let image = try await webPage.snapshot()
+}
+```
+
+We can't save the image directly, because it doesn't have data representation. Instead, we need to use `ImageRenderer` to convert the image to `UIImage` and then save the data to the file:
+
+```swift
+Task {
+    let image = try await webPage.snapshot()
+    if let image {
+        let renderer = ImageRenderer(content: image)
+        renderer.scale = 2
+        if let uiImage = renderer.uiImage, let data = uiImage.pngData() {
+            // Save data to the file
+        }
+    }
+}
+```
+
+The snapshot contains only the visible part of the web view, even with scroll indicators. For PDFs and web archives, we get data directly:
+
+```swift
+Task {
+    let pdfData = try await webPage.pdf()
+    // Save data to the file
+}
+
+Task {
+    let webArchiveData = try await webPage.webArchiveData()
+    // Save data to the file
+}
+```
+
+Simple and straightforward.
+
+## Showing saved content
+
+To show snapshots and PDF content, we reused the same code from the previous blog post. For web arhives, we can use new `WebView` directly:
+
+```swift
+import SwiftUI
+import WebKit
+
+struct WebArchiveView: View {
+    
+    let url: URL
+    @State private var webPage: WebPage = .init()
+    
+    var body: some View {
+        WebView(webPage)
+            .onAppear {
+                guard let data = FileManager.default.contents(atPath: url.path()) else {
+                    print("Failed to load web archive data from \(url.path())")
+                    return
+                }
+                let baseURL = URL(string: "about:blank")!
+                webPage.load(data, mimeType: "application/x-webarchive", characterEncoding: .utf8, baseURL: baseURL)
+            }
+    }
+}
+```
+
+## Conclusion
+
+New APIs simplify web content handling in SwiftUI. I didn't cover all the features, like url schemes or JavaScript calling, but you can find more details in the official documentation or WWDC video. And the final project is available [here](https://github.com/artemnovichkov/WebPageExample). Thanks for reading!
+
+## References
+
+- [WebKit for SwiftUI](https://developer.apple.com/documentation/webkit/webkit-for-swiftui)
+- [Meet WebKit for SwiftUI](https://developer.apple.com/videos/play/wwdc2025/231/)
