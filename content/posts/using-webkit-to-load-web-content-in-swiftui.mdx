@@ -1,14 +1,13 @@
 ---
-title: A First Look at WebKit for SwiftUI: WebView and WebPage in Action
+title: Using WebKit to load web content in SwiftUI
 description: Learn how to use WebView and WebPage to load and save web content
-cover: /images/web-page/cover.png
+cover: /images/using-webkit-to-load-web-content-in-swiftui/cover.png
 date: '2025-07-07'
 author:
   - artem-novichkov
 ---
 
-In my [previous blog post](https://www.artemnovichkov.com/blog/swiftui-offline), I've shown how to get web content offline in SwiftUI apps. The implementation was a bit tricky, because I've used `WKWebView` to load web content. On WWDC25, Apple introduced `WebView` and `WebPage` to simplify web content handling in SwiftUI. Surprisingly, the new APIs are available in iOS 18.4. Let's try to use them.
-
+In my [previous blog post](https://www.artemnovichkov.com/blog/swiftui-offline), I showed how to load web content offline in SwiftUI apps. The implementation was a bit tricky because it relied on `WKWebView` to load web content. On WWDC25, Apple introduced `WebView` and `WebPage` to simplify web content handling in SwiftUI. Surprisingly, these new APIs are already available starting with iOS 18.4. Let's try to use them.
 
 ## Loading web content
 
@@ -27,7 +26,7 @@ struct ContentView: View {
 }
 ```
 
-WebView works with URL directly, but it doesn't have any loading or error handling. Add `WebPage` to handle loading the content:
+`WebView` supports direct URL loading, but lacks built-in loading indicators or error handling. Add `WebPage` to handle loading the content:
 
 ```swift
 import SwiftUI
@@ -50,7 +49,7 @@ struct ContentView: View {
 }
 ```
 
-Moreover, `WebPage` has a loading state and estimated progress:
+Additionally, `WebPage` provides loading state and estimated progress support:
 
 ```swift {9} {19-29}
 import SwiftUI
@@ -85,7 +84,11 @@ struct ContentView: View {
 }
 ```
 
-To handle different states, like errors or redirects, you can use `currentNavigationEvent` property. Let's add a controls to save the content, it will be a picker for content types:
+Here is the result:
+
+![Web page loading](/images/using-webkit-to-load-web-content-in-swiftui/loading.png)
+
+To handle different states such as errors or redirects, use the `currentNavigationEvent` property. Let's add controls to save content — starting with a picker for selecting content type:
 
 ```swift
 enum ContentType: String, CaseIterable {
@@ -134,7 +137,7 @@ struct ContentView: View {
 }
 ```
 
-The picker is disabled until the content is loaded. Now, let's add saving the content.
+The picker remains disabled until the web content finishes loading.
 
 
 ## Saving web content locally
@@ -152,7 +155,7 @@ Task {
 }
 ```
 
-We can't save the image directly, because it doesn't have data representation. Instead, we need to use `ImageRenderer` to convert the image to `UIImage` and then save the data to the file:
+You can’t save the image directly, as it lacks a data representation. Instead, we need to use `ImageRenderer` to convert the image to `UIImage` and then save the data to the file:
 
 ```swift
 Task {
@@ -167,7 +170,7 @@ Task {
 }
 ```
 
-The snapshot contains only the visible part of the web view, even with scroll indicators. For PDFs and web archives, we get data directly:
+The snapshot includes only the visible portion of the WebView, scroll indicators included. For PDFs and web archives, we get data directly:
 
 ```swift
 Task {
@@ -185,7 +188,7 @@ Simple and straightforward.
 
 ## Showing saved content
 
-To show snapshots and PDF content, we reused the same code from the previous blog post. For web arhives, we can use new `WebView` directly:
+To display snapshots and PDF files, I reused code from the previous blog post. For web archives, the new `WebView` can be used directly:
 
 ```swift
 import SwiftUI
@@ -212,7 +215,7 @@ struct WebArchiveView: View {
 
 ## Conclusion
 
-New APIs simplify web content handling in SwiftUI. I didn't cover all the features, like url schemes or JavaScript calling, but you can find more details in the official documentation or WWDC video. And the final project is available [here](https://github.com/artemnovichkov/WebPageExample). Thanks for reading!
+New APIs simplify web content handling in SwiftUI. I didn't cover all the features, like url schemes or JavaScript calling, but you can find more details in the official documentation or WWDC video. The complete sample project is available [on Github](https://github.com/artemnovichkov/WebPageExample). Thanks for reading!
 
 ## References
 
