@@ -1,5 +1,11 @@
 import { getAllPosts } from "@/lib/api";
 import PostPreview from "../_components/post-preview";
+import { Metadata } from 'next';
+import { name } from '@/lib/const'
+
+export const metadata: Metadata = {
+  title: `${name} | Blog`,
+};
 
 export default function Blog() {
   const posts = getAllPosts();
