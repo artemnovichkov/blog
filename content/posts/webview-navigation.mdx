@@ -1,0 +1,111 @@
+---
+title: WebKit in SwiftUI. Navigation
+description: Learn how to handle navigation in WebView and WebPage
+cover: /images/webview-navigation/cover.png
+date: '2025-07-11'
+author:
+  - artem-novichkov
+---
+
+A key feature of any web browsing is the ability to move backward and forward through your navigation history. In this post, we'll explore how to handle navigation in WebView and WebPage. If you're new to WebKit in SwiftUI, check out my [previous post](https://www.artemnovichkov.com/blog/using-webkit-to-load-web-content-in-swiftui) to learn more.
+
+## Preparation
+
+Here's the basic setup in our `ContentView`:
+
+```swift
+struct ContentView: View {
+    @State private var page: WebPage = .init()
+
+    var body: some View {
+        WebView(page)
+            .ignoresSafeArea(.all, edges: .bottom)
+            .onAppear {
+                page = WebPage())
+                let request = URLRequest(url: URL(string: "https://www.artemnovichkov.com")!)
+                page.load(request)
+            }
+    }
+}
+```
+
+By default, `WebView` supports line previews on long press action:
+
+![Preview](/images/webview-navigation/preview.png)
+
+To disable it, use the `webViewLinkPreviews` modifier:
+
+```swift
+WebView(page)
+    .webViewLinkPreviews(.disabled)
+```
+
+Moreover, `WebView` supports back/forward navigation gestures:
+
+![Gesture](/images/webview-navigation/gesture.png)
+
+You can also control this behavior with a special modifier:
+
+```swift
+WebView(page)
+    .webViewBackForwardNavigationGestures(.disabled)
+```
+
+## Using back/forward list
+
+A key feature of any browser is the ability to move backward and forward through your navigation history. WebKit exposes this via a back/forward list, which we surface in the UI using custom menus:
+
+```swift
+ToolbarBackForwardMenuView(
+    list: page.backForwardList.backList.reversed(),
+    label: .init(text: "Backward", systemImage: "chevron.backward")
+) { item in
+    page.load(item)
+}
+ToolbarBackForwardMenuView(
+    list: page.backForwardList.forwardList,
+    label: .init(text: "Forward", systemImage: "chevron.forward")
+) { item in
+    page.load(item)
+}
+```
+
+Each menu displays the navigation history, allowing users to jump directly to any previous or next page. The `ToolbarBackForwardMenuView` is a reusable SwiftUI view that takes a list of navigation items and a callback for loading the selected item.
+
+---
+
+## WebPage.NavigationDeciding
+
+Sometimes, you want to control which URLs your web view is allowed to load. For example, you might want to restrict navigation to your own domain, and open external links in Safari. This is where `WebPage.NavigationDeciding` comes in.
+
+Here’s our custom navigation decider:
+
+```swift
+@Observable
+final class NavigationDecider: WebPage.NavigationDeciding {
+    private(set) var url: URL?
+
+    func decidePolicy(for action: WebPage.NavigationAction, preferences: inout WebPage.NavigationPreferences) async -> WKNavigationActionPolicy {
+        if action.request.url?.host() == "www.artemnovichkov.com" {
+            return .allow
+        }
+        self.url = action.request.url
+        return .cancel
+    }
+}
+```
+
+This class checks the host of each navigation request. If it matches our domain, we allow the navigation. Otherwise, we cancel it and store the URL. In the view, we observe changes to `navigationDecider.url` and open external links using SwiftUI’s `openURL` environment value.
+
+---
+
+## References
+
+- [Apple Developer Documentation: WKWebView](https://developer.apple.com/documentation/webkit/wkwebview)
+- [SwiftUI: Integrating with UIKit and WebKit](https://developer.apple.com/documentation/swiftui/representable)
+- [WebKit Back-Forward List](https://developer.apple.com/documentation/webkit/wkbackforwardlist)
+- [Handling Navigation Actions in WKWebView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview)
+
+---
+
+This approach gives you a powerful, flexible web browsing experience in SwiftUI, with full control over navigation, gestures, and external links. Happy coding!
