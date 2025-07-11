@@ -7,10 +7,10 @@ author:
   - artem-novichkov
 ---
 
-In my [previous blog post](https://www.artemnovichkov.com/blog/swiftui-offline), I showed how to load web content offline in SwiftUI apps. The implementation was a bit tricky because it relied on `WKWebView` to load web content. On WWDC25, Apple introduced `WebView` and `WebPage` to simplify web content handling in SwiftUI. Surprisingly, these new APIs are already available starting with iOS 18.4. Let's try to use them.
+In my [previous blog post](https://www.artemnovichkov.com/blog/swiftui-offline), I showed how to load web content offline in SwiftUI apps. The implementation was a bit tricky because it relied on `WKWebView` to load web content. On WWDC25, Apple introduced `WebView` and `WebPage` to simplify web content handling in SwiftUI. Let's try to use them.
 
 <Callout type="info" emoji="️ℹ️">
-  Code examples are tested in Xcode 26.0 beta 2 (17A5241o). The APIs are changed in beta 3, I'll update the post soon.
+  Code examples are tested in Xcode 26.0 beta 3 (17A5276g). The APIs may be changed in the final release.
 </Callout>
 
 ## Loading web content
@@ -22,7 +22,7 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    @State private var url: URL = URL(string: "https://www.artemnovichkov.com")!
+    @State private var url = URL(string: "https://www.artemnovichkov.com")!
 
     var body: some View {
         WebView(url: url)
@@ -37,7 +37,7 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    @State private var url: URL = URL(string: "https://www.artemnovichkov.com")!
+    @State private var url = URL(string: "https://www.artemnovichkov.com")!
     @State private var webPage = WebPage()
 
     var body: some View {
@@ -60,7 +60,7 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    @State private var url: URL = URL(string: "https://www.artemnovichkov.com")!
+    @State private var url = URL(string: "https://www.artemnovichkov.com")!
     @State private var webPage = WebPage()
 
     var body: some View {
@@ -92,107 +92,143 @@ Here is the result:
 
 ![Web page loading](/images/using-webkit-to-load-web-content-in-swiftui/loading.png)
 
-To handle different states such as errors or redirects, use the `currentNavigationEvent` property. Let's add controls to save content — starting with a picker for selecting content type:
+To handle different states such as errors or redirects, we can observe navigation changes through the async sequence returned by `load` function. 
+
+Let's add controls to save content — starting with an enum for selecting content type:
 
 ```swift
 enum ContentType: String, CaseIterable {
-    case snapshot = "Snapshot"
+    case image = "Image"
     case pdf = "PDF"
-    case webarchive = "Web Archive"
+    case webArchive = "Web Archive"
 }
 ```
 
-And add a picker to the content:
+And a toolbar with a picker and save button:
 
-```swift {21, 26-33}
+```swift {3, 24, 29-35}
 struct ContentView: View {
     // Other states
-    @State private var contentType: ContentType = .snapshot
+    @State private var loaded = false
+    @State private var contentType: ContentType = .image
 
     var body: some View {
         content
-            .safeAreaInset(edge: .bottom) {
-                HStack {
+            .toolbar {
+                ToolbarSpacer(placement: .bottomBar)
+                ToolbarItem(placement: .bottomBar) {
                     Picker("Content Type", selection: $contentType) {
                         ForEach(ContentType.allCases, id: \.self) { contentType in
                             Text(contentType.rawValue)
                                 .tag(contentType)
                         }
                     }
-                    Spacer()
-                    Button("Save") {
+                    .tint(.primary)
+                    .fixedSize()
+                }
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Save", systemImage: "square.and.arrow.down") {
                         // Save content
                     }
+                    .disabled(!loaded)
                 }
-                .padding()
-                .disabled(disabled)
             }
-            // Other modifiers
-    }
-
-    private var disabled: Bool {
-        switch webPage.currentNavigationEvent?.kind {
-        case .finished:
-            false
-        default:
-            true
-        }
+            .onAppear {
+                let request = URLRequest(url: url)
+                Task {
+                    for try await event in webPage.load(request) {
+                        if event == .committed {
+                            loaded = true
+                        }
+                    }
+                }
+            }
+            .onDisappear {
+                webPage.stopLoading()
+            }
     }
 }
 ```
 
-The picker remains disabled until the web content finishes loading.
+The picker remains disabled until the web content finishes loading. Here is the picker in action:
 
+<p align="center">
+  <img src="/images/using-webkit-to-load-web-content-in-swiftui/picker.gif" alt="Picker" />
+</p>
 
 ## Saving web content locally
 
-As before, we have 3 types of content:
-- snapshot;
+`WebPage` supports `Transferable` protocol, so we can export its content to various types:
+- image;
 - PDF;
-- Web archive.
+- web archive data.
 
-For snapshots, the web page returns optional `Image`:
+For images and PDFs, we may use `WebPage.ExportedContentConfiguration` struct to configure additional options like region of a webpage or transparent background.
 
 ```swift
 Task {
-    let image = try await webPage.snapshot()
+    // Export as image
+    let imageData = try await webPage.exported(as: .image(region: .contents))
+    // Export as PDF
+    let pdfData = try await webPage.exported(as: .pdf(allowTransparentBackground: true))
 }
 ```
 
-You can’t save the image directly, as it lacks a data representation. Instead, we need to use `ImageRenderer` to convert the image to `UIImage` and then save the data to the file:
+If you don't need to configure the exported content, we can use `exported(as:)` function with `UTType`:
 
 ```swift
+import UniformTypeIdentifiers
+
 Task {
-    let image = try await webPage.snapshot()
-    if let image {
-        let renderer = ImageRenderer(content: image)
-        renderer.scale = 2
-        if let uiImage = renderer.uiImage, let data = uiImage.pngData() {
-            // Save data to the file
+    let webArchiveData = try await webPage.exported(as: .webArchive)
+}
+```
+
+Now we can save the content based on the selected type:
+
+```swift
+private func save() {
+    Task {
+        do {
+            let data = try await webPage.exported(as: contentType.type)
+            let fileManager = FileManager.default
+            let url = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("data")
+                .appendingPathExtension(contentType.pathExtension)
+            fileManager.createFile(atPath: url.path(), contents: data)
+        }
+        catch {
+            print("Error saving content: \(error)")
+        }
+    }
+}
+
+extension ContentType {
+
+    var type: UTType {
+        switch self {
+        case .image: .image
+        case .pdf: .pdf
+        case .webarchive: .webArchive
+        }
+    }
+
+    var pathExtension: String {
+        if let preferredFilenameExtension = type.preferredFilenameExtension {
+            return preferredFilenameExtension
+        }
+        return switch self {
+        case .image: "png"
+        case .pdf: "pdf"
+        case .webarchive: "webarchive"
         }
     }
 }
 ```
 
-The snapshot includes only the visible portion of the WebView, scroll indicators included. For PDFs and web archives, we get data directly:
-
-```swift
-Task {
-    let pdfData = try await webPage.pdf()
-    // Save data to the file
-}
-
-Task {
-    let webArchiveData = try await webPage.webArchiveData()
-    // Save data to the file
-}
-```
-
-Simple and straightforward.
-
 ## Showing saved content
 
-To display snapshots and PDF files, I reused code from the previous blog post. For web archives, the new `WebView` can be used directly:
+To display image and PDF files, I reused code from the previous blog post. For web archive data, the new `WebView` can be used directly:
 
 ```swift
 import SwiftUI
@@ -201,7 +237,7 @@ import WebKit
 struct WebArchiveView: View {
     
     let url: URL
-    @State private var webPage: WebPage = .init()
+    @State private var webPage = WebPage()
     
     var body: some View {
         WebView(webPage)
