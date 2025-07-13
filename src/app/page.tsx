@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Experience from "./_components/experience";
 
-export default function About() {
+export default function Home() {
     return (
         <div className="flex flex-col justify-center items-start max-w-2xl mx-auto">
             <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">About Me</p>
