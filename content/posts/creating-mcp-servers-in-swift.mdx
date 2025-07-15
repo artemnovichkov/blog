@@ -12,19 +12,21 @@ author:
 
 In this article, we will create a simple MCP server in Swift that returns the current Swift version on your machine.
 
+<AudioPlayer src="/audio/creating-mcp-servers-in-swift.wav" />
+
 ## Creating a server
 
 We'll start with a package:
 
-```bash
-> mkdir swift-version-mcp
-> cd swift-version-mcp
-> swift package init --type executable
+```ansi
+mkdir swift-version-mcp
+cd swift-version-mcp
+swift package init --type executable
 ```
 
 Next, add the official Swift SDK for Model Context Protocol servers and clients. Update the `Package.swift` file to include the SDK as a dependency:
 
-```swift
+```swift showLineNumbers title="Package.swift"
 // swift-tools-version:6.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
@@ -51,7 +53,7 @@ let package = Package(
 
 Open `main.swift` and add the following code:
 
-```swift
+```swift showLineNumbers title="main.swift"
 import Foundation
 import MCP
 
@@ -69,7 +71,7 @@ Here we are creating a server with a name and version. The `capabilities` parame
 
 Next, we need to implement the tools. The server will have one tool that returns the current Swift version:
 
-```swift
+```swift showLineNumbers{13} title="main.swift"
 let tool = Tool(name: "swift_version",
                 description: "Returns the current Swift version")
 
@@ -80,7 +82,7 @@ await server.withMethodHandler(ListTools.self) { params in
 
 During the experiments with the SDK, I found that the tool name should be in snake case format. Otherwise, you may face errors during the tool call. Tools also may have input schema for input parameters, it's optional by specification. But experimenting with different clients, I found that some of them don't see the tool if it doesn't have input schema. This quick fix helps to make the tool visible:
 
-```swift
+```swift {3-5} showLineNumbers{13} title="main.swift"
 let tool = Tool(name: "swift_version",
                 description: "Returns the current Swift version",
                 inputSchema: .object([
@@ -90,7 +92,7 @@ let tool = Tool(name: "swift_version",
 
 To make the server respond to the tool, we need to implement the `withMethodHandler(CallTool.self)` function. It will be called when the client requests the tool. The method should return a `Result` object with the result of the tool:
 
-```swift
+```swift showLineNumbers{23} title="main.swift"
 await server.withMethodHandler(CallTool.self) { params in
     guard params.name == tool.name else {
         throw MCPError.invalidParams("Wrong tool name: \(params.name)")
@@ -122,17 +124,17 @@ Because the server may contain several tools, we check the tool name here.
 
 In the end of the file, add a call to `waitUntilCompleted()` to keep the server running:
 
-```swift
+```swift showLineNumbers{49} title="main.swift"
 await server.waitUntilCompleted()
 ```
 
 Build the package with the following command to generate the executable:
 
-```bash
+```ansi
 > swift build
 ```
 
-Interfaces in the SDK look a bit strange, because it was highly inspired by TypeScript implementation. It uses the same naming conventions and patterns. Sometimes you need to use dictionaries without strong types, but it is not a big deal. But hopefully it supports structured concurrency, so you can use `async/await` syntax.
+Interfaces in the SDK look a bit strange, because it was highly inspired by TypeScript implementation. It uses the same naming conventions and patterns. Sometimes you need to use dictionaries without strong types, but it is not a big deal. But hopefully it supports structured concurrency, so you can use async/await syntax.
 
 Now, we are ready to test the server. With a new Agent mode available in last releases of Visual Studio Code, you can use any MCP server in the editor. Let's configure it.
 
@@ -140,8 +142,8 @@ Now, we are ready to test the server. With a new Agent mode available in last re
 
  Here is how to add the server. Make sure you install [Github Copilot extension](https://marketplace.visualstudio.com/items/?itemName=GitHub.copilot) first.
 
-1. Open `Command Palette...` via ⌘+⇧+P shortcut and search for `MCP: List Servers`
-2. Click on `Add Server`
+1. Open *Command Palette...* via ⌘+⇧+P shortcut and search for *MCP: List Servers*
+2. Click on *Add Server*
 3. There are two options:
 - Command (Stdio)
 - HTTP (server-sent events)
@@ -150,7 +152,7 @@ Select the first one because we are using Stdio transport.
 
 4. Add a path to the executable:
 
-```bash
+```ansi
 /Users/artemnovichkov/Developer/swift-version-mcp/.build/arm64-apple-macosx/debug/swift-version-mcp
 ```
 
@@ -180,7 +182,7 @@ Above the server name you will see a `Start` button. Click on it to start the se
 ```
 
 In the output you will see the following logs:
-```bash
+```ansi
 2025-04-16 23:13:15.438 [info] Starting server swift-version-server
 2025-04-16 23:13:15.439 [info] Connection state: Starting
 2025-04-16 23:13:15.439 [info] Starting server from LocalProcess extension host

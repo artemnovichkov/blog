@@ -130,8 +130,8 @@ These items are related to the current recognized audio. We also can get a histo
 `SHLibrary` allows us to add, remove, and get media items from previous app sessions. We'll add the recognized song to the library:
 
 
-```swift
-@Published var library: SHLibrary = .default // [!code highlight]
+```swift /library/
+@Published var library: SHLibrary = .default
 
 func match() async {
     let result = await managedSession.result()
@@ -139,7 +139,7 @@ func match() async {
     switch result {
     case .match(let match):
         if let mediaItem = match.mediaItems.first {
-            try? await library.addItems([mediaItem]) // [!code highlight]
+            try? await library.addItems([mediaItem])
         }
     case .noMatch(_):
         print("Mo match")
@@ -153,7 +153,7 @@ Adding and removing items also affect the library in Shazam app.
 
 `SHLibrary` conforms to the `Observable` protocol, so we can observe changes in the library and show them in the interface:
 
-```swift
+```swift /viewModel.library.items/
 struct ShazamView: View {
 
     @StateObject private var viewModel: ShazamViewModel = .init()
@@ -162,7 +162,7 @@ struct ShazamView: View {
         NavigationStack {
             VStack {
                 List {
-                    ForEach(viewModel.library.items) { mediaItem in // [!code highlight]
+                    ForEach(viewModel.library.items) { mediaItem in
                         // Media item view
                     }
                 }
@@ -329,15 +329,15 @@ func remove(_ mediaItem: SHMediaItem) {
 
 Music recognition is a time-consuming process. We need to show the user that the app is working. We can use the `managedSession.state` to show the current state and disable the button during matching:
 
-```swift
+```swift {6,8}
 private var shazamButton: some View {
     Button(action: match) {
         Image(systemName: "shazam.logo.fill")
             .resizable()
             .frame(width: 52, height: 52)
-            .symbolEffect(.pulse, isActive: viewModel.managedSession.state == .matching) // [!code highlight]
+            .symbolEffect(.pulse, isActive: viewModel.managedSession.state == .matching)
     }
-    .allowsHitTesting(viewModel.managedSession.state != .matching) // [!code highlight]
+    .allowsHitTesting(viewModel.managedSession.state != .matching)
 }
 ```
 
