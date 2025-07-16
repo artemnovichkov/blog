@@ -8,7 +8,7 @@ import { name as siteName } from '@/lib/const';
 
 export default async function CategoryPage(props: Params) {
   const params = await props.params;
-  const { name } = params;
+  const name = params.name.toLowerCase();
   const posts = getAllPosts().filter(post =>
     post.categories?.includes(name)
   );
@@ -61,7 +61,7 @@ export async function generateStaticParams() {
   });
 
   return Array.from(categories).map((category) => ({
-    name: category.toLowerCase(),
+    name: category,
   }));
 }
 
