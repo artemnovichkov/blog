@@ -2,32 +2,18 @@ import { getAllPosts } from "@/lib/api";
 import PostPreview from "@/app/_components/post-preview";
 import { categoryTitleMap } from "@/lib/const";
 
-export async function generateStaticParams() {
-  const posts = getAllPosts();
-  const categories = new Set<string>();
-  
-  posts.forEach(post => {
-    if (post.categories) {
-      post.categories.forEach(category => categories.add(category));
-    }
-  });
-
-  return Array.from(categories).map((category) => ({
-    name: category,
-  }));
-}
 
 export default async function CategoryPage(props: Params) {
   const params = await props.params;
-  const decodedCategory = decodeURIComponent(params.slug).toLowerCase();
+  const { name } = params;
   const posts = getAllPosts().filter(post => 
-    post.categories?.includes(decodedCategory)
+    post.categories?.includes(name)
   );
 
   return (
     <main>
       <div className="flex items-center mb-8">
-      <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Category: {categoryTitleMap[decodedCategory] || decodedCategory}</p>
+      <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Category: {categoryTitleMap[name] || name}</p>
       </div>
       <section>
         {posts.length > 0 ? (
@@ -48,6 +34,21 @@ export default async function CategoryPage(props: Params) {
 
 type Params = {
   params: Promise<{
-    slug: string;
+    name: string;
   }>;
 };
+
+export async function generateStaticParams() {
+  const posts = getAllPosts();
+  const categories = new Set<string>();
+  
+  posts.forEach(post => {
+    if (post.categories) {
+      post.categories.forEach(category => categories.add(category));
+    }
+  });
+
+  return Array.from(categories).map((category) => ({
+    name: category.toLowerCase(),
+  }));
+}
