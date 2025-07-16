@@ -12,7 +12,7 @@ interface PostPreviewProps {
 export default function PostPreview({ post }: PostPreviewProps) {
     return (
         <div className="mb-4 flex items-center dark:bg-gray-800 p-4 rounded-lg border border-zinc-300 dark:border-gray-600">
-            <Link className="mr-4 flex-shrink-0" href={`/blog/${post.slug}`}>
+            <Link className="mr-4 flex-shrink-0" href={`/blog/${encodeURIComponent(post.slug)}`}>
                     <Image className="rounded"
                         priority
                         width={200}
@@ -23,7 +23,7 @@ export default function PostPreview({ post }: PostPreviewProps) {
                 </Link>
             <div className="flex flex-col justify-between min-h-32">
                 <div>
-                    <Link href={`/blog/${post.slug}`}>
+                    <Link href={`/blog/${encodeURIComponent(post.slug)}`}>
                         <h4 className="text-xl font-medium text-zinc-800 dark:text-gray-100">
                             {post.title}
                         </h4>
