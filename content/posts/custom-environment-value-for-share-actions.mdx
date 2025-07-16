@@ -58,7 +58,7 @@ Next, we should extend `EnvironmentValues` to make `ourShareAction` be available
 extension EnvironmentValues {
 
     var share: ShareAction {
-        self[ShareActionEnvironmentKey]
+        self[ShareActionEnvironmentKey.self]
     }
 }
 ```
@@ -70,7 +70,13 @@ struct ShareAction {
 
     func callAsFunction(_ activityItems: [Any]) {
         let vc = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-        UIApplication.shared.windows.first?.rootViewController?.present(vc, animated: true, completion: nil)
+        let windowScenes = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+        let activeScene = windowScenes
+            .filter { $0.activationState == .foregroundActive }
+        let firstActiveScene = activeScene.first
+        let keyWindow = firstActiveScene?.keyWindow
+        keyWindow?.rootViewController?.present(vc, animated: true, completion: nil)
     }
 }
 ```
@@ -93,6 +99,16 @@ struct ContentView: View {
             share([URL(string: "https://www.artemnovichkov.com")!])
         }
     }
+}
+```
+
+## Using ShareLink
+
+Since iOS 16.0, you can use `ShareLink` view to share activities. It's a more SwiftUI-way to share activities and it's more convenient to use.
+
+```swift
+ShareLink(item: URL(string: "https://www.artemnovichkov.com")!) {
+    Text("Share")
 }
 ```
 
