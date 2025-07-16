@@ -23,7 +23,7 @@ export default async function CategoryPage(props: Params) {
         {posts.length > 0 ? (
           <div>
             <p className="mb-2 text-zinc-500 dark:text-gray-400">
-              {posts.length} post{posts.length == 1 ? '' : 's'} found in this category:
+              {posts.length} post{posts.length === 1 ? '' : 's'} found in this category:
             </p>
             <ul>
               {posts.map((post) => (
