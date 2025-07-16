@@ -14,6 +14,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/blog`,
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/blog/category`,
+      priority: 0.8,
+    },
   ];
 
   const postEntries = posts.map((post) => ({
