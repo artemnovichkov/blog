@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  metadataBase: new URL('https://www.artemnovichkov.com/'),
   openGraph: {
     title: name,
     description: about,
