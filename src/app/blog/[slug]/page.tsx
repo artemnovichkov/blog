@@ -11,7 +11,7 @@ export default async function BlogPost(props: Params) {
     const post = getPostBySlug(params.slug);
     const content = await markdownToHtml(post.content || "");
     return (
-        <div>
+        <div className="max-w-2xl mx-auto w-full px-4">
             <article>
                 <h1 className="my-4 font-bold text-3xl tracking-tight text-zinc-800 dark:text-gray-100">
                     {post.title}
