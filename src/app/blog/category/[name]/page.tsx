@@ -3,7 +3,8 @@ import PostPreview from "@/app/_components/post-preview";
 import { categoryTitleMap } from "@/lib/const";
 import CategoryList from "@/app/_components/category-list";
 import { getAllCategories } from "@/lib/api";
-
+import { Metadata } from 'next';
+import { name as siteName } from '@/lib/const';
 
 export default async function CategoryPage(props: Params) {
   const params = await props.params;
@@ -62,4 +63,13 @@ export async function generateStaticParams() {
   return Array.from(categories).map((category) => ({
     name: category.toLowerCase(),
   }));
+}
+
+export async function generateMetadata(props: Params): Promise<Metadata> {
+  const params = await props.params;
+  const { name } = params;
+  return {
+    title: `${siteName} | Category: ${categoryTitleMap[name] || name}`,
+    description: `Posts in "${categoryTitleMap[name] || name}" category`,
+  };
 }
