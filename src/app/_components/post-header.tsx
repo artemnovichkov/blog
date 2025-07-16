@@ -1,7 +1,7 @@
 import PostDate from './post-date'
 import readingTime from 'reading-time'
 import ViewCounter from './view-counter'
-import PostCategories from './post-categories'
+import CategoryList from './category-list'
 
 interface PostMetaProps {
     post: {
@@ -25,7 +25,7 @@ export default function PostMeta({ post }: PostMetaProps) {
                     <ViewCounter slug={post.slug} />
                 </p>
             </div>
-            {post.categories && <PostCategories categories={post.categories} />}
+            {post.categories && <CategoryList categories={post.categories} />}
         </div>
     )
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import Link from 'next/link';
 import { categoryTitleMap } from "@/lib/const";
 
@@ -9,7 +7,7 @@ interface CategoryListProps {
 
 export default function CategoryList({ categories }: CategoryListProps) {
     return (
-        <div className="mb-8">
+        <div>
             <div className="flex flex-wrap gap-2">
                 {categories.map((category) => (
                     <Link key={category} href={`/blog/category/${category}`}
