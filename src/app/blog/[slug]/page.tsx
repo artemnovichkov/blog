@@ -45,10 +45,6 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
     return {
         title: post.title,
         description: post.description,
-        robots: {
-            index: true,
-            follow: true,
-        },
         openGraph: {
             title: post.title,
             description: post.description,
@@ -64,10 +60,7 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
             creator: '@iosartem',
             creatorId: '3081906297',
             images: [post.cover],
-        },
-        other: {
-            'yandex-verification': '0dbe1f786dcb070d',
-        },
+        }
     };
 }
 

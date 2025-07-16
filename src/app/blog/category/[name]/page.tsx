@@ -9,7 +9,7 @@ import { name as siteName } from '@/lib/const';
 export default async function CategoryPage(props: Params) {
   const params = await props.params;
   const { name } = params;
-  const posts = getAllPosts().filter(post => 
+  const posts = getAllPosts().filter(post =>
     post.categories?.includes(name)
   );
   const categories = getAllCategories();
@@ -17,7 +17,7 @@ export default async function CategoryPage(props: Params) {
   return (
     <main>
       <div className="flex items-center">
-      <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Category: {categoryTitleMap[name] || name}</p>
+        <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Category: {categoryTitleMap[name] || name}</p>
       </div>
       <section>
         {posts.length > 0 ? (
@@ -53,7 +53,7 @@ type Params = {
 export async function generateStaticParams() {
   const posts = getAllPosts();
   const categories = new Set<string>();
-  
+
   posts.forEach(post => {
     if (post.categories) {
       post.categories.forEach(category => categories.add(category));
