@@ -1,6 +1,8 @@
 import { getAllPosts } from "@/lib/api";
 import PostPreview from "@/app/_components/post-preview";
 import { categoryTitleMap } from "@/lib/const";
+import CategoryList from "@/app/_components/category-list";
+import { getAllCategories } from "@/lib/api";
 
 
 export default async function CategoryPage(props: Params) {
@@ -9,23 +11,32 @@ export default async function CategoryPage(props: Params) {
   const posts = getAllPosts().filter(post => 
     post.categories?.includes(name)
   );
+  const categories = getAllCategories();
 
   return (
     <main>
-      <div className="flex items-center mb-8">
+      <div className="flex items-center">
       <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Category: {categoryTitleMap[name] || name}</p>
       </div>
       <section>
         {posts.length > 0 ? (
-          <ul>
-            {posts.map((post) => (
-              <li key={post.slug}>
-                <PostPreview post={post} />
-              </li>
-            ))}
-          </ul>
+          <div>
+            <p className="mb-2 text-zinc-500 dark:text-gray-400">
+              {posts.length} post{posts.length == 1 ? '' : 's'} found in this category:
+            </p>
+            <ul>
+              {posts.map((post) => (
+                <li key={post.slug}>
+                  <PostPreview post={post} />
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : (
-          <p className="text-zinc-500 dark:text-gray-400">No posts found in this category.</p>
+          <div className="flex flex-col gap-4">
+            <p className="text-zinc-500 dark:text-gray-400">No posts found in this category. You can browse other categories:</p>
+            <CategoryList categories={categories} />
+          </div>
         )}
       </section>
     </main>
