@@ -1,5 +1,4 @@
 import { getAllPosts } from "@/lib/api";
-import PostPreview from "../_components/post-preview";
 import { Metadata } from 'next';
 import { name } from '@/lib/const'
 import PostList from "../_components/post-list";

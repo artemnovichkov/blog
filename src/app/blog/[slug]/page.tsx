@@ -2,7 +2,6 @@ import { getPostBySlug, getAllPosts } from '@/lib/api'
 import markdownToHtml from '@/lib/markdownToHtml'
 import PostHeader from '@/app/_components/post-header'
 import PostActions from '@/app/_components/post-actions'
-import Image from 'next/image'
 import type { Metadata } from 'next'
 import { name } from '@/lib/const'
 

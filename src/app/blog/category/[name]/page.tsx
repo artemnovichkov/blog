@@ -1,5 +1,4 @@
 import { getAllPosts } from "@/lib/api";
-import PostPreview from "@/app/_components/post-preview";
 import { categoryTitleMap } from "@/lib/const";
 import CategoryList from "@/app/_components/category-list";
 import { getAllCategories } from "@/lib/api";
