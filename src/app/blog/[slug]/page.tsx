@@ -12,11 +12,11 @@ export default async function BlogPost(props: Params) {
     return (
         <main>
             <article>
-                <div>
-                    <div className="py-4">
+                <div className="flex flex-col justify-center items-start">
+                    <div className="y-4">
                         <PostHeader post={post} />
                     </div>
-                    <div className="prose dark:prose-darke">
+                    <div className="prose dark:prose-dark">
                         {content}
                     </div>
                 </div>
