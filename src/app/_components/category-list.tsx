@@ -1,11 +1,7 @@
 import Link from 'next/link';
 import { categoryTitleMap } from "@/lib/const";
 
-interface CategoryListProps {
-    categories: string[];
-}
-
-export default function CategoryList({ categories }: CategoryListProps) {
+export default function CategoryList({ categories }: { categories: string[] }) {
     return (
         <div className="flex flex-wrap gap-2">
             {categories.map((category) => (

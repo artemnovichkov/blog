@@ -11,31 +11,23 @@ export default async function BlogPost(props: Params) {
     const post = getPostBySlug(params.slug);
     const content = await markdownToHtml(post.content || "");
     return (
-        <div className="max-w-2xl mx-auto w-full px-4">
+        <main>
             <article>
-                <h1 className="my-4 font-bold text-3xl tracking-tight text-zinc-800 dark:text-gray-100">
-                    {post.title}
-                </h1>
-                <PostHeader post={post} />
-                <Image className="mb-4 rounded"
-                    priority
-                    alt={post.title}
-                    src={post.cover}
-                    width={1200}
-                    height={740}
-                />
+                <div className="py-4">
+                    <PostHeader post={post} />
+                </div>
                 <div className="prose dark:prose-dark">
-                  {content}
+                    {content}
                 </div>
             </article>
             <PostActions post={post} />
-        </div>
+        </main>
     );
 }
 
 type Params = {
     params: Promise<{
-      slug: string;
+        slug: string;
     }>;
 };
 
@@ -66,8 +58,8 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
 
 export async function generateStaticParams() {
     const posts = getAllPosts();
-  
+
     return posts.map((post) => ({
-      slug: post.slug,
+        slug: post.slug,
     }));
 }

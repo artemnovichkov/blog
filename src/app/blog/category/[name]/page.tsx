@@ -5,6 +5,7 @@ import CategoryList from "@/app/_components/category-list";
 import { getAllCategories } from "@/lib/api";
 import { Metadata } from 'next';
 import { name as siteName } from '@/lib/const';
+import PostList from "@/app/_components/post-list";
 
 export default async function CategoryPage(props: Params) {
   const params = await props.params;
@@ -16,22 +17,14 @@ export default async function CategoryPage(props: Params) {
 
   return (
     <main>
-      <div className="flex items-center">
-        <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Category: {categoryTitleMap[name] || name}</p>
-      </div>
+      <p className="flex items-center font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Category: {categoryTitleMap[name] || name}</p>
       <section>
         {posts.length > 0 ? (
           <div>
-            <p className="mb-2 text-zinc-500 dark:text-gray-400">
+            <p className="mb-4 text-zinc-500 dark:text-gray-400">
               {posts.length} post{posts.length === 1 ? '' : 's'} found in this category:
             </p>
-            <ul>
-              {posts.map((post) => (
-                <li key={post.slug}>
-                  <PostPreview post={post} />
-                </li>
-              ))}
-            </ul>
+            <PostList posts={posts} />
           </div>
         ) : (
           <div className="flex flex-col gap-4">
