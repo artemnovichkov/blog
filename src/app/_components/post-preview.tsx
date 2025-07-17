@@ -14,7 +14,7 @@ export default function PostPreview({ post }: { post: Post }) {
                     className="rounded w-full h-auto object-cover"
                     priority
                     src={post.cover}
-                    alt={"cover"}
+                    alt={`Cover image for ${post.title}`}
                     width={800}
                     height={400}
                     sizes="(max-width: 768px) 100vw, 50vw"
