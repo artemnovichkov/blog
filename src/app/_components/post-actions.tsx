@@ -1,23 +1,18 @@
 import React from 'react';
 import { Post } from '@/interfaces/post';
 
-
-interface PostActionsProps {
-  post: Post;
-}
-
 const twitterShareUrl = (post: Post): string => {
   return `https://x.com/intent/tweet?text=${encodeURIComponent(
     `https://artemnovichkov.com/blog/${post.slug} by @iosartem`
-  )}`;
+  )}`;  
 };
 
 const editUrl = (slug: string): string =>
   `https://github.com/artemnovichkov/blog/edit/main/content/posts/${slug}.mdx`;
 
-export default function PostActions({ post }: PostActionsProps) {
+export default function PostActions({ post }: { post: Post }) {
   return (
-    <div className="mb-8 mt-4 text-sm text-gray-500 dark:text-gray-400">
+    <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
       <a
         href={twitterShareUrl(post)}
         target="_blank"

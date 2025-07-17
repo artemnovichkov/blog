@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  metadataBase: new URL('https://www.artemnovichkov.com/'),
   openGraph: {
     title: name,
     description: about,
@@ -40,9 +41,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-zinc-100 dark:bg-gray-900">
+      <body className="min-h-screen flex flex-col bg-zinc-100 dark:bg-gray-900">
         <Header />
-        <main className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
+        <main className="flex-1 flex flex-col px-4 sm:px-0 max-w-2xl mx-auto">
           {children}
         </main>
         <Footer />

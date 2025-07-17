@@ -3,6 +3,7 @@ title: Github contribution graph with Swift Charts
 description: Recreation of the contribution graph from GitHub using Swift Charts
 cover: /images/github-contribution-graph-swift-charts/cover.png
 date: '2024-09-07'
+categories: swiftui, swift-charts
 author:
   - artem-novichkov
 ---
@@ -42,7 +43,7 @@ struct Contribution: Identifiable {
 
 Here, the `Contribution` struct captures the `date` when a contribution was made and the `count` of contributions on that particular day.
 
-Since my GitHub activity has been a bit low recently 😅, let’s mock contribution data for the last 60 days using random values:
+Since my GitHub activity has been a bit low recently 😅, let's mock contribution data for the last 60 days using random values:
 
 ```swift
 extension Contribution {
@@ -66,7 +67,7 @@ extension Contribution {
 
 ## Creating the chart
 
-To bring this data to life, we’ll import the Charts framework and prepare a content view:
+To bring this data to life, we'll import the Charts framework and prepare a content view:
 
 ```swift
 import SwiftUI
@@ -117,11 +118,11 @@ RectangleMark(/*...*/)
   .foregroundStyle(by: .value("Count", contribution.count))
 ```
 
-`clipShape` modifier allows you to make a shape that fills each mark’s frame. You can use it as a mask. `foregroundStyle` modifier applies color styling. You can set a solid color, gradient, or you can pass `PlottableValue` that will change the color based on the value:
+`clipShape` modifier allows you to make a shape that fills each mark's frame. You can use it as a mask. `foregroundStyle` modifier applies color styling. You can set a solid color, gradient, or you can pass `PlottableValue` that will change the color based on the value:
 
 ![Chart with styling](/images/github-contribution-graph-swift-charts/color-chart.png)
 
-This looks much better! The chart is now functional and displays the data. It even shows a legend based on count range. To ensure the chart’s marks are square, we can apply `chartPlotStyle` modifier. It allows you to change frame or aspect ratio of a plot area:
+This looks much better! The chart is now functional and displays the data. It even shows a legend based on count range. To ensure the chart's marks are square, we can apply `chartPlotStyle` modifier. It allows you to change frame or aspect ratio of a plot area:
 
 ```swift
 Chart(/*...*/)
@@ -208,7 +209,7 @@ Chart(/*...*/)
 
 ## The legend of ~~Zelda~~ the chart
 
-Finally, let’s enhance the chart with a color-coded legend to visually indicate the range of contribution values, from 'Less' to 'More':
+Finally, let's enhance the chart with a color-coded legend to visually indicate the range of contribution values, from 'Less' to 'More':
 
 ```swift
 Chart(/*...*/)
@@ -238,6 +239,6 @@ It overrides the default legend with a custom one. You can also change the legen
 
 ## Conclusion
 
-Swift Charts is a truly interesting framework. It's designed in SwiftUI style: declarative syntax, some magic default behaviour and lack of documentation in some cases. Classic SwiftUI 😅. Thankfully, the community has provided plenty of chart examples, and I’ve compiled the resources that helped me in one place — [Awesome Swift Charts](https://artemnovichkov.github.io/awesome-swift-charts/). This article is my way to explore the framework, implement production-ready design and highlight non-obvious logic. And, of course, share my experience with you!
+Swift Charts is a truly interesting framework. It's designed in SwiftUI style: declarative syntax, some magic default behaviour and lack of documentation in some cases. Classic SwiftUI 😅. Thankfully, the community has provided plenty of chart examples, and I've compiled the resources that helped me in one place — [Awesome Swift Charts](https://artemnovichkov.github.io/awesome-swift-charts/). This article is my way to explore the framework, implement production-ready design and highlight non-obvious logic. And, of course, share my experience with you!
 
 Check [Github Contribution Graph Example](https://github.com/artemnovichkov/GithubContributionGraphExample) project to see the final result. Thanks for reading!

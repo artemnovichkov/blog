@@ -5,4 +5,5 @@ export type Post = {
   date: string;
   cover: string;
   content: string;
+  categories?: string[];
 };

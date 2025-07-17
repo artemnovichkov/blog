@@ -1,26 +1,35 @@
 import PostDate from './post-date'
 import readingTime from 'reading-time'
 import ViewCounter from './view-counter'
+import CategoryList from './category-list'
+import Image from 'next/image'
+import { Post } from "@/interfaces/post";
 
-interface PostMetaProps {
-    post: {
-        date: string;
-        content: string;
-        slug: string;
-    };
-}
-
-export default function PostMeta({ post }: PostMetaProps) {
+export default function PostHeader({ post }: { post: Post }) {
     return (
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full mb-2 text-sm text-gray-500 dark:text-gray-400">
-            <div className="flex items-center">
-              <PostDate dateString={post.date} />
+        <div className="flex flex-col w-full items-center text-center gap-4">
+            <p className="flex items-center font-bold text-3xl tracking-tight text-zinc-800 dark:text-gray-100">{post.title}</p>
+            <div className="flex flex-col w-full text-sm text-gray-500 dark:text-gray-400 items-center">
+                <span className="flex flex-row gap-2 items-center justify-center whitespace-nowrap">
+                    <PostDate dateString={post.date} />
+                    <span>•</span>
+                    <span>{readingTime(post.content).text}</span>
+                    <span>•</span>
+                    <ViewCounter slug={post.slug} />
+                </span>
             </div>
-            <p>
-                {readingTime(post.content).text}
-                { ` • ` }
-                <ViewCounter slug={post.slug} />
-            </p>
+            <Image className="rounded"
+                priority
+                alt={post.title}
+                src={post.cover}
+                width={1200}
+                height={740}
+            />
+            {post.categories && (
+                <div className="w-full flex justify-start">
+                    <CategoryList categories={post.categories} />
+                </div>
+            )}
         </div>
     )
 }
