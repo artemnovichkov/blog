@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconType } from 'react-icons';
 import { FaXTwitter } from 'react-icons/fa6'
 import { FaGithub } from 'react-icons/fa'
 import { FaLinkedin } from 'react-icons/fa';
@@ -21,7 +22,7 @@ const socialLinks = [
   },
 ];
 
-function SocialButton({ href, label, Icon }: { href: string; label: string; Icon: React.ComponentType<any> }) {
+function SocialButton({ href, label, Icon }: { href: string; label: string; Icon: IconType }) {
   return (
     <a
       rel="noopener noreferrer"

@@ -12,7 +12,7 @@ export default function Home() {
                 width={144}
                 alt="Artem Novichkov"
             />
-            <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Hey, I'm Artem Novichkov</p>
+            <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Hey, I&apos;m Artem Novichkov</p>
             <div className="flex flex-col gap-2 my-4 text-zinc-800 dark:text-gray-100">
                 <p>
                     I am an iOS Developer. I work at Salmon Group Ltd, developing the Salmon app — a super app designed to connect millions of Filipinos with reliable financial services, making finance accessible and easy.
