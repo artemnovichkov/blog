@@ -5,7 +5,7 @@ import { FaGithub, FaTelegramPlane } from 'react-icons/fa'
 export default function Footer() {
     return (
       <footer>
-        <div className="text-center pb-8">
+        <div className="text-center py-8">
           <div className="flex flex-row gap-16 place-content-center">
             <a
               rel="noopener noreferrer"

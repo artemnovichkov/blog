@@ -13,11 +13,13 @@ export default async function BlogPost(props: Params) {
     return (
         <main>
             <article>
-                <div className="py-4">
-                    <PostHeader post={post} />
-                </div>
-                <div className="prose dark:prose-dark">
-                    {content}
+                <div className="max-w-2xl mx-auto w-full">
+                    <div className="py-4">
+                        <PostHeader post={post} />
+                    </div>
+                    <div className="prose dark:prose-dark w-full max-w-none">
+                        {content}
+                    </div>
                 </div>
             </article>
             <PostActions post={post} />

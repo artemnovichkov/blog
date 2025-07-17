@@ -25,7 +25,11 @@ export default function PostHeader({ post }: { post: Post }) {
                 width={1200}
                 height={740}
             />
-            {post.categories && <CategoryList categories={post.categories} />}
+            {post.categories && (
+                <div className="w-full flex justify-start">
+                    <CategoryList categories={post.categories} />
+                </div>
+            )}
         </div>
     )
 }
