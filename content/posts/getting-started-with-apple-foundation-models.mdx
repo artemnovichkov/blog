@@ -23,7 +23,7 @@ Foundation Models are available across all Apple platforms starting with version
 Additionally, the model may take some time to download and initialize after Apple Intelligence is enabled.
 
 <Callout type="info" emoji="ℹ️">
-  For testing purposes, I used a MacBook Pro with an M1 Pro chip, running macOS Tahoe 26.0 Beta (25A5295e) and Xcode 26.0 beta 2 (17A5241o).
+  For testing purposes, I used a MacBook Pro with an M1 Pro chip, running macOS Tahoe 26.0 Beta (25A5316i) and Xcode 26.0 beta 4 (17A5285i).
 </Callout>
 
 Let's start with a simple view and check for model availability. We'll use `SystemLanguageModel.default.availability` to check if the model is available:
@@ -236,8 +236,8 @@ final class BloodPressureTool: Tool {
     @Generable
     struct Arguments {}
 
-    func call(arguments: Arguments) async throws -> ToolOutput {
-        ToolOutput("")
+    func call(arguments: Arguments) async throws -> GeneratedContent {
+        GeneratedContent("")
     }
 }
 ```
@@ -313,10 +313,9 @@ final class BloodPressureTool: Tool {
     private let diastolicType = HKQuantityType(.bloodPressureDiastolic)
     private let bloodPressureType = HKCorrelationType(.bloodPressure)
 
-    func call(arguments: Arguments) async throws -> ToolOutput {
+    func call(arguments: Arguments) async throws -> GeneratedContent {
         let (systolic, diastolic) = try await fetchLatestBloodPressure()
-        let content = GeneratedContent(properties: ["systolic": Int(systolic), "diastolic": Int(diastolic)])
-        return ToolOutput(content)
+        return GeneratedContent(properties: ["systolic": Int(systolic), "diastolic": Int(diastolic)])
     }
 
     // MARK: - Private
