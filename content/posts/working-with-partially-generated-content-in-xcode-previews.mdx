@@ -1,0 +1,313 @@
+---
+title: Working with partially generated content in Xcode previews
+description: Learn how to use Foundation Models guided generation in Xcode previews
+cover: /images/working-with-partially-generated-content-in-xcode-previews/cover.png
+date: '2025-07-28'
+categories: swiftui, foundation-models, xcode
+author:
+  - artem-novichkov
+---
+
+With the introduction of the Foundation Models framework, Apple provides tools to integrate AI-generated content directly into SwiftUI apps. One particularly useful feature is guided generation of Swift data structures. In this post, we'll explore techniques for working with partially generated content in Xcode previews.
+
+<Callout type="info" emoji="️ℹ️">
+  Code examples are tested in Xcode 26.0 beta 4 (17A5285i). APIs may change in the final release.
+</Callout>
+
+## Generating content
+
+Let's start with a simple example from Apple documentation and generate a cat profile:
+
+```swift
+import FoundationModels
+
+@Generable(description: "Basic profile information about a cat")
+struct CatProfile: Equatable {
+    let name: String
+
+    @Guide(description: "A one sentence profile about the cat's personality")
+    let profile: String
+
+    @Guide(description: "The age of the cat", .range(0...20))
+    let age: Int
+}
+```
+
+To show it, create a view that generates and displays the cat profile:
+
+```swift
+import SwiftUI
+import FoundationModels
+
+struct ContentView: View {
+    @State private var session = LanguageModelSession()
+    @State private var catProfile: CatProfile.PartiallyGenerated?
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if let catProfile {
+                    // Displays the cat profile
+                    CatProfileView(catProfile: catProfile)
+                }
+            }
+            .navigationTitle("Cat Profile")
+            .task {
+                do {
+                    let stream = session.streamResponse(generating: CatProfile.self) {
+                        "Generate a cute rescue cat"
+                    }
+                    for try await catProfile in stream {
+                        self.catProfile = catProfile
+                    }
+                } catch {
+                    print("Error generating cat profile: \(error)")
+                }
+            }
+        }
+    }
+}
+```
+
+The session responds with a delay, so we can use `streamResponse` to get a stream of partially generated content. Here's what `PartiallyGenerated` may look like if you expand `@Generable` macro:
+
+```swift
+nonisolated struct PartiallyGenerated: Identifiable, nonisolated FoundationModels.ConvertibleFromGeneratedContent, Equatable {
+    var id: GenerationID
+    var name: String.PartiallyGenerated?
+    var profile: String.PartiallyGenerated?
+    var age: Int.PartiallyGenerated?
+    nonisolated init(_ content: FoundationModels.GeneratedContent) throws {
+        self.id = content.id ?? GenerationID()
+        self.name = try content.value(forProperty: "name")
+        self.profile = try content.value(forProperty: "profile")
+        self.age = try content.value(forProperty: "age")
+    }
+}
+```
+
+To display the cat profile, we create a separate view:
+
+```swift
+import SwiftUI
+import FoundationModels
+
+struct CatProfileView: View {
+    let catProfile: CatProfile.PartiallyGenerated
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            if let name = catProfile.name {
+                Text(name)
+                    .font(.headline)
+            }
+            if let profile = catProfile.profile {
+                Text(profile)
+                    .font(.subheadline)
+            }
+            if let age = catProfile.age {
+                Text("Age: \(age)")
+                    .font(.caption)
+            }
+        }
+    }
+}
+```
+
+Let's check the result:
+
+<div className="flex justify-center">
+  <img src="/images/working-with-partially-generated-content-in-xcode-previews/main.gif" alt="Main" style={{maxWidth: "50%"}} />
+</div>
+
+Looks good, but how do we check the layout and intermediate states of `CatProfileView` in Xcode preview?
+
+## Working with previews
+
+Any `Generable` type can be converted to `PartiallyGenerated` by calling `asPartiallyGenerated()` function:
+
+```swift
+extension CatProfile {
+    static let mock = CatProfile(name: "Trisha",
+                                 profile: "A playful and curious cat who loves to explore her surroundings.",
+                                 age: 8)
+}
+
+#Preview("Mock", traits: .sizeThatFitsLayout) {
+    CatProfileView(catProfile: CatProfile.mock.asPartiallyGenerated())
+}
+```
+
+Here we can check the final layout of the view:
+
+![Mock](/images/working-with-partially-generated-content-in-xcode-previews/mock-preview.png)
+
+Additionally, we can create a `CatProfile` from raw JSON fragments:
+
+```swift
+#Preview("GeneratedContent", traits: .sizeThatFitsLayout) {
+    let jsons = [
+        #"{"name": "Trisha"#,
+        #"{"name": "Trisha", "profile": "A playful and curious cat"#,
+        #"{"name": "Trisha", "profile": "A playful and curious cat", "age": 8"#,
+    ]
+    VStack(spacing: 8) {
+        ForEach(jsons, id: \.self) { json in
+            let content = try! GeneratedContent(json: json)
+            CatProfileView(catProfile: try! .init(content))
+        }
+    }
+}
+```
+
+Note that the JSON may be invalid; `GeneratedContent` will still attempt to parse it and return `PartiallyGenerated` value with whatever fields are present.
+
+Initially, I tried to use the generated content's type directly:
+
+```swift
+CatProfileView(catProfile: try! CatProfile.PartiallyGenerated(content))
+```
+
+But I got an error related to the type mismatch:
+
+<Callout type="error" emoji="️🚫">
+  Cannot convert value of type 'CatProfile.PartiallyGenerated' (aka 'CatProfile') to expected argument type 'CatProfile.PartiallyGenerated'
+</Callout>
+
+I'm not yet sure why this fails — if you have ideas, please let me know.
+
+Let's check the preview:
+
+<div className="flex justify-center">
+  <img src="/images/working-with-partially-generated-content-in-xcode-previews/content-preview.png" alt="Content" style={{maxWidth: "100%"}} />
+</div>
+
+Here we can validate intermediate states. For instance, if `CatProfile` has only the `name` property, the content becomes centered — something we may want to adjust.
+
+Next, let's add some animations:
+
+```swift {12, 17, 22, 25}
+import SwiftUI
+import FoundationModels
+
+struct CatProfileView: View {
+    let catProfile: CatProfile.PartiallyGenerated
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            if let name = catProfile.name {
+                Text(name)
+                    .font(.headline)
+                    .transition(.opacity)
+            }
+            if let profile = catProfile.profile {
+                Text(profile)
+                    .font(.subheadline)
+                    .transition(.opacity)
+            }
+            if let age = catProfile.age {
+                Text("Age: \(age)")
+                    .font(.caption)
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut, value: catProfile)
+    }
+}
+```
+
+To simulate a stream response and verify animations with partially generated content, let's write an extension:
+
+```swift
+import FoundationModels
+
+extension Generable {
+    static func streamResponse(from json: String,
+                               offsetBy distance: Int = 4,
+                               delay: Duration = .milliseconds(500)) -> AsyncThrowingStream<Self.PartiallyGenerated, Error> {
+        AsyncThrowingStream { continuation in
+            Task {
+                var index = json.startIndex
+                while index < json.endIndex {
+                    let nextIndex = json.index(index, offsetBy: distance, limitedBy: json.endIndex) ?? json.endIndex
+                    let substring = String(json[..<nextIndex])
+                    let generatedContent = try GeneratedContent(json: substring)
+                    let content = try PartiallyGenerated(generatedContent)
+                    continuation.yield(content)
+                    index = nextIndex
+                    try await Task.sleep(for: delay)
+                }
+                continuation.finish()
+            }
+        }
+    }
+}
+```
+
+First, let's check it in a playground:
+
+```swift
+import Playgrounds
+
+#Playground {
+    let json = #"{"name": "Trisha", "profile": "A playful and curious cat", "age": 8}"#
+    for try await catProfile in CatProfile.streamResponse(from: json) {
+        print(catProfile)
+    }
+}
+```
+
+When you run it, you'll see the stream in action:
+
+![Playground](/images/working-with-partially-generated-content-in-xcode-previews/playground-preview.png)
+
+You might consider adding `Encodable` conformance to avoid hard-coding JSON. The model from `LanguageModelSession` generates `Generable` properties in the order they're declared. But `JSONEncoder` supports only `.sortedKeys` output formatting. That would change the on-screen appearance order, so it's not ideal for previews.
+
+To use this extension in a preview, we can write a wrapper view to handle the stream response:
+
+```swift
+private struct WrapperView: View {
+    @State private var catProfile: CatProfile.PartiallyGenerated?
+
+    var body: some View {
+        ZStack {
+            if let catProfile {
+                CatProfileView(catProfile: catProfile)
+            }
+        }
+        .task {
+            do {
+                let json = #"{"name": "Trisha", "profile": "A playful and curious cat", "age": 8}"#
+                for try await catProfile in CatProfile.streamResponse(from: json) {
+                    self.catProfile = catProfile
+                }
+            } catch {
+                print("Error generating cat profile: \(error)")
+            }
+        }
+    }
+}
+
+#Preview("Stream") {
+    WrapperView()
+}
+```
+
+Now we can inspect the stream response in a preview:
+
+<div className="flex justify-center">
+  <img src="/images/working-with-partially-generated-content-in-xcode-previews/stream-preview.gif" alt="Stream" style={{maxWidth: "50%"}} />
+</div>
+
+I also explored a more convenient approach (a custom modifier or an `@Previewable` macro), but ran into persistent type-mismatch errors. Still, this approach works as expected without calling or waiting for a real model session.
+
+## Conclusion
+
+The Foundation Models framework changes how we build SwiftUI views. With partially generated content, you can preview intermediate UI states. We can also use Xcode Previews or snapshot tests to validate layout. While this post's approach requires some boilerplate, it provides a practical way to test AI-generated content.
+
+The final example is available on [GitHub](https://github.com/artemnovichkov/partially-generated-content-preview-example). Thanks for reading!
+
+## References
+
+- [Adding intelligent app features with generative models](https://developer.apple.com/documentation/FoundationModels/adding-intelligent-app-features-with-generative-models)
+- [Generating Swift data structures with guided generation](https://developer.apple.com/documentation/foundationmodels/generating-swift-data-structures-with-guided-generation?changes=_10_5)
