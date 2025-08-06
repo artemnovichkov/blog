@@ -11,7 +11,7 @@ author:
 With the introduction of the Foundation Models framework, Apple provides tools to integrate AI-generated content directly into SwiftUI apps. One particularly useful feature is guided generation of Swift data structures. In this post, we'll explore techniques for working with partially generated content in Xcode previews.
 
 <Callout type="info" emoji="️ℹ️">
-  Code examples are tested in Xcode 26.0 beta 4 (17A5285i). APIs may change in the final release.
+  Code examples are tested in Xcode 26.0 beta 5 (17A5295f). The APIs may be changed in the final release.
 </Callout>
 
 ## Generating content
@@ -58,7 +58,7 @@ struct ContentView: View {
                         "Generate a cute rescue cat"
                     }
                     for try await catProfile in stream {
-                        self.catProfile = catProfile
+                        self.catProfile = catProfile.content
                     }
                 } catch {
                     print("Error generating cat profile: \(error)")
