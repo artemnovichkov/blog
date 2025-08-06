@@ -60,8 +60,24 @@ export async function generateStaticParams() {
 export async function generateMetadata(props: Params): Promise<Metadata> {
   const params = await props.params;
   const { name } = params;
+  const title = `${siteName} | Category: ${categoryTitleMap[name] || name}`;
+  const description = `Posts in "${categoryTitleMap[name] || name}" category`;
   return {
-    title: `${siteName} | Category: ${categoryTitleMap[name] || name}`,
-    description: `Posts in "${categoryTitleMap[name] || name}" category`,
+    title,
+    description,
+    openGraph: {
+      title: title,
+      description: description,
+      url: `https://artemnovichkov.com/blog/category/${name}`,
+      siteName: siteName,
+    },
+    twitter: {
+      card: 'summary',
+      title: title,
+      description: description,
+      siteId: '3081906297',
+      creator: '@iosartem',
+      creatorId: '3081906297',
+    }
   };
 }
