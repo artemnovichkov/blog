@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { Metadata } from 'next';
 import { name } from '@/lib/const';
 import markdownToHtml from '@/lib/markdownToHtml';
