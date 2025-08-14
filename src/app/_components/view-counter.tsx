@@ -13,10 +13,13 @@ interface ViewCounterProps {
 
 const fetcher = async (url: string): Promise<ViewData> => {
   const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error(`Failed to fetch views: ${res.status}`)
+  }
   return res.json()
 }
 
-export default function ViewCounter({ slug }: ViewCounterProps): string {
+export default function ViewCounter({ slug }: ViewCounterProps) {
   const { data } = useSWR<ViewData>(`/api/views/${slug}`, fetcher)
   const views = Number(data?.total)
 
