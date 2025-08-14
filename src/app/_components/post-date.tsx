@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function PostDate({ dateString }: { dateString: string }) {
   const date: Date = new Date(dateString);
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };

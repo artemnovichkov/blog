@@ -1,12 +1,12 @@
-import React from 'react';
+import { ReactNode } from 'react';
 
 interface CalloutProps {
     type?: 'info' | 'warning' | 'error';
     emoji: string;
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
-const Callout: React.FC<CalloutProps> = ({ type = 'info', emoji, children }) => {
+const Callout = ({ type = 'info', emoji, children }: CalloutProps) => {
     const baseStyles = 'callout p-4 rounded-md flex flex-col gap-2';
 
     const typeStyles: Record<string, string> = {

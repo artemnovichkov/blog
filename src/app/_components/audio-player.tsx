@@ -1,6 +1,8 @@
-import React from 'react';  
+interface AudioPlayerProps {
+  src: string;
+}
 
-const AudioPlayer: React.FC<{ src: string }> = ({ src }) => {
+const AudioPlayer = ({ src }: AudioPlayerProps) => {
   return (
     <div className="audio-player p-4 rounded-md flex flex-col gap-2 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-600 w-full">
       <div>
