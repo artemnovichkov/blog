@@ -1,0 +1,20 @@
+```swift
+enum NavigationError: Error {
+    case pageNotFound
+    
+    var localizedDescription: String {
+        switch self {
+        case .pageNotFound:
+            "404 - Page not found"
+        }
+    }
+}
+
+func handleMissingPage() {
+    do {
+        throw NavigationError.pageNotFound
+    } catch {
+        print(error.localizedDescription)
+    }
+}
+```
