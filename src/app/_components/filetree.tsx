@@ -1,4 +1,4 @@
-import React from 'react'
+import { ReactNode } from 'react'
 import { FaRegFileLines, FaSwift } from "react-icons/fa6";
 import { FaRegFolderOpen } from "react-icons/fa6";
 
@@ -9,10 +9,10 @@ type FileProps = {
 
 type FolderProps = {
   name: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
-const File: React.FC<FileProps> = ({ name, iconType = 'common' }) => {
+const File = ({ name, iconType = 'common' }: FileProps) => {
   const Icon = iconType === 'swift' ? FaSwift : FaRegFileLines;
   
   return (
@@ -23,7 +23,7 @@ const File: React.FC<FileProps> = ({ name, iconType = 'common' }) => {
   )
 }
 
-const Folder: React.FC<FolderProps> = ({ name, children }) => {
+const Folder = ({ name, children }: FolderProps) => {
   return (
     <div>
       <div className="py-1 flex items-center">
@@ -35,10 +35,7 @@ const Folder: React.FC<FolderProps> = ({ name, children }) => {
   )
 }
 
-const FileTree: React.FC<{ children: React.ReactNode }> & {
-  File: typeof File
-  Folder: typeof Folder
-} = ({ children }) => {
+const FileTree = ({ children }: { children: ReactNode }) => {
   return <div className="font-mono text-sm border border-gray-300 dark:border-white/50 rounded p-4 w-fit">{children}</div>
 }
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Post } from '@/interfaces/post';
 
 const twitterShareUrl = (post: Post): string => {
