@@ -19,7 +19,7 @@ const fetcher = async (url: string): Promise<ViewData> => {
   return res.json()
 }
 
-export default function ViewCounter({ slug }: ViewCounterProps) {
+export default function ViewCounter({ slug }: ViewCounterProps): JSX.Element {
   const { data } = useSWR<ViewData>(`/api/views/${slug}`, fetcher)
   const views = Number(data?.total)
 
@@ -32,5 +32,5 @@ export default function ViewCounter({ slug }: ViewCounterProps) {
     registerView()
   }, [slug])
 
-  return `${views > 0 ? views.toLocaleString() : '–––'} views`
+  return <span>{views > 0 ? views.toLocaleString() : '–––'} views</span>
 }
