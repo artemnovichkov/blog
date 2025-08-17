@@ -15,7 +15,10 @@ export default function Home() {
             <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">Hey, I&apos;m Artem Novichkov</p>
             <div className="flex flex-col gap-2 my-4 text-zinc-800 dark:text-gray-100">
                 <p>
-                    I am an iOS Developer. I work at Salmon Group Ltd, developing the Salmon app — a super app designed to connect millions of Filipinos with reliable financial services, making finance accessible and easy.
+                    I am an iOS Developer. I work at Salmon Group Ltd, developing the&nbsp;
+                    <a className="text-base underline" href="https://salmon.ph" target="_blank" rel="noopener noreferrer">
+                        Salmon app
+                    </a> — a super app designed to connect millions of Filipinos with reliable financial services, making finance accessible and easy.
                 </p>
                 <p>
                     Besides my main work, I focus on individual mentoring and consultations for developers and companies, helping them solve their challenges in iOS development. I also worked with the online platform Netology, where I created teaching materials, reviewed student assignments, and conducted over 100 online lectures.
