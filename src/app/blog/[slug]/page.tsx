@@ -2,20 +2,30 @@ import { getPostBySlug, getAllPosts } from '@/lib/api'
 import markdownToHtml from '@/lib/markdownToHtml'
 import PostHeader from '@/app/_components/post-header'
 import PostActions from '@/app/_components/post-actions'
+import AdBlock from '@/app/_components/ad-block'
 import type { Metadata } from 'next'
 import { name } from '@/lib/const'
+import { sponsorshipConfig } from '@/lib/sponsorship-config'
 
 export default async function BlogPost(props: Params) {
     const params = await props.params;
     const post = getPostBySlug(params.slug);
     const content = await markdownToHtml(post.content || "");
+    
+    
     return (
         <main>
             <article>
                 <div className="max-w-2xl mx-auto w-full">
-                    <div className="py-4">
+                    <div className="mt-4">
                         <PostHeader post={post} />
                     </div>
+                    <AdBlock 
+                        title={sponsorshipConfig.title}
+                        description={sponsorshipConfig.description}
+                        url={sponsorshipConfig.url}
+                        isVisible={sponsorshipConfig.isVisible}
+                    />
                     <div className="prose dark:prose-dark w-full max-w-none">
                         {content}
                     </div>

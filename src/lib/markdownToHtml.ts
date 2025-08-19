@@ -7,6 +7,7 @@ import Callout from '../app/_components/callout';
 import { FileTree } from "../app/_components/filetree";
 import AudioPlayer from '../app/_components/audio-player';
 import CodeBlock from '../app/_components/code-block';
+import AdBlock from '../app/_components/ad-block';
 
 const options = {
     theme: {
@@ -28,7 +29,7 @@ export default async function markdownToHtml(markdown: string) {
                 remarkPlugins: [remarkGfm],
             },
         },
-        components: { Tweet, Callout, FileTree, AudioPlayer, pre: CodeBlock },
+        components: { Tweet, Callout, FileTree, AudioPlayer, pre: CodeBlock, AdBlock },
     });
 
     return content;
