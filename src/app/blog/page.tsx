@@ -3,8 +3,16 @@ import { Metadata } from 'next';
 import { name } from '@/lib/const'
 import PostList from "../_components/post-list";
 
+const title = `${name} | Blog`;
+
 export const metadata: Metadata = {
-  title: `${name} | Blog`,
+  title,
+  openGraph: {
+    title,
+  },
+  twitter: {
+    title,
+  }
 };
 
 export default function Blog() {

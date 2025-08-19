@@ -4,8 +4,16 @@ import markdownToHtml from '@/lib/markdownToHtml'
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
+const title = `${name} | Sponsorship`;
+
 export const metadata: Metadata = {
-    title: `${name} | Sponsorship`
+    title,
+    openGraph: {
+        title,
+    },
+    twitter: {
+        title,
+    }
 }
 
 export default async function SponsorshipPage() {

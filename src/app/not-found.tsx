@@ -4,9 +4,17 @@ import markdownToHtml from '@/lib/markdownToHtml';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
+const title = `${name} | Page Not Found`;
+
 export const metadata: Metadata = {
-  title: `404 - Page Not Found | ${name}`,
+  title,
   description: 'Oops! This page seems to have wandered off into the digital void.',
+  openGraph: {
+    title
+  },
+  twitter: {
+    title
+  }
 };
 
 export default async function NotFound() {
