@@ -10,7 +10,10 @@ interface CodeBlockProps extends React.HTMLAttributes<HTMLPreElement> {
 function extractText(node: React.ReactNode): string {
   if (typeof node === "string") return node;
   if (Array.isArray(node)) return node.map(extractText).join("");
-  if (React.isValidElement(node)) return extractText(node.props.children);
+  if (React.isValidElement(node)) {
+    const props = node.props as { children?: React.ReactNode };
+    return extractText(props.children);
+  }
   return "";
 }
 

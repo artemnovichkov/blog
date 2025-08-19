@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import useSWR from 'swr'
 
 interface ViewData {
@@ -19,7 +19,7 @@ const fetcher = async (url: string): Promise<ViewData> => {
   return res.json()
 }
 
-export default function ViewCounter({ slug }: ViewCounterProps): JSX.Element {
+export default function ViewCounter({ slug }: ViewCounterProps): React.ReactElement {
   const { data } = useSWR<ViewData>(`/api/views/${slug}`, fetcher)
   const views = Number(data?.total)
 
