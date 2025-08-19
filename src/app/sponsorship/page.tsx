@@ -5,20 +5,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 export const metadata: Metadata = {
-    title: 'Sponsorship - Artem Novichkov',
-    description: 'Sponsor Artem Novichkov&apos;s iOS development blog and reach thousands of iOS developers and Swift enthusiasts.',
-    openGraph: {
-        title: 'Sponsorship - Artem Novichkov',
-        description: 'Sponsor Artem Novichkov&apos;s iOS development blog and reach thousands of iOS developers and Swift enthusiasts.',
-        url: 'https://artemnovichkov.com/sponsorship',
-        siteName: name,
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title: 'Sponsorship - Artem Novichkov',
-        description: 'Sponsor Artem Novichkov&apos;s iOS development blog and reach thousands of iOS developers and Swift enthusiasts.',
-        creator: '@iosartem',
-    }
+    title: `${name} | Sponsorship`
 }
 
 export default async function SponsorshipPage() {
