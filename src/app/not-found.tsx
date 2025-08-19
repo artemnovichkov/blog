@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { name } from '@/lib/const';
+import { about, name } from '@/lib/const';
 import markdownToHtml from '@/lib/markdownToHtml';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -10,11 +10,21 @@ export const metadata: Metadata = {
   title,
   description: 'Oops! This page seems to have wandered off into the digital void.',
   openGraph: {
-    title
+    title: name,
+    description: about,
+    url: 'https://www.artemnovichkov.com/',
+    siteName: title,
+    images: ['https://www.artemnovichkov.com/images/banner.png'],
   },
   twitter: {
-    title
-  }
+    card: 'summary_large_image',
+    title: name,
+    description: about,
+    siteId: '3081906297',
+    creator: '@iosartem',
+    creatorId: '3081906297',
+    images: ['https://www.artemnovichkov.com/images/banner.png'],
+  },
 };
 
 export default async function NotFound() {

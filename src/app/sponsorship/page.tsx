@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { name } from '@/lib/const'
+import { about, name } from '@/lib/const'
 import markdownToHtml from '@/lib/markdownToHtml'
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -9,11 +9,21 @@ const title = `${name} | Sponsorship`;
 export const metadata: Metadata = {
     title,
     openGraph: {
-        title,
-    },
-    twitter: {
-        title,
-    }
+        title: name,
+        description: about,
+        url: 'https://www.artemnovichkov.com/',
+        siteName: title,
+        images: ['https://www.artemnovichkov.com/images/banner.png'],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: name,
+        description: about,
+        siteId: '3081906297',
+        creator: '@iosartem',
+        creatorId: '3081906297',
+        images: ['https://www.artemnovichkov.com/images/banner.png'],
+      },
 }
 
 export default async function SponsorshipPage() {

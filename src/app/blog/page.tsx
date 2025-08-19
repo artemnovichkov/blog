@@ -1,6 +1,6 @@
 import { getAllPosts } from "@/lib/api";
 import { Metadata } from 'next';
-import { name } from '@/lib/const'
+import { about, name } from '@/lib/const'
 import PostList from "../_components/post-list";
 
 const title = `${name} | Blog`;
@@ -8,11 +8,21 @@ const title = `${name} | Blog`;
 export const metadata: Metadata = {
   title,
   openGraph: {
-    title,
+    title: name,
+    description: about,
+    url: 'https://www.artemnovichkov.com/',
+    siteName: title,
+    images: ['https://www.artemnovichkov.com/images/banner.png'],
   },
   twitter: {
-    title,
-  }
+    card: 'summary_large_image',
+    title: name,
+    description: about,
+    siteId: '3081906297',
+    creator: '@iosartem',
+    creatorId: '3081906297',
+    images: ['https://www.artemnovichkov.com/images/banner.png'],
+  },
 };
 
 export default function Blog() {
