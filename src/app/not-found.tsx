@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title,
   description: 'Oops! This page seems to have wandered off into the digital void.',
   openGraph: {
-    title: name,
+    title: title,
     description: about,
     url: 'https://www.artemnovichkov.com/',
     siteName: title,
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: name,
+    title: title,
     description: about,
     siteId: '3081906297',
     creator: '@iosartem',
