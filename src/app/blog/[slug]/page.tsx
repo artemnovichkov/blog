@@ -1,7 +1,8 @@
-import { getPostBySlug, getAllPosts } from '@/lib/api'
+import { getPostBySlug, getAllPosts, getPreviousPost } from '@/lib/api'
 import markdownToHtml from '@/lib/markdownToHtml'
 import PostHeader from '@/app/_components/post-header'
 import PostActions from '@/app/_components/post-actions'
+import ReadNext from '@/app/_components/read-next'
 import AdBlock from '@/app/_components/ad-block'
 import type { Metadata } from 'next'
 import { name } from '@/lib/const'
@@ -11,6 +12,7 @@ export default async function BlogPost(props: Params) {
     const params = await props.params;
     const post = getPostBySlug(params.slug);
     const content = await markdownToHtml(post.content || "");
+    const previousPost = getPreviousPost(params.slug);
     
     
     return (
@@ -31,7 +33,10 @@ export default async function BlogPost(props: Params) {
                     </div>
                 </div>
             </article>
-            <PostActions post={post} />
+            <div className="max-w-2xl mx-auto w-full">
+                <PostActions post={post} />
+                {previousPost && <ReadNext post={previousPost} />}
+            </div>
         </main>
     );
 }
