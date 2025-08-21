@@ -34,6 +34,17 @@ export function getAllPosts(): Post[] {
     return posts;
 }
 
+export function getPreviousPost(currentSlug: string): Post | null {
+    const posts = getAllPosts();
+    const currentIndex = posts.findIndex(post => post.slug === currentSlug);
+    
+    if (currentIndex === -1 || currentIndex === posts.length - 1) {
+        return null;
+    }
+    
+    return posts[currentIndex + 1];
+}
+
 export function getAllCategories(): string[] {
     const posts = getAllPosts();
     const categoriesSet = new Set<string>();
