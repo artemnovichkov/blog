@@ -28,7 +28,7 @@ export default function ReadNext({ post }: { post: Post }) {
                     <h4 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-2">
                         {post.title}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                         {post.description}
                     </p>
                     <div className="text-xs text-gray-500 dark:text-gray-500">
