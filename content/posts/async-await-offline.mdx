@@ -9,7 +9,7 @@ author:
 ---
 *Translations: [Russian](https://habr.com/ru/company/skyeng/blog/598295)*
 
-Previously I wrote a post about [working with web view content offline](https://www.artemnovichkov.com/blog/swiftui-offline). Since then Apple team has released Xcode 13.2 beta with Swift 5.5, I've read a book about [modern concurrency model in Swift](https://www.raywenderlich.com/books/modern-concurrency-in-swift), and I guess it's a perfect time to update my examples with async/await!
+Previously I wrote a post about [working with web view content offline](https://artemnovichkov.com/blog/swiftui-offline). Since then Apple team has released Xcode 13.2 beta with Swift 5.5, I've read a book about [modern concurrency model in Swift](https://www.raywenderlich.com/books/modern-concurrency-in-swift), and I guess it's a perfect time to update my examples with async/await!
 
 Before reading this post I highly recommend checking [Concurrency](https://docs.swift.org/swift-book/LanguageGuide/Concurrency.html) article in Swift Language Guide.
 
@@ -252,7 +252,7 @@ Congratulations, we did it! Wait, but how to use new async functions from sync c
 ```swift
 Task {
     do {
-        let url = URL(string: "https://www.artemnovichkov.com")!
+        let url = URL(string: "https://artemnovichkov.com")!
         let data = try await webDataManager.createData(url: url, type: .pdf)
         print(data)
     }

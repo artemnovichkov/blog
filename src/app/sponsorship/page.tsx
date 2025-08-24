@@ -11,9 +11,9 @@ export const metadata: Metadata = {
     openGraph: {
         title: title,
         description: about,
-        url: 'https://www.artemnovichkov.com/',
+        url: 'https://artemnovichkov.com/',
         siteName: title,
-        images: ['https://www.artemnovichkov.com/images/banner.png'],
+        images: ['https://artemnovichkov.com/images/banner.png'],
       },
       twitter: {
         card: 'summary_large_image',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
         siteId: '3081906297',
         creator: '@iosartem',
         creatorId: '3081906297',
-        images: ['https://www.artemnovichkov.com/images/banner.png'],
+        images: ['https://artemnovichkov.com/images/banner.png'],
       },
 }
 

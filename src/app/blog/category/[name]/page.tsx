@@ -70,7 +70,7 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
       description: description,
       url: `https://artemnovichkov.com/blog/category/${name}`,
       siteName: siteName,
-      images: ['https://www.artemnovichkov.com/images/banner.png'],
+      images: ['https://artemnovichkov.com/images/banner.png'],
     },
     twitter: {
       card: 'summary',
@@ -79,7 +79,7 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
       siteId: '3081906297',
       creator: '@iosartem',
       creatorId: '3081906297',
-      images: ['https://www.artemnovichkov.com/images/banner.png'],
+      images: ['https://artemnovichkov.com/images/banner.png'],
     }
   };
 }

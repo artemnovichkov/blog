@@ -8,7 +8,7 @@ author:
   - artem-novichkov
 ---
 
-In my [previous blog post](https://www.artemnovichkov.com/blog/swiftui-offline), I showed how to load web content offline in SwiftUI apps. The implementation was a bit tricky because it relied on `WKWebView` to load web content. On WWDC25, Apple introduced `WebView` and `WebPage` to simplify web content handling in SwiftUI. Let's try to use them.
+In my [previous blog post](https://artemnovichkov.com/blog/swiftui-offline), I showed how to load web content offline in SwiftUI apps. The implementation was a bit tricky because it relied on `WKWebView` to load web content. On WWDC25, Apple introduced `WebView` and `WebPage` to simplify web content handling in SwiftUI. Let's try to use them.
 
 <Callout type="info" emoji="️ℹ️">
   Code examples are tested in Xcode 26.0 beta 6 (17A5305f). The APIs may be changed in the final release.
@@ -23,7 +23,7 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    @State private var url = URL(string: "https://www.artemnovichkov.com")!
+    @State private var url = URL(string: "https://artemnovichkov.com")!
 
     var body: some View {
         WebView(url: url)
@@ -38,7 +38,7 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    @State private var url = URL(string: "https://www.artemnovichkov.com")!
+    @State private var url = URL(string: "https://artemnovichkov.com")!
     @State private var webPage = WebPage()
 
     var body: some View {
@@ -61,7 +61,7 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    @State private var url = URL(string: "https://www.artemnovichkov.com")!
+    @State private var url = URL(string: "https://artemnovichkov.com")!
     @State private var webPage = WebPage()
 
     var body: some View {

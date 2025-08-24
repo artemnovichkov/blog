@@ -31,7 +31,7 @@ struct ContentView: View {
     
     var body: some View {
         Button("Share") {
-            openURL(URL(string: "https://www.artemnovichkov.com")!)
+            openURL(URL(string: "https://artemnovichkov.com")!)
         }
     }
 }
@@ -96,7 +96,7 @@ struct ContentView: View {
     
     var body: some View {
         Button("Share") {
-            share([URL(string: "https://www.artemnovichkov.com")!])
+            share([URL(string: "https://artemnovichkov.com")!])
         }
     }
 }
@@ -107,7 +107,7 @@ struct ContentView: View {
 Since iOS 16.0, you can use `ShareLink` view to share activities. It's a more SwiftUI-way to share activities and it's more convenient to use.
 
 ```swift
-ShareLink(item: URL(string: "https://www.artemnovichkov.com")!) {
+ShareLink(item: URL(string: "https://artemnovichkov.com")!) {
     Text("Share")
 }
 ```

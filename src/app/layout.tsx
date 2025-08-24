@@ -12,13 +12,16 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  metadataBase: new URL('https://www.artemnovichkov.com/'),
+  metadataBase: new URL('https://artemnovichkov.com/'),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: name,
     description: about,
-    url: 'https://www.artemnovichkov.com/',
+    url: 'https://artemnovichkov.com/',
     siteName: title,
-    images: ['https://www.artemnovichkov.com/images/banner.png'],
+    images: ['https://artemnovichkov.com/images/banner.png'],
   },
   twitter: {
     card: 'summary_large_image',
@@ -27,7 +30,7 @@ export const metadata: Metadata = {
     siteId: '3081906297',
     creator: '@iosartem',
     creatorId: '3081906297',
-    images: ['https://www.artemnovichkov.com/images/banner.png'],
+    images: ['https://artemnovichkov.com/images/banner.png'],
   },
   other: {
     'yandex-verification': '0dbe1f786dcb070d',
