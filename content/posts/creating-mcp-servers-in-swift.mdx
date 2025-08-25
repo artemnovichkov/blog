@@ -18,7 +18,7 @@ In this article, we will create a simple MCP server in Swift that returns the cu
 
 We'll start with a package:
 
-```ansi
+```bash
 mkdir swift-version-mcp
 cd swift-version-mcp
 swift package init --type executable
@@ -130,8 +130,8 @@ await server.waitUntilCompleted()
 
 Build the package with the following command to generate the executable:
 
-```ansi
-> swift build
+```bash
+swift build
 ```
 
 Interfaces in the SDK look a bit strange, because it was highly inspired by TypeScript implementation. It uses the same naming conventions and patterns. Sometimes you need to use dictionaries without strong types, but it is not a big deal. But hopefully it supports structured concurrency, so you can use async/await syntax.
@@ -152,7 +152,7 @@ Select the first one because we are using Stdio transport.
 
 4. Add a path to the executable:
 
-```ansi
+```bash
 /Users/artemnovichkov/Developer/swift-version-mcp/.build/arm64-apple-macosx/debug/swift-version-mcp
 ```
 
@@ -182,7 +182,7 @@ Above the server name you will see a `Start` button. Click on it to start the se
 ```
 
 In the output you will see the following logs:
-```ansi
+```bash
 2025-04-16 23:13:15.438 [info] Starting server swift-version-server
 2025-04-16 23:13:15.439 [info] Connection state: Starting
 2025-04-16 23:13:15.439 [info] Starting server from LocalProcess extension host
