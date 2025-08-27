@@ -1,13 +1,13 @@
-import { Post } from '@/interfaces/post';
+import type { Post } from "@/interfaces/post"
 
 const twitterShareUrl = (post: Post): string => {
   return `https://x.com/intent/tweet?text=${encodeURIComponent(
     `https://artemnovichkov.com/blog/${post.slug} by @iosartem`
-  )}`;  
-};
+  )}`
+}
 
 const editUrl = (slug: string): string =>
-  `https://github.com/artemnovichkov/blog/edit/main/content/posts/${slug}.mdx`;
+  `https://github.com/artemnovichkov/blog/edit/main/content/posts/${slug}.mdx`
 
 export default function PostActions({ post }: { post: Post }) {
   return (
@@ -18,7 +18,7 @@ export default function PostActions({ post }: { post: Post }) {
         rel="noopener noreferrer"
         className="underline"
       >
-        {'Share on X'}
+        {"Share on X"}
       </a>
       {` • `}
       <a
@@ -27,8 +27,8 @@ export default function PostActions({ post }: { post: Post }) {
         rel="noopener noreferrer"
         className="underline"
       >
-        {'Found a typo? Edit this post on GitHub'}
+        {"Found a typo? Edit this post on GitHub"}
       </a>
     </div>
-  );
-};
+  )
+}

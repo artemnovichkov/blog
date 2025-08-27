@@ -1,31 +1,31 @@
-'use client';
+"use client"
 
-import React, { useState } from "react";
-import { GoCopy, GoCheck } from "react-icons/go";  
+import React, { useState } from "react"
+import { GoCheck, GoCopy } from "react-icons/go"
 
 interface CodeBlockProps extends React.HTMLAttributes<HTMLPreElement> {
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }
 
 function extractText(node: React.ReactNode): string {
-  if (typeof node === "string") return node;
-  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (typeof node === "string") return node
+  if (Array.isArray(node)) return node.map(extractText).join("")
   if (React.isValidElement(node)) {
-    const props = node.props as { children?: React.ReactNode };
-    return extractText(props.children);
+    const props = node.props as { children?: React.ReactNode }
+    return extractText(props.children)
   }
-  return "";
+  return ""
 }
 
 export default function CodeBlock({ children, ...props }: CodeBlockProps) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
-    const text = extractText(children);
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
+    const text = extractText(children)
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
 
   return (
     <div className="relative">
@@ -35,9 +35,7 @@ export default function CodeBlock({ children, ...props }: CodeBlockProps) {
       >
         {copied ? <GoCheck /> : <GoCopy />}
       </button>
-      <pre {...props}>
-        {children}
-      </pre>
+      <pre {...props}>{children}</pre>
     </div>
-  );
-} 
+  )
+}

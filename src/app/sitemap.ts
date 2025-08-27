@@ -1,9 +1,9 @@
-import type { MetadataRoute } from 'next';
-import { getAllPosts } from '@/lib/api';
+import type { MetadataRoute } from "next"
+import { getAllPosts } from "@/lib/api"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://artemnovichkov.com';
-  const posts = getAllPosts();
+  const baseUrl = "https://artemnovichkov.com"
+  const posts = getAllPosts()
 
   const staticEntries = [
     {
@@ -22,13 +22,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/sponsorship`,
       priority: 0.8,
     },
-  ];
+  ]
 
   const postEntries = posts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: post.date,
     priority: 0.7,
-  }));
+  }))
 
-  return [...staticEntries, ...postEntries];
-} 
+  return [...staticEntries, ...postEntries]
+}

@@ -20,6 +20,12 @@ npm start
 
 # Lint the codebase
 npm run lint
+
+# Fix linting issues automatically
+npm run lint:fix
+
+# Format code
+npm run format
 ```
 
 ## Architecture

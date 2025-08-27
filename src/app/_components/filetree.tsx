@@ -1,10 +1,9 @@
-import { ReactNode } from 'react'
-import { FaRegFileLines, FaSwift } from "react-icons/fa6";
-import { FaRegFolderOpen } from "react-icons/fa6";
+import type { ReactNode } from "react"
+import { FaRegFileLines, FaRegFolderOpen, FaSwift } from "react-icons/fa6"
 
 type FileProps = {
   name: string
-  iconType?: 'common' | 'swift'
+  iconType?: "common" | "swift"
 }
 
 type FolderProps = {
@@ -12,9 +11,9 @@ type FolderProps = {
   children: ReactNode
 }
 
-const File = ({ name, iconType = 'common' }: FileProps) => {
-  const Icon = iconType === 'swift' ? FaSwift : FaRegFileLines;
-  
+const File = ({ name, iconType = "common" }: FileProps) => {
+  const Icon = iconType === "swift" ? FaSwift : FaRegFileLines
+
   return (
     <div className="pl-4 py-1 flex items-center">
       <Icon className="w-4 h-4" />
@@ -36,10 +35,14 @@ const Folder = ({ name, children }: FolderProps) => {
 }
 
 const FileTree = ({ children }: { children: ReactNode }) => {
-  return <div className="font-mono text-sm border border-gray-300 dark:border-white/50 rounded p-4 w-fit">{children}</div>
+  return (
+    <div className="font-mono text-sm border border-gray-300 dark:border-white/50 rounded p-4 w-fit">
+      {children}
+    </div>
+  )
 }
 
 FileTree.File = File
 FileTree.Folder = Folder
 
-export { FileTree } 
+export { FileTree }

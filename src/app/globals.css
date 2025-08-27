@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-style: normal;
   font-weight: 100 900;
   font-display: optional;
@@ -41,8 +41,8 @@
 }
 
 .ad-block a {
-  text-decoration: none;                                                                                
-} 
+  text-decoration: none;
+}
 
 .audio-player p {
   margin-top: 0;
@@ -85,7 +85,7 @@ code[data-theme*=" "],
 code[data-theme*=" "] span {
   color: var(--shiki-light);
 }
- 
+
 @media (prefers-color-scheme: dark) {
   code[data-theme*=" "],
   code[data-theme*=" "] span {
@@ -97,7 +97,7 @@ code[data-theme*=" "] span {
 code[data-line-numbers] {
   counter-reset: line;
 }
- 
+
 code[data-line-numbers] > [data-line]::before {
   counter-increment: line;
   content: counter(line);

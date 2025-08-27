@@ -1,9 +1,9 @@
-import { name, title, about } from '@/lib/const'
-import type { Metadata } from 'next'
-import '@/app/globals.css'
-import Header from './_components/header';
-import Footer from './_components/footer';
-import { Analytics } from '@vercel/analytics/react';
+import type { Metadata } from "next"
+import { about, name, title } from "@/lib/const"
+import "@/app/globals.css"
+import { Analytics } from "@vercel/analytics/react"
+import Footer from "./_components/footer"
+import Header from "./_components/header"
 
 export const metadata: Metadata = {
   title: name,
@@ -12,35 +12,35 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  metadataBase: new URL('https://artemnovichkov.com/'),
+  metadataBase: new URL("https://artemnovichkov.com/"),
   alternates: {
-    canonical: '/',
+    canonical: "/",
   },
   openGraph: {
     title: name,
     description: about,
-    url: 'https://artemnovichkov.com/',
+    url: "https://artemnovichkov.com/",
     siteName: title,
-    images: ['https://artemnovichkov.com/images/banner.png'],
+    images: ["https://artemnovichkov.com/images/banner.png"],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: "summary_large_image",
     title: name,
     description: about,
-    siteId: '3081906297',
-    creator: '@iosartem',
-    creatorId: '3081906297',
-    images: ['https://artemnovichkov.com/images/banner.png'],
+    siteId: "3081906297",
+    creator: "@iosartem",
+    creatorId: "3081906297",
+    images: ["https://artemnovichkov.com/images/banner.png"],
   },
   other: {
-    'yandex-verification': '0dbe1f786dcb070d',
+    "yandex-verification": "0dbe1f786dcb070d",
   },
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
@@ -53,5 +53,5 @@ export default function RootLayout({
         <Analytics />
       </body>
     </html>
-  );
+  )
 }

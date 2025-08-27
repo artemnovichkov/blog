@@ -1,27 +1,34 @@
-import { IconType } from 'react-icons';
-import { FaXTwitter } from 'react-icons/fa6'
-import { FaGithub } from 'react-icons/fa'
-import { FaLinkedin } from 'react-icons/fa';
+import type { IconType } from "react-icons"
+import { FaGithub, FaLinkedin } from "react-icons/fa"
+import { FaXTwitter } from "react-icons/fa6"
 
 const socialLinks = [
   {
-    href: 'https://x.com/iosartem',
-    label: 'X (Twitter)',
+    href: "https://x.com/iosartem",
+    label: "X (Twitter)",
     Icon: FaXTwitter,
   },
   {
-    href: 'https://github.com/artemnovichkov',
-    label: 'GitHub',
+    href: "https://github.com/artemnovichkov",
+    label: "GitHub",
     Icon: FaGithub,
   },
   {
-    href: 'https://www.linkedin.com/in/artemnovichkov',
-    label: 'LinkedIn',
+    href: "https://www.linkedin.com/in/artemnovichkov",
+    label: "LinkedIn",
     Icon: FaLinkedin,
   },
-];
+]
 
-function SocialButton({ href, label, Icon }: { href: string; label: string; Icon: IconType }) {
+function SocialButton({
+  href,
+  label,
+  Icon,
+}: {
+  href: string
+  label: string
+  Icon: IconType
+}) {
   return (
     <a
       rel="noopener noreferrer"
@@ -32,20 +39,22 @@ function SocialButton({ href, label, Icon }: { href: string; label: string; Icon
     >
       <Icon className="w-5 h-5 dark:invert" />
     </a>
-  );
+  )
 }
 
 export default function Footer() {
-    return (
-      <footer>
-        <div className="text-center py-8">
-          <div className="flex flex-row gap-16 place-content-center">
-            {socialLinks.map((item) => (
-              <SocialButton key={item.href} {...item} />
-            ))}
-          </div>
-          <p className="pt-4 text-gray-900 dark:text-white">Made with ❤️ by Artem Novichkov</p>
+  return (
+    <footer>
+      <div className="text-center py-8">
+        <div className="flex flex-row gap-16 place-content-center">
+          {socialLinks.map((item) => (
+            <SocialButton key={item.href} {...item} />
+          ))}
         </div>
+        <p className="pt-4 text-gray-900 dark:text-white">
+          Made with ❤️ by Artem Novichkov
+        </p>
+      </div>
     </footer>
-    )
+  )
 }

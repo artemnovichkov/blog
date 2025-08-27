@@ -1,14 +1,15 @@
-'use client'
+"use client"
 
-import React, { useEffect } from 'react'
-import useSWR from 'swr'
+import type React from "react"
+import { useEffect } from "react"
+import useSWR from "swr"
 
 interface ViewData {
-  total: number;
+  total: number
 }
 
 interface ViewCounterProps {
-  slug: string;
+  slug: string
 }
 
 const fetcher = async (url: string): Promise<ViewData> => {
@@ -19,18 +20,20 @@ const fetcher = async (url: string): Promise<ViewData> => {
   return res.json()
 }
 
-export default function ViewCounter({ slug }: ViewCounterProps): React.ReactElement {
+export default function ViewCounter({
+  slug,
+}: ViewCounterProps): React.ReactElement {
   const { data } = useSWR<ViewData>(`/api/views/${slug}`, fetcher)
   const views = Number(data?.total)
 
   useEffect(() => {
     const registerView = () =>
       fetch(`/api/views/${slug}`, {
-        method: 'POST'
+        method: "POST",
       })
 
     registerView()
   }, [slug])
 
-  return <span>{views > 0 ? views.toLocaleString() : '–––'} views</span>
+  return <span>{views > 0 ? views.toLocaleString() : "–––"} views</span>
 }

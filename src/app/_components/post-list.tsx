@@ -1,5 +1,5 @@
-import PostPreview from "@/app/_components/post-preview";
-import { Post } from "@/interfaces/post";
+import PostPreview from "@/app/_components/post-preview"
+import type { Post } from "@/interfaces/post"
 
 export default function PostList({ posts }: { posts: Post[] }) {
   return (
@@ -10,5 +10,5 @@ export default function PostList({ posts }: { posts: Post[] }) {
         </li>
       ))}
     </ul>
-  );
-} 
+  )
+}
