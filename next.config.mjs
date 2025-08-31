@@ -9,6 +9,14 @@ const nextConfig = {
     optimizePackageImports: ['react-icons'],
   },
   
+  // Fix CSS minification compatibility issue with Tailwind v4
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.optimization.minimize = false;
+    }
+    return config;
+  },
+  
   // Image optimization
   images: {
     // Enable modern image formats for better compression

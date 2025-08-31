@@ -1,6 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-family-sans:
+    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  
+  /* Typography colors for light mode */
+  --color-prose: theme(colors.black);
+  --color-prose-headings: theme(colors.black);
+  --color-prose-links: theme(colors.black);
+  --color-prose-bold: theme(colors.black);
+}
 
 @font-face {
   font-family: "Inter";
@@ -13,7 +24,6 @@
   position: sticky;
   z-index: 10;
   top: 0;
-  @apply bg-zinc-100 dark:bg-gray-900 border-b border-zinc-200 dark:border-gray-800;
 }
 
 .prose .react-tweet-theme {
@@ -27,7 +37,6 @@
 .callout p {
   margin-top: 0;
   margin-bottom: 0;
-  @apply text-gray-800 dark:text-white;
 }
 
 .ad-block p {
@@ -46,38 +55,6 @@
 
 .audio-player p {
   margin-top: 0;
-  margin-bottom: 2;
-  @apply text-gray-800 dark:text-white;
-}
-
-.prose strong {
-  @apply text-gray-800 dark:text-white;
-}
-
-/* rehype-pretty-code block styles */
-
-[data-rehype-pretty-code-figure] {
-  @apply bg-slate-200 dark:bg-gray-800 rounded;
-}
-
-[data-rehype-pretty-code-figure] pre {
-  margin-top: 0 !important;
-}
-
-[data-rehype-pretty-code-title] {
-  @apply pl-4 pt-2 pb-0;
-}
-
-figcaption[data-rehype-pretty-code-title] {
-  margin-bottom: 0 !important;
-}
-
-[data-highlighted-line] {
-  @apply bg-slate-300 dark:bg-slate-600;
-}
-
-[data-highlighted-chars] {
-  @apply bg-slate-300 dark:bg-slate-600 rounded;
 }
 
 /* rehype-pretty-code theme */
@@ -101,10 +78,102 @@ code[data-line-numbers] {
 code[data-line-numbers] > [data-line]::before {
   counter-increment: line;
   content: counter(line);
-  @apply inline-block w-4 mr-2 text-right text-gray-400 dark:text-gray-700;
+  display: inline-block;
+  width: 1rem;
+  margin-right: 0.5rem;
+  text-align: right;
+  color: theme(colors.gray.400);
+}
+
+@media (prefers-color-scheme: dark) {
+  code[data-line-numbers] > [data-line]::before {
+    color: theme(colors.gray.600);
+  }
 }
 
 /* Remove default prose background for code blocks */
 .prose pre {
   background-color: transparent !important;
+}
+
+/* Dark mode typography colors */
+@media (prefers-color-scheme: dark) {
+  .prose {
+    --tw-prose-body: white;
+    --tw-prose-headings: white;
+    --tw-prose-links: white;
+    --tw-prose-bold: white;
+    --tw-prose-counters: theme(colors.gray.400);
+    --tw-prose-bullets: theme(colors.gray.600);
+    --tw-prose-hr: theme(colors.gray.700);
+    --tw-prose-quotes: theme(colors.white);
+    --tw-prose-quote-borders: theme(colors.gray.600);
+    --tw-prose-captions: theme(colors.gray.400);
+    --tw-prose-code: theme(colors.white);
+    --tw-prose-pre-code: theme(colors.gray.200);
+    --tw-prose-pre-bg: theme(colors.gray.900);
+    --tw-prose-th-borders: theme(colors.gray.600);
+    --tw-prose-td-borders: theme(colors.gray.700);
+  }
+  
+  /* Global text colors for dark mode */
+  body {
+    @apply text-white;
+  }
+  
+  p, h1, h2, h3, h4, h5, h6 {
+    @apply text-white;
+  }
+}
+
+@layer components {
+  .sticky-nav {
+    @apply bg-zinc-100 border-b border-zinc-200;
+  }
+
+  .callout p,
+  .audio-player p,
+  .prose strong {
+    @apply text-gray-800;
+  }
+
+  [data-rehype-pretty-code-figure] {
+    @apply bg-slate-200 rounded;
+  }
+
+  [data-rehype-pretty-code-title] {
+    @apply pl-4 pt-2;
+  }
+
+  [data-highlighted-line] {
+    @apply bg-slate-300;
+  }
+
+  [data-highlighted-chars] {
+    @apply bg-slate-300 rounded;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .sticky-nav {
+      @apply bg-gray-900 border-gray-800;
+    }
+
+    .callout p,
+    .audio-player p,
+    .prose strong {
+      @apply text-white;
+    }
+
+    [data-rehype-pretty-code-figure] {
+      @apply bg-gray-800;
+    }
+
+    [data-highlighted-line] {
+      @apply bg-slate-600;
+    }
+
+    [data-highlighted-chars] {
+      @apply bg-slate-600;
+    }
+  }
 }

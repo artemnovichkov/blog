@@ -37,7 +37,7 @@ function SocialButton({
       aria-label={label}
       className="p-3 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
     >
-      <Icon className="w-5 h-5 dark:invert" />
+      <Icon className="w-5 h-5 text-gray-900 dark:text-white" />
     </a>
   )
 }
