@@ -97,34 +97,6 @@ code[data-line-numbers] > [data-line]::before {
   background-color: transparent !important;
 }
 
-@layer components {
-  .sticky-nav {
-    @apply bg-zinc-100 border-b border-zinc-200;
-  }
-
-  .callout p,
-  .audio-player p,
-  .prose strong {
-    @apply text-gray-800;
-  }
-
-  [data-rehype-pretty-code-figure] {
-    @apply bg-slate-200 rounded;
-  }
-
-  [data-rehype-pretty-code-title] {
-    @apply pl-4 pt-2;
-  }
-
-  [data-highlighted-line] {
-    @apply bg-slate-300;
-  }
-
-  [data-highlighted-chars] {
-    @apply bg-slate-300 rounded;
-  }
-}
-
 /* Dark mode typography colors */
 @media (prefers-color-scheme: dark) {
   .prose {
@@ -156,6 +128,32 @@ code[data-line-numbers] > [data-line]::before {
 }
 
 @layer components {
+  .sticky-nav {
+    @apply bg-zinc-100 border-b border-zinc-200;
+  }
+
+  .callout p,
+  .audio-player p,
+  .prose strong {
+    @apply text-gray-800;
+  }
+
+  [data-rehype-pretty-code-figure] {
+    @apply bg-slate-200 rounded;
+  }
+
+  [data-rehype-pretty-code-title] {
+    @apply pl-4 pt-2;
+  }
+
+  [data-highlighted-line] {
+    @apply bg-slate-300;
+  }
+
+  [data-highlighted-chars] {
+    @apply bg-slate-300 rounded;
+  }
+
   @media (prefers-color-scheme: dark) {
     .sticky-nav {
       @apply bg-gray-900 border-gray-800;
