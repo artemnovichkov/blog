@@ -40,8 +40,8 @@
     "@types/rss": "^0.0.32",
     "postcss": "^8",
     "rss": "^1.2.2",
-    "tailwindcss": "^3.4.1",
-    "tailwindcss-dark-mode": "^1.1.7",
+    "tailwindcss": "^4.0.6",
+    "@tailwindcss/postcss": "^4.0.6",
     "typescript": "^5"
   }
 }
