@@ -23,7 +23,7 @@ Foundation Models are available across all Apple platforms starting with version
 Additionally, the model may take some time to download and initialize after Apple Intelligence is enabled.
 
 <Callout type="info" emoji="ℹ️">
-  Code examples are tested in Xcode 26.0 (17A321).
+  Code examples are tested in Xcode 26.0 (17A324).
 </Callout>
 
 Let's start with a simple view and check for model availability. We'll use `SystemLanguageModel.default.availability` to check if the model is available:
@@ -274,12 +274,6 @@ nonisolated struct PartiallyGenerated: Identifiable, ConvertibleFromGeneratedCon
     }
 }
 ```
-
-Arguments with no parameters will produce a warning:
-
-<Callout type="warning" emoji="⚠️"> 
-    '@Generable' has no effect if there are no stored properties to generate. (from macro 'Generable')
-</Callout>
 
 Without `@Generable` macro, you'll need to implement the code above manually, so it's better to use it and ignore the warning.
 
