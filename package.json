@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.2",
+    "@tailwindcss/postcss": "^4.1.13",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -41,7 +42,6 @@
     "postcss": "^8",
     "rss": "^1.2.2",
     "tailwindcss": "^4.0.6",
-    "@tailwindcss/postcss": "^4.0.6",
     "typescript": "^5"
   }
 }

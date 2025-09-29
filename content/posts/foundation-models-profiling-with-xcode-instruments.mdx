@@ -1,0 +1,157 @@
+---
+title: Foundation Models profiling with Xcode Instruments
+description: Learn how to profile and optimize Foundation Models performance using Xcode Instruments
+cover: /images/foundation-models-profiling-with-xcode-instruments/cover.png
+date: '2025-09-29'
+categories: foundation-models, xcode, wwdc25
+author:
+  - artem-novichkov
+---
+
+With iOS 26, Apple introduced the Foundation Models framework, making it easier to experiment with generative AI directly in your apps. While the `transcript` property lets you review the output of a session, it doesn't show how long the model needed to generate a response. To address this, Xcode 26 now includes a dedicated instrument for profiling Foundation Models. In this post, I'll walk you through how to use it to measure and optimize the performance of your model sessions.
+
+## Preparation
+
+To get started, let's create a simple session and generate a haiku about Swift. This example will serve as a baseline for measuring performance in Xcode Instruments:
+
+```swift
+import SwiftUI
+import FoundationModels
+
+struct ContentView: View {
+    private let session = LanguageModelSession {
+        "You're a haiku generator."
+    }
+
+    private let prompt = Prompt {
+        "Generate a haiku about Swift"
+    }
+
+    @State private var text = ""
+
+    var body: some View {
+        VStack {
+            Text(text)
+            Button("Generate") {
+                Task {
+                    do {
+                        let response = try await session.respond(to: prompt)
+                        text = response.content
+                    } catch {
+                        print(error)
+                    }
+                }
+            }
+        }
+        .padding()
+    }
+}
+```
+
+To run Instruments profiling in Xcode:
+
+1.	Go to *Product → Profile*.
+2.	In the Instruments window, choose the *Blank* template.
+3.	Add a new instrument with *+ Instrument* and select *Foundation Models*.
+
+![Foundation Models instrument](/images/foundation-models-profiling-with-xcode-instruments/instrument.png)
+
+<Callout type="info" emoji="️ℹ️">
+  You can reuse my [Foundation Models](https://github.com/artemnovichkov/FoundationModelsProfilingExample/blob/main/Foundation%20Models.tracetemplate) template to profile the sessions.
+</Callout>
+
+Press *Record*, and the app will launch. Then tap *Generate* to produce a haiku. In the profiling results, the first section displays the asset loading time:
+
+![Run 1. Asset Loading](/images/foundation-models-profiling-with-xcode-instruments/run1-asset-loading.png)
+
+The second section shows the session information:
+
+![Run 1. Session](/images/foundation-models-profiling-with-xcode-instruments/run1-session.png)
+
+Here we can see total response time, prompt processing, etc. You can also view the input and output token counts. Tracking these is critical, since exceeding the token limit can cause failures. The system model supports up to 4,096 tokens.
+
+Let's update the session and add tool calling.
+
+## Tool calling
+
+Create a tool to generate a random mood:
+
+```swift
+import FoundationModels
+
+enum Mood: String, CaseIterable {
+    case melancholic
+    case joyful
+    case mysterious
+    case playful
+}
+
+struct MoodTool: Tool {
+    let name = "generateRandomMood"
+    let description = "Generate a random mood for haiku"
+    @Generable
+    struct Arguments {}
+
+    func call(arguments: Arguments) async throws -> String? {
+        Mood.allCases.randomElement()?.rawValue
+    }
+}
+```
+
+Add the tool to the session:
+
+```swift
+private let session = LanguageModelSession(tools: [MoodTool()]) {
+    "You're a haiku generator."
+}
+```
+
+Run profiling again and you'll see the tool calling time:
+
+![Run 2](/images/foundation-models-profiling-with-xcode-instruments/run2.png)
+
+This view highlights tools with longer processing times. To improve performance, you can use techniques such as caching results. In our case, the tool was called twice, so adjusting the prompt could reduce it to a single call.
+
+Another useful optimization is prewarming the session, which helps reduce response latency.
+
+## Prewarming the session
+
+Next, add a `prewarm` function call:
+
+```swift
+.onAppear {
+    session.prewarm()
+}
+```
+
+We may notice that response time decreases:
+
+![Run 3](/images/foundation-models-profiling-with-xcode-instruments/run3.png)
+
+If you already know the prompt, you can pass it during prewarm. This allows the system to process it eagerly, reducing latency for future responses:
+
+```swift
+.onAppear {
+    session.prewarm(promptPrefix: prompt)
+}
+```
+
+The response time is even better now:
+
+![Run 4](/images/foundation-models-profiling-with-xcode-instruments/run4.png)
+
+Keep in mind that prewarming doesn't guarantee immediate asset loading — especially if the app is in the background or the system is under heavy load. Also, only use prewarm if you have at least a one-second window before calling `respond(to:)`.
+
+## Restrictions
+
+When running the app in the iOS Simulator, you may notice that token counts always remain 0. According to [Xcode 26.1 Release Notes](https://developer.apple.com/documentation/xcode-release-notes/xcode-26_1-release-notes), there is a fix related to this:
+
+> Fixed: Foundation Models Instrument shows incorrect input and output token counts. (159793146)
+
+Unfortunately, it still not working on the simulators, so you can use it only on real devices.
+
+## Conclusion
+
+In this post, we covered how to profile and optimize Foundation Models performance using Xcode Instruments. You may also find useful my [TranscriptDebugMenu](https://swiftpackageindex.com/artemnovichkov/TranscriptDebugMenu) package to debug session transcripts. It allows you to search and filter transript entries, view details about transcript entries, and generate `LanguageModelFeedback` JSON for Apple's Feedback Assistant.
+
+The final example is available on [GitHub](https://github.com/artemnovichkov/FoundationModelsProfilingExample). Thanks for reading!
