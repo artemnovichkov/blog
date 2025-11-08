@@ -1,9 +1,10 @@
 import admin from "firebase-admin"
 
-if (!admin.apps.length) {
+// Only initialize Firebase if credentials are available
+if (!admin.apps.length && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
   admin.initializeApp({
     credential: admin.credential.cert({
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       projectId: "blog-ad799",
     }),
@@ -11,4 +12,5 @@ if (!admin.apps.length) {
   })
 }
 
-export default admin.database()
+// Export database or null if not initialized
+export default admin.apps.length > 0 ? admin.database() : null as any

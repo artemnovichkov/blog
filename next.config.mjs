@@ -9,7 +9,10 @@ const nextConfig = {
     optimizePackageImports: ['react-icons'],
   },
   
-  // Fix CSS minification compatibility issue with Tailwind v4
+  // Turbopack configuration (Next.js 16+ default)
+  turbopack: {},
+
+  // Fix CSS minification compatibility issue with Tailwind v4 (for webpack builds)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.optimization.minimize = false;
