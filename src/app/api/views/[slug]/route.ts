@@ -8,6 +8,10 @@ export async function GET(request: Request): Promise<Response> {
     return NextResponse.json({ error: "Slug is required" }, { status: 400 })
   }
 
+  if (!db) {
+    return NextResponse.json({ total: 0 }, { status: 200 })
+  }
+
   const snapshot = await db.ref("views").child(slug).once("value")
   return NextResponse.json({ total: snapshot.val() })
 }
@@ -17,6 +21,10 @@ export async function POST(request: Request): Promise<Response> {
 
   if (!slug) {
     return NextResponse.json({ error: "Slug is required" }, { status: 400 })
+  }
+
+  if (!db) {
+    return NextResponse.json({ total: 0 }, { status: 200 })
   }
 
   const ref = db.ref("views").child(slug)
