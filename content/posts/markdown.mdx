@@ -1,0 +1,147 @@
+---
+title: Markdown
+description: Markdown
+cover: /images/foundation-models-profiling-with-xcode-instruments/cover.png
+date: '2025-12-27'
+categories: 
+author:
+  - artem-novichkov
+---
+
+## Basic formatting
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+    var body: some View {
+        Text("Here is **bold** and _italic_ text.")
+    }
+}
+```
+
+```swift
+public init(_ key: LocalizedStringKey, tableName: String? = nil, bundle: Bundle? = nil, comment: StaticString? = nil)
+
+public init<S>(_ content: S) where S : StringProtocol
+```
+
+The key in localization.
+
+```swift
+struct ContentView: View {
+    @State private var string = "Here is **bold** and _italic_ text."
+    var body: some View {
+        Text(string)
+    }
+}
+```
+
+Use LocalizedStringKey or LocalizedStringResource
+
+```swift /LocalizedStringKey/
+struct ContentView: View {
+    @State private var string: LocalizedStringKey = "Here is **bold** and _italic_ text."
+    var body: some View {
+        Text(string)
+    }
+}
+```
+
+> Important: `Text` doesn't render all styling possible in Markdown. It
+doesn't support line breaks, soft breaks, or any style of paragraph- or
+block-based formatting like lists, block quotes, code blocks, or tables.
+It also doesn't support the `imageURL` attribute. Parsing with SwiftUI treats any whitespace in the Markdown
+string as described by the `inlineOnlyPreservingWhitespace` parsing option.
+
+## Links
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+    @State private var string: LocalizedStringKey = "Here is **bold** and _italic_ text.\nRead more at [artemnovichkov.com](https://artemnovichkov.com)."
+    var body: some View {
+        Text(string)
+            .environment(\.openURL, OpenURLAction { url in
+                guard url.host == "artemnovichkov.com" else {
+                    return .discarded
+                }
+                return if #available(iOS 26.0, *) {
+                    .systemAction(prefersInApp: true)
+                } else {
+                    .systemAction
+                }
+            })
+    }
+}
+```
+
+By default, links is colored blue or AccentColor from Assets catalog. You can also customize it with tint color.
+
+```swift
+Text(string)
+    .tint(.orange)
+```
+
+How to apply it for all links or make all links underlined?
+
+## AttributedString
+
+```swift
+let link = AttributeContainer()
+                    .link(.init(string: "https://artemnovichkov.com")!)
+                let green = AttributeContainer
+                    .foregroundColor(.green)
+                    .underlineStyle(.single)
+                string.replaceAttributes(link, with: green)
+```
+
+## Custom attributes
+
+```swift
+private enum ColorAttribute: CodableAttributedStringKey, MarkdownDecodableAttributedStringKey {
+    typealias Value = String
+    static let name = "color"
+}
+
+private extension AttributeScopes {
+    struct Custom: AttributeScope {
+        let color: ColorAttribute
+    }
+
+    var custom: Custom.Type { Custom.self }
+}
+
+private extension AttributeDynamicLookup {
+    subscript<T: AttributedStringKey>(dynamicMember keyPath: KeyPath<AttributeScopes.Custom, T>) -> T {
+        self[T.self]
+    }
+}
+```
+
+How to use 
+
+```swift
+string = try .init(markdown: "^[Happy New Year!](color: 'red')", including: \.custom)
+```
+
+```swift
+for run in string.runs {
+    if run.link != nil {
+        string[run.range].foregroundColor = .green
+        string[run.range].underlineStyle = .single
+    }
+    if let color = run.color {
+        string[run.range].foregroundColor = Color(color)
+    }
+}
+```
+
+> `Failed to parse markdown: dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: "The given data was not valid JSON.", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 "Unexpected end of file" UserInfo={NSDebugDescription=Unexpected end of file})))`
+
+## References
+
+- [What's new in Foundation - WWDC21](https://developer.apple.com/videos/play/wwdc2021/10109/)
+- [swift-markdown-ui: Display and customize Markdown text in SwiftUI](https://github.com/gonzalezreal/swift-markdown-ui)
+- [AttributedString: Making Text More Beautiful Than Ever](https://fatbobman.com/en/posts/attributedstring/)
