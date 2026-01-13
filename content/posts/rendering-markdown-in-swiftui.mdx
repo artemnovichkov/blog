@@ -1,0 +1,236 @@
+---
+title: Rendering Markdown in SwiftUI
+description: Learn how to render Markdown in SwiftUI using Text and AttributedString
+cover: /images/rendering-markdown-in-swiftui/cover.png
+date: '2026-01-13'
+categories: swiftui, swift, ios
+author:
+  - artem-novichkov
+---
+
+SwiftUI **does** support Markdown, but with _nuances_. Since iOS 15, `Text` can render inline Markdown. But there are limits you need to understand. In this guide, we'll see how to work with Markdown in SwiftUI without third-party libraries.
+
+## Basic formatting
+
+Let's start with the simplest case — inline Markdown rendered directly by `Text`:
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+    var body: some View {
+        Text("SwiftUI **does** support Markdown, but with _nuances_.")
+    }
+}
+```
+
+![Basics](/images/rendering-markdown-in-swiftui/basics.png)
+
+At first glance, everything looks correct — but this behavior depends on how `Text` is initialized. Real content is usually dynamic, so let's store it in state:
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+    @State private var string = "SwiftUI **does** support Markdown, but with _nuances_."
+
+    var body: some View {
+        Text(string)
+    }
+}
+```
+
+![Basics Raw](/images/rendering-markdown-in-swiftui/basics-raw.png)
+
+The key detail: `Text` chooses its initializer based on the parameter type:
+
+```swift
+public init(_ key: LocalizedStringKey, tableName: String? = nil, bundle: Bundle? = nil, comment: StaticString? = nil)
+
+public init<S>(_ content: S) where S : StringProtocol
+```
+
+The fix is simple — use `LocalizedStringKey` explicitly:
+
+```swift /LocalizedStringKey/
+@State private var string: LocalizedStringKey = "SwiftUI **does** support Markdown, but with _nuances_."
+```
+
+According to Apple's documentation, `Text` supports only inline Markdown. More complex structures like lists or block quotes are not supported. What about links?
+
+## Handling links in Markdown
+
+Let's update the string to include a link:  
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+    @State private var string: LocalizedStringKey = "SwiftUI **does** support Markdown, but with _nuances_. Read more on [artemnovichkov.com](https://artemnovichkov.com)"
+
+    var body: some View {
+        Text(string)
+    }
+}
+```
+
+It works as expected: links are tappable and automatically handled by the system.
+
+![Link](/images/rendering-markdown-in-swiftui/link.png)
+
+You can customize link behavior via the `openURL` environment:
+
+```swift
+Text(string)
+    .environment(\.openURL, OpenURLAction { url in
+        guard url.host == "artemnovichkov.com" else {
+            return .discarded
+        }
+        return .systemAction
+    })
+```
+
+Starting with iOS 26, links can be opened in-app:
+
+```swift {6-8}
+Text(string)
+    .environment(\.openURL, OpenURLAction { url in
+        guard url.host == "artemnovichkov.com" else {
+            return .discarded
+        }
+        if #available(iOS 26.0, *) {
+            return .systemAction(prefersInApp: true)
+        }
+        return .systemAction
+    })
+```
+
+To change link color, we can use the `tint` modifier:
+
+```swift
+Text(string)
+    .tint(.orange)
+```
+
+To apply color for all links in the app, set it in the AccentColor in Assets.xcassets:
+
+![Assets](/images/rendering-markdown-in-swiftui/assets.png)
+
+Links are often decorated with underlines. You can add them using `AttributedString`, which we will cover next.
+
+## AttributedString, the real power of Markdown
+
+`AttributedString` is where Markdown in SwiftUI gets real. let's update our example to use it:
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+    @State private var string: AttributedString = ""
+
+    var body: some View {
+        Text(string)
+            .onAppear {
+                do {
+                    let markdown = "SwiftUI **does** support Markdown, but with _nuances_. Read more on [artemnovichkov.com](https://artemnovichkov.com)"
+                    string = try AttributedString(markdown: markdown)
+                } catch {
+                    print("Failed to parse markdown: \(error)")
+                }
+            }
+    }
+}
+```
+
+The initializer `AttributedString(markdown:)` parses inline Markdown into an attributed string. It can throw errors, but they're not related to basic Markdown syntax. We'll get back to this later.
+
+`AttributedString` gives us access to individual text runs, allowing fine-grained styling:
+
+```swift
+for run in string.runs {
+    if run.link != nil {
+        string[run.range].foregroundColor = .green
+        string[run.range].underlineStyle = .single
+    }
+}
+```
+
+Here's the result:
+
+![Link underline](/images/rendering-markdown-in-swiftui/link-underline.png)
+
+Runs are powerful. You can inspect and modify attributes for different text elements, like links, dates, names, measurements, and more. We can even define custom attributes for Markdown syntax extensions, which we'll explore later.
+
+## Extending Markdown with custom attributes
+
+`AttributedString` supports custom attributes, which we can leverage to extend Markdown syntax. For example, let's create a custom `color` attribute to apply text color directly from Markdown:
+
+```swift
+import Foundation
+
+// 1
+enum ColorAttribute: DecodableAttributedStringKey, MarkdownDecodableAttributedStringKey {
+    typealias Value = String
+    static let name = "color"
+}
+
+// 2
+extension AttributeScopes {
+    struct Custom: AttributeScope {
+        let color: ColorAttribute
+    }
+
+    var custom: Custom.Type { Custom.self }
+}
+
+// 3
+extension AttributeDynamicLookup {
+    subscript<T: AttributedStringKey>(dynamicMember keyPath: KeyPath<AttributeScopes.Custom, T>) -> T {
+        self[T.self]
+    }
+}
+```
+
+Here's how it works:
+1. We define a custom attribute `ColorAttribute` conforming to `DecodableAttributedStringKey` and `MarkdownDecodableAttributedStringKey`. The main purpose is to specify how to decode the attribute from Markdown.
+2. We extend `AttributeScopes` to include our custom attribute scope. We'll use this scope when working with `AttributedString`.
+3. We add a dynamic lookup subscript to access our custom attributes easily.
+
+Now, we can use this custom attribute in our Markdown string:
+
+```swift
+// 1
+let markdown = "^[SwiftUI](color: 'red') **does** support Markdown, but with _nuances_. Read more on [artemnovichkov.com](https://artemnovichkov.com)"
+// 2
+string = try AttributedString(markdown: markdown, including: \.custom)
+for run in string.runs {
+    if run.link != nil {
+        string[run.range].foregroundColor = .green
+        string[run.range].underlineStyle = .single
+    }
+    // 3
+    if let color = run.color {
+        string[run.range].foregroundColor = Color(color)
+    }
+}
+```
+
+Here's the breakdown:
+
+1. We define a Markdown string that uses our custom `color` attribute. Here is a place where an error may occur in parsing:
+> Failed to parse markdown: 
+> dataCorrupted(Swift.DecodingError.Context(codingPath: [], 
+> debugDescription: "The given data was not valid JSON.", 
+> underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 
+> `"Unexpected end of file" UserInfo={NSDebugDescription=Unexpected end of file})))`
+2. We parse the Markdown string into an `AttributedString`, specifying our custom attribute scope.
+3. We iterate over the runs and apply the color attribute to the corresponding text ranges.
+
+That's it. You can now extend Markdown with custom attributes and style text exactly the way you need:
+
+![Custom attributes](/images/rendering-markdown-in-swiftui/custom-attributes.png)
+
+## References
+
+- [What's New in Foundation — WWDC21](https://developer.apple.com/videos/play/wwdc2021/10109/)
+- [AttributedString: Making Text More Beautiful Than Ever](https://fatbobman.com/en/posts/attributedstring/)
