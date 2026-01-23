@@ -102,6 +102,12 @@ code[data-line-numbers] > [data-line]::before {
   content: none !important;
 }
 
+/* Remove quotes from blockquotes */
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+  content: none !important;
+}
+
 .prose :where(code):not(:where([class~="not-prose"] *)) {
   padding: 0.25rem;
 }
