@@ -152,7 +152,9 @@ code[data-line-numbers] > [data-line]::before {
   }
 
   [data-rehype-pretty-code-title] {
-    @apply pl-4 pt-2;
+    @apply pl-4 py-2 text-sm font-medium rounded-t border-b border-slate-400;
+    color: theme(colors.slate.700) !important;
+    background-color: theme(colors.slate.200) !important;
   }
 
   [data-highlighted-line] {
@@ -176,6 +178,12 @@ code[data-line-numbers] > [data-line]::before {
 
     [data-rehype-pretty-code-figure] {
       @apply bg-gray-800;
+    }
+
+    [data-rehype-pretty-code-title] {
+      color: theme(colors.slate.300) !important;
+      background-color: theme(colors.gray.700) !important;
+      @apply border-b border-gray-600;
     }
 
     [data-highlighted-line] {
