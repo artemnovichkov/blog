@@ -1,6 +1,6 @@
 ---
 title: Highlighting code blocks in Markdown with SwiftSyntax
-description: Learn how to implement syntax highlighting for Swift code blocks in Markdown using SwiftSyntax and AttributedString in SwiftUI.
+description: A practical guide to highlighting Swift code
 cover: /images/highlighting-code-blocks-in-markdown-with-swiftsyntax/cover.png
 date: '2026-01-23'
 categories: swift, ios
@@ -8,7 +8,7 @@ author:
   - artem-novichkov
 ---
 
-In [a previous post](https://artemnovichkov/posts/rendering-markdown-in-swiftui), we explored rendering Markdown in SwiftUI using `AttributedString` and customizing its appearance. Code blocks appear frequently in technical posts, and syntax highlighting improves readability. In this post, we'll implement a simple syntax highlighter for Swift code and apply it to code blocks in Markdown.
+In [a previous post](https://artemnovichkov.com/posts/rendering-markdown-in-swiftui), we explored rendering Markdown in SwiftUI using `AttributedString` and customizing its appearance. Code blocks appear frequently in technical posts, and syntax highlighting improves readability. In this post, we'll implement a simple syntax highlighter for Swift code and apply it to code blocks in Markdown.
 
 ## Code highlighting with SwiftSyntax
 
@@ -41,7 +41,7 @@ struct ContentView: View {
 
 ![Code Highlight Basic](/images/highlighting-code-blocks-in-markdown-with-swiftsyntax/basic.png)
 
-To highlight code, we use [SwiftSyntax](https://github.com/swiftlang/swift-syntax), which parses Swift source code into a syntax tree.. We need two packages — `SwiftSyntax` and `SwiftParser`.
+To highlight code, we use [SwiftSyntax](https://github.com/swiftlang/swift-syntax), which parses Swift source code into a syntax tree. We need two packages — `SwiftSyntax` and `SwiftParser`.
 
 Let's create a simple syntax highlighter function:
 
