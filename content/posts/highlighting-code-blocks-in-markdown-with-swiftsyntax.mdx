@@ -8,11 +8,11 @@ author:
   - artem-novichkov
 ---
 
-In [a previous post](https://artemnovichkov/posts/rendering-markdown-in-swiftui), we explored rendering Markdown in SwiftUI using `AttributedString` and customizing its appearance. I constantly use code blocks in my posts, and syntax highlighting makes them more readable and visually appealing. In this post, we'll implement a simple syntax highlighter for Swift code and apply it to code blocks in Markdown.
+In [a previous post](https://artemnovichkov/posts/rendering-markdown-in-swiftui), we explored rendering Markdown in SwiftUI using `AttributedString` and customizing its appearance. Code blocks appear frequently in technical posts, and syntax highlighting improves readability. In this post, we'll implement a simple syntax highlighter for Swift code and apply it to code blocks in Markdown.
 
 ## Code highlighting with SwiftSyntax
 
-Initially, we'll add syntax highlighting to code snippets in attributed strings. Here's a simple SwiftUI view displaying a code snippet:
+First, we'll add syntax highlighting to code snippets in attributed strings. Here's a simple SwiftUI view displaying a code snippet:
 
 ```swift
 import SwiftUI
@@ -41,7 +41,7 @@ struct ContentView: View {
 
 ![Code Highlight Basic](/images/highlighting-code-blocks-in-markdown-with-swiftsyntax/basic.png)
 
-To highlight the code, we can use [SwiftSyntax](https://github.com/swiftlang/swift-syntax), a set of libraries that work with tree representation of Swift code. We nee two packages — `SwiftSyntax` and `SwiftParser`.
+To highlight code, we use [SwiftSyntax](https://github.com/swiftlang/swift-syntax), which parses Swift source code into a syntax tree.. We need two packages — `SwiftSyntax` and `SwiftParser`.
 
 Let's create a simple syntax highlighter function:
 
@@ -67,7 +67,7 @@ let sourceFile = Parser.parse(source: code)
 let tokens = sourceFile.tokens(viewMode: .sourceAccurate)
 ```
 
-Tokens is `TokenSequence` that we can iterate over. Each token has a `tokenKind` property that tells us what kind of syntax element it is (keyword, identifier, string literal, etc.). We can use this information to apply different styles to different kinds of tokens:
+Tokens is a `TokenSequence` that we can iterate over. Each token has a `tokenKind` property that tells us what kind of syntax element it is (keyword, identifier, string literal, etc.). We can use this information to apply different styles to different kinds of tokens:
 
 ```swift
 for token in tokens {
@@ -90,15 +90,15 @@ for token in tokens {
 }
 ```
 
-Here's what each part does:
+What this code does:
 
 1. Determine the color based on the token kind. Here, we color keywords with a purple shade.
-2. Calculate the range of the token in the original string. The hardest part here, because we need to convert from UTF-8 offsets to `AttributedString.Index`.
+2. Calculate the range of the token in the original string. This is the hardest part: converting UTF-8 offsets to `AttributedString.Index`.
 3. Apply the color to the corresponding range in the attributed string.
 
 ![Code Highlight Keywords](/images/highlighting-code-blocks-in-markdown-with-swiftsyntax/keywords.png)
 
-We can extend this logic to cover more token kinds. Finally, let's set a monospaced font for better code readability:
+You can extend this logic to support more token kinds. Finally, let's set a monospaced font for better code readability:
 
 ```swift
 highlightedString.font = .system(.body, design: .monospaced)
@@ -106,14 +106,14 @@ highlightedString.font = .system(.body, design: .monospaced)
 
 ![Code Highlight Final](/images/highlighting-code-blocks-in-markdown-with-swiftsyntax/final.png)
 
-Now we can highlight Swift code snippets with SwiftSyntax, let's try to apply it to code blocks in Markdown.
+Now that Swift code highlighting works, let's apply it to Markdown code blocks.
 
 ## Working with Markdown code blocks
 
-According to last [CommonMark](https://spec.commonmark.org/0.31.2/) specification, code blocks can be created in three ways:
+According to the last [CommonMark](https://spec.commonmark.org/0.31.2/) specification, code blocks can be created in three ways:
 
 - Inline code block (placing single backticks (`) before and after the code);
-- Intented code blocks (placing four spaces before each line of code);
+- Indented code blocks (placing four spaces before each line of code);
 - Fenced code blocks (placing three consecutive backtick characters (`) or tildes (~) before and after the code block).
 
 Let's start with inline code blocks and use this Markdown snippet:
@@ -136,9 +136,9 @@ static func highlight(markdown: String) -> AttributedString {
 }
 ```
 
-In case of failure, we return the original string as an `AttributedString`.
+If parsing fails, return the original string.
 
-We can print `highlightedString.runs` to see how our string parsed:
+Print `highlightedString.runs` to see how the string was parsed:
 
 ```bash
 Write  {
@@ -153,7 +153,7 @@ print("Hello, World!") {
 }
 ```
 
-Next, we iterate through all runs and check for inline presentation intent:
+Next, iterate through all runs and look for inline presentation intent:
 
 ```swift
 for run in highlightedString.runs {
@@ -167,7 +167,7 @@ for run in highlightedString.runs {
 
 ![Markdown Inline Code Highlight](/images/highlighting-code-blocks-in-markdown-with-swiftsyntax/markdown-inline.png)
 
-Continue with intented code block and update the example:
+Continue with indented code block and update the example:
 
 ```
 Write this code and check the console output:
@@ -187,7 +187,7 @@ print("Hello, World!")
 }
 ```
 
-Here we check for presentation intent attribute. It contains an array of components, so we need to iterate through them:
+Here we inspect the presentationIntent attribute. It contains an array of components, so we need to iterate through them:
 
 ```swift
 if let presentationIntent = run.presentationIntent {
@@ -201,18 +201,17 @@ if let presentationIntent = run.presentationIntent {
 }
 ```
 
-The result is good, but a bit strange:
+The result looks odd:
 
 ![Markdown Indented Code Highlight](/images/highlighting-code-blocks-in-markdown-with-swiftsyntax/markdown-indented.png)
 
-Actually, it works as expected. According to CommonMark specification, indented code blocks cannot interrupt a paragraph. To fix it in CommonMark, we can add an extra line break before [the code block](https://spec.commonmark.org/dingus/?text=Foo%0A%0A%20%20%20%20bar%0A). But it doesnt work in `Foundation` parser. Moreover, here is a quote
-from `Text` documentation:
+Actually, it works as expected. According to CommonMark specification, indented code blocks cannot interrupt a paragraph. To fix it in CommonMark, we can add an extra line break before [the code block](https://spec.commonmark.org/dingus/?text=Foo%0A%0A%20%20%20%20bar%0A). But it doesn't work in `Foundation` parser. The `Text` documentation confirms this:
 
 > `Text` doesn't render all styling possible in Markdown. It
 doesn't support line breaks, soft breaks, or any style of paragraph- or
 block-based formatting like lists, block quotes, code blocks, or tables.
 
-I tried `\n` and whitespaces in different combinations, but no luck. A possible workaround is to use a line separator `\u{2028}` before the indented code block:
+`\n` and extra whitespace don't solve the problem. A workaround is to insert a line separator (\u{2028}) before the indented code block:
 
 ```
 Write this code and check the console output:\u{2028}
