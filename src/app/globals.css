@@ -96,6 +96,16 @@ code[data-line-numbers] > [data-line]::before {
   background-color: transparent !important;
 }
 
+/* Remove backticks from inline code */
+.prose :where(code):not(:where([class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"] *))::after {
+  content: none !important;
+}
+
+.prose :where(code):not(:where([class~="not-prose"] *)) {
+  padding: 0.25rem;
+}
+
 /* Dark mode typography colors */
 @media (prefers-color-scheme: dark) {
   .prose {
