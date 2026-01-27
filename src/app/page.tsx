@@ -1,5 +1,5 @@
 import Image from "next/image"
-import Experience from "./_components/experience"
+import Projects from "./_components/projects"
 
 export default function Home() {
   return (
@@ -12,13 +12,12 @@ export default function Home() {
         width={144}
         alt="Artem Novichkov"
       />
-      <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">
+      <p className="font-bold text-3xl tracking-tight mt-4 mb-2 text-zinc-800 dark:text-gray-100">
         Hey, I&apos;m Artem Novichkov
       </p>
-      <div className="flex flex-col gap-2 my-4 text-zinc-800 dark:text-gray-100">
+      <div className="flex flex-col gap-2 mb-8 text-zinc-800 dark:text-gray-100">
         <p>
-          I am an iOS Developer. I work at Salmon Group Ltd, developing
-          the&nbsp;
+          I&apos;m an iOS developer at Salmon Group Ltd, building the&nbsp;
           <a
             className="text-base underline"
             href="https://salmon.ph"
@@ -27,41 +26,37 @@ export default function Home() {
           >
             Salmon app
           </a>{" "}
-          — a super app designed to connect millions of Filipinos with reliable
-          financial services, making finance accessible and easy.
+          — a fintech super app bringing accessible financial services to
+          millions of Filipinos.
         </p>
         <p>
-          Besides my main work, I focus on individual mentoring and
-          consultations for developers and companies, helping them solve their
-          challenges in iOS development. I also worked with the online platform
-          Netology, where I created teaching materials, reviewed student
-          assignments, and conducted over 100 online lectures.
+          From time to time, I do mentoring and consulting for developers and
+          companies navigating iOS development challenges.
         </p>
         <p>
-          I am passionate about Swift and open-source development. My primary
-          focus is on the iOS platform, and sometimes I publish interesting and
-          useful content on my&nbsp;
+          I&apos;m passionate about Swift and open-source. You can find my
+          projects on&nbsp;
           <a
             className="text-base underline"
             href="https://github.com/artemnovichkov"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Github
+            GitHub
           </a>
-          . I am currently working on developing pet projects and writing blog
-          posts on SwiftUI.
+          . Lately I&apos;ve been exploring ways to integrate AI into my
+          development workflows.
         </p>
         <p>
-          Occasionally, I also enjoy sharing my knowledge through public
-          speaking. You can find a playlist of my talks on&nbsp;
+          I write blog posts mostly about SwiftUI and occasionally share
+          knowledge through public speaking. Check out my talks on&nbsp;
           <a
             className="text-base underline"
             href="https://www.youtube.com/playlist?list=PLRSU1SC70qRudLaYKSjM14tJmA-J-dRvU"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Youtube
+            YouTube
           </a>
           .
         </p>
@@ -71,7 +66,7 @@ export default function Home() {
           PS 5.
         </p>
       </div>
-      <Experience />
+      <Projects />
     </div>
   )
 }
