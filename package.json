@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "npx biome check .",
     "lint:fix": "npx biome check --write .",
-    "format": "npx biome format --write ."
+    "format": "npx biome format --write .",
+    "optimize-images": "bash scripts/optimize-images.sh"
   },
   "dependencies": {
     "@types/mdx": "^2.0.13",
