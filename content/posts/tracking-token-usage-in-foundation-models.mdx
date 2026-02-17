@@ -1,0 +1,130 @@
+---
+title: Tracking token usage in Foundation Models
+description: Measuring instructions, prompts, and transcripts against the context window
+cover: /images/tracking-token-usage-in-foundation-models/cover.png
+date: '2026-02-17'
+categories: foundation-models, ai, llm
+author:
+  - artem-novichkov
+---
+
+iOS 26.4 introduces token usage tracking for Apple's Foundation Models framework. The on-device model has a context window of 4096 tokens, so understanding how many tokens your instructions, prompts, and tools consume is essential for building reliable features. In this post, we'll explore APIs for measuring token usage at every level — from individual instructions to full conversation transcripts.
+
+## Context Size
+
+Before measuring token usage, you need to know the total context size available. The new `contextSize` property on `SystemLanguageModel` returns this value:
+
+```swift
+let model = SystemLanguageModel.default
+let contextSize = try await model.contextSize
+print("Context size", contextSize) // "Context size 4096"
+```
+
+The `contextSize` property is marked with `@backDeployed(before: iOS 26.4, macOS 26.4, visionOS 26.4)`, so it's available on earlier OS versions as well. Note that the call can throw an error if the model is unavailable or Apple Intelligence is disabled on the device.
+
+## Instructions Token Usage
+
+The `tokenUsage(for:)` method lets you measure how many tokens a given input consumes. Start with instructions — the system prompt that guides model behavior:
+
+```swift
+let instructions = Instructions("You're a helpful assistant that generates haiku.")
+let instructionsTokenUsage = try await model.tokenUsage(for: instructions)
+print(instructionsTokenUsage.tokenCount) // "16"
+```
+
+When you use tools, their definitions (name, description, and argument schema) are serialized and sent alongside your instructions. This increases the token count significantly. Here's a simple tool definition:
+
+```swift
+@Generable
+enum Mood: String, CaseIterable {
+    case happy, sad, thoughtful, excited, calm
+}
+
+struct MoodTool: Tool {
+    let name = "generateMood"
+    let description = "Generates a mood for haiku"
+
+    @Generable
+    struct Arguments {}
+
+    func call(arguments: Arguments) async throws -> GeneratedContent {
+        GeneratedContent(properties: ["mood": Mood.allCases.randomElement()])
+    }
+}
+```
+
+Passing tools to `tokenUsage(for:tools:)` shows the combined cost of instructions plus tool definitions:
+
+```swift
+let tools = [MoodTool()]
+let instructionsTokenUsage = try await model.tokenUsage(for: instructions,
+                                                        tools: tools)
+print(instructionsTokenUsage.tokenCount) // "79"
+```
+
+The jump from 16 to 79 tokens comes from the JSON schema generated for the tool's arguments and return type.
+
+## Prompt Token Usage
+
+You can also measure individual prompts — the user-facing messages you send to the model:
+
+```swift
+let prompt = Prompt("Generate a haiku about Swift")
+let promptTokenUsage = try await model.tokenUsage(for: prompt)
+print(promptTokenUsage.tokenCount) // 14
+```
+
+With all the pieces in place, create a session and generate a response:
+
+```swift
+let session = LanguageModelSession(model: model,
+                                  tools: tools,
+                                  instructions: instructions)
+
+let response = try await session.respond(to: prompt)
+print(response.content)
+```
+
+## Transcript Token Usage
+
+After a conversation, you can measure the total token usage of the entire transcript. This includes all messages exchanged — instructions, prompts, and model responses:
+
+```swift
+let transcriptTokenUsage = try await model.tokenUsage(for: session.transcript)
+print(transcriptTokenUsage.tokenCount)
+```
+
+<Callout>
+In Xcode 26.4 beta (17E5159k), `session.respond(to:)` may throw `GenerationError Code=-1` related to `SensitiveContentAnalysisML`. This appears to be a beta-specific issue. If you have no this error on know how to fix it, please let me know.
+</Callout>
+
+## Comparison with Context Size
+
+Knowing raw token counts is useful, but comparing them against the context size gives you a clearer picture of how much budget you have left. Here's a small extension to calculate that percentage:
+
+```swift
+extension SystemLanguageModel.TokenUsage {
+    func percent(ofContextSize contextSize: Int) -> Float {
+        guard contextSize > 0 else { return 0 }
+        return Float(tokenCount) / Float(contextSize)
+    }
+
+    func formattedPercent(ofContextSize contextSize: Int) -> String {
+        percent(ofContextSize: contextSize)
+            .formatted(.percent.precision(.fractionLength(0)).rounded(rule: .down))
+    }
+}
+```
+
+Now you can see at a glance how much of your context window each component uses:
+
+```swift
+print(instructionsTokenUsage.formattedPercent(ofContextSize: contextSize))
+// "1%"
+```
+
+## Conclusion
+
+Token usage tracking helps you make informed decisions about prompt design — whether to simplify instructions, reduce tool definitions, or split conversations into multiple sessions. I created [TokenUsageExample](https://github.com/artemnovichkov/TokenUsageExample) with all the code from this post, so you can run it in Xcode right away. For more details, see Apple's tech note [TN3193: Managing the on-device foundation model's context window](https://developer.apple.com/documentation/technotes/tn3193-managing-the-on-device-foundation-model-s-context-window).
+
+If you want a visual way to inspect transcripts during development, check out [TranscriptDebugMenu](https://swiftpackageindex.com/artemnovichkov/TranscriptDebugMenu) — a drop-in SwiftUI component that displays the full conversation transcript. I already added token usage information, so you can see how many tokens each message consumes in real time. Happy prompting!
