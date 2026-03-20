@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { notFound } from "next/navigation"
 import AdBlock from "@/app/_components/ad-block"
 import PostActions from "@/app/_components/post-actions"
 import PostHeader from "@/app/_components/post-header"
@@ -11,6 +12,7 @@ import { sponsorshipConfig } from "@/lib/sponsorship-config"
 export default async function BlogPost(props: Params) {
   const params = await props.params
   const post = getPostBySlug(params.slug)
+  if (!post) notFound()
   const content = await markdownToHtml(post.content || "")
   const previousPost = getPreviousPost(params.slug)
 
@@ -49,6 +51,7 @@ type Params = {
 export async function generateMetadata(props: Params): Promise<Metadata> {
   const params = await props.params
   const post = getPostBySlug(params.slug)
+  if (!post) return {}
   return {
     title: post.title,
     description: post.description,
