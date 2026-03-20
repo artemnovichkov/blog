@@ -25,6 +25,7 @@ export async function GET(): Promise<Response> {
   return new Response(feed.xml({ indent: true }), {
     headers: {
       "Content-Type": "application/atom+xml; charset=utf-8",
+      "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
     },
   })
 }
