@@ -1,5 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/",
+        headers: [
+          {
+            key: "Link",
+            value: [
+              '</feed.xml>; rel="alternate"; type="application/rss+xml"; title="Artem Novichkov Blog"',
+              '</sitemap.xml>; rel="sitemap"; type="application/xml"',
+            ].join(", "),
+          },
+        ],
+      },
+    ]
+  },
   // Enable src directory
   distDir: '.next',
   
