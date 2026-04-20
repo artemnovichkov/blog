@@ -1,0 +1,60 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Artem Novichkov Blog API",
+    "version": "1.0.0",
+    "description": "API for blog post view counts"
+  },
+  "servers": [{ "url": "https://artemnovichkov.com" }],
+  "paths": {
+    "/api/views/{slug}": {
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" },
+          "description": "Blog post slug"
+        }
+      ],
+      "get": {
+        "summary": "Get view count",
+        "operationId": "getViews",
+        "responses": {
+          "200": {
+            "description": "View count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Increment view count",
+        "operationId": "incrementViews",
+        "responses": {
+          "200": {
+            "description": "Updated view count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
