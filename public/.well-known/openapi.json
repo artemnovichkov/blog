@@ -3,11 +3,11 @@
   "info": {
     "title": "Artem Novichkov Blog API",
     "version": "1.0.0",
-    "description": "API for blog post view counts"
+    "description": "Blog post content API for agents. Send Accept: text/markdown to receive posts as markdown."
   },
   "servers": [{ "url": "https://artemnovichkov.com" }],
   "paths": {
-    "/api/views/{slug}": {
+    "/blog/{slug}": {
       "parameters": [
         {
           "name": "slug",
@@ -18,40 +18,33 @@
         }
       ],
       "get": {
-        "summary": "Get view count",
-        "operationId": "getViews",
-        "responses": {
-          "200": {
-            "description": "View count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "total": { "type": "integer" }
-                  }
-                }
-              }
-            }
+        "summary": "Get blog post",
+        "operationId": "getPost",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": ["text/html", "text/markdown"]
+            },
+            "description": "Use text/markdown to receive the post as markdown"
           }
-        }
-      },
-      "post": {
-        "summary": "Increment view count",
-        "operationId": "incrementViews",
+        ],
         "responses": {
           "200": {
-            "description": "Updated view count",
+            "description": "Blog post content",
             "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "total": { "type": "integer" }
-                  }
-                }
+              "text/html": {
+                "schema": { "type": "string" }
+              },
+              "text/markdown": {
+                "schema": { "type": "string" }
               }
             }
+          },
+          "404": {
+            "description": "Post not found"
           }
         }
       }

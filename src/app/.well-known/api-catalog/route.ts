@@ -3,7 +3,7 @@ const BASE = "https://artemnovichkov.com"
 const catalog = {
   linkset: [
     {
-      anchor: `${BASE}/api/views`,
+      anchor: `${BASE}/blog`,
       "service-desc": [
         {
           href: `${BASE}/.well-known/openapi.json`,
