@@ -24,12 +24,12 @@ The `contextSize` property is marked with `@backDeployed(before: iOS 26.4, macOS
 
 ## Instructions Token Usage
 
-The `tokenUsage(for:)` method lets you measure how many tokens a given input consumes. Start with instructions — the system prompt that guides model behavior:
+The `tokenCount(for:)` method lets you measure how many tokens a given input consumes. Start with instructions — the system prompt that guides model behavior:
 
 ```swift
 let instructions = Instructions("You're a helpful assistant that generates haiku.")
-let instructionsTokenUsage = try await model.tokenUsage(for: instructions)
-print(instructionsTokenUsage.tokenCount) // "16"
+let instructionsTokenCount = try await model.tokenCount(for: instructions)
+print(instructionsTokenCount) // "16"
 ```
 
 When you use tools, their definitions (name, description, and argument schema) are serialized and sent alongside your instructions. This increases the token count significantly. Here's a simple tool definition:
@@ -53,16 +53,15 @@ struct MoodTool: Tool {
 }
 ```
 
-Passing tools to `tokenUsage(for:tools:)` shows the combined cost of instructions plus tool definitions:
+You can also measure tools separately using `tokenCount(for:)`:
 
 ```swift
 let tools = [MoodTool()]
-let instructionsTokenUsage = try await model.tokenUsage(for: instructions,
-                                                        tools: tools)
-print(instructionsTokenUsage.tokenCount) // "79"
+let toolsTokenCount = try await model.tokenCount(for: tools)
+print(toolsTokenCount) // "68"
 ```
 
-The jump from 16 to 79 tokens comes from the JSON schema generated for the tool's arguments and return type.
+The tool adds 68 tokens — the cost of serializing its name, description, and argument schema as JSON.
 
 ## Prompt Token Usage
 
@@ -70,8 +69,8 @@ You can also measure individual prompts — the user-facing messages you send to
 
 ```swift
 let prompt = Prompt("Generate a haiku about Swift")
-let promptTokenUsage = try await model.tokenUsage(for: prompt)
-print(promptTokenUsage.tokenCount) // 14
+let promptTokenCount = try await model.tokenCount(for: prompt)
+print(promptTokenCount) // 14
 ```
 
 With all the pieces in place, create a session and generate a response:
@@ -87,11 +86,11 @@ print(response.content)
 
 ## Transcript Token Usage
 
-After a conversation, you can measure the total token usage of the entire transcript. This includes all messages exchanged — instructions, prompts, and model responses:
+After a conversation, you can measure the total token count of the entire transcript. This includes all messages exchanged — instructions, prompts, tool definitions, and model responses:
 
 ```swift
-let transcriptTokenUsage = try await model.tokenUsage(for: session.transcript)
-print(transcriptTokenUsage.tokenCount)
+let transcriptTokenCount = try await model.tokenCount(for: session.transcript)
+print(transcriptTokenCount)
 ```
 
 <Callout>
@@ -103,14 +102,14 @@ In Xcode 26.4 beta (17E5159k), `session.respond(to:)` may throw `GenerationError
 Knowing raw token counts is useful, but comparing them against the context size gives you a clearer picture of how much budget you have left. Here's a small extension to calculate that percentage:
 
 ```swift
-extension SystemLanguageModel.TokenUsage {
-    func percent(ofContextSize contextSize: Int) -> Float {
+extension SystemLanguageModel {
+    func percent(tokenCount: Int, contextSize: Int) -> Float {
         guard contextSize > 0 else { return 0 }
         return Float(tokenCount) / Float(contextSize)
     }
 
-    func formattedPercent(ofContextSize contextSize: Int) -> String {
-        percent(ofContextSize: contextSize)
+    func formattedPercent(tokenCount: Int, contextSize: Int) -> String {
+        percent(tokenCount: tokenCount, contextSize: contextSize)
             .formatted(.percent.precision(.fractionLength(0)).rounded(rule: .down))
     }
 }
@@ -119,7 +118,7 @@ extension SystemLanguageModel.TokenUsage {
 Now you can see at a glance how much of your context window each component uses:
 
 ```swift
-print(instructionsTokenUsage.formattedPercent(ofContextSize: contextSize))
+print(model.formattedPercent(tokenCount: instructionsTokenCount, contextSize: contextSize))
 // "1%"
 ```
 
