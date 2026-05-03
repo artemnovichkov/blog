@@ -34,13 +34,14 @@ export default async function NotFound() {
   const highlightedContent = await markdownToHtml(mdxContent)
 
   return (
-    <div className="flex flex-col justify-center items-start mt-8">
-      <h1 className="font-bold text-4xl tracking-tight mb-4 text-zinc-800 dark:text-gray-100">
-        404 - Page Not Found
-      </h1>
-
-      <div className="prose dark:prose-dark w-full max-w-none mb-8">
-        {highlightedContent}
+    <div className="shell">
+      <section className="post-hero">
+        <h1>
+          <em>404</em> — Page Not Found
+        </h1>
+      </section>
+      <div className="article-wrap">
+        <div className="article">{highlightedContent}</div>
       </div>
     </div>
   )

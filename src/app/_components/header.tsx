@@ -1,34 +1,42 @@
+"use client"
+
 import Link from "next/link"
+import { usePathname } from "next/navigation"
+import ThemeToggle from "./theme-toggle"
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/blog", label: "Blog" },
+  { href: "/sponsorship", label: "Sponsorship" },
+]
 
 export default function Header() {
+  const pathname = usePathname()
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href)
+
   return (
-    <header className="sticky-nav w-full py-2">
-      <nav className="flex items-center">
-        <Link
-          href="/"
-          className="p-4 text-gray-900 hover:text-gray-600 dark:text-gray-100"
-        >
-          Home
+    <header className="topbar">
+      <div className="shell topbar-inner">
+        <Link href="/" className="brand">
+          Artem Novichkov
         </Link>
-        <Link
-          href="/blog"
-          className="p-4 text-gray-900 hover:text-gray-600 dark:text-gray-100"
-        >
-          Blog
-        </Link>
-        <Link
-          href="/sponsorship"
-          className="p-4 text-gray-900 hover:text-gray-600 dark:text-gray-100"
-        >
-          Sponsorship
-        </Link>
-        <Link
-          href="/feed.xml"
-          className="p-4 text-gray-900 hover:text-gray-600 dark:text-gray-100"
-        >
-          RSS
-        </Link>
-      </nav>
+        <nav className="nav">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={isActive(l.href) ? "active" : ""}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="topbar-right">
+          <ThemeToggle />
+        </div>
+      </div>
     </header>
   )
 }

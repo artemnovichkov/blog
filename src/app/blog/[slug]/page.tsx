@@ -17,28 +17,26 @@ export default async function BlogPost(props: Params) {
   const previousPost = getPreviousPost(params.slug)
 
   return (
-    <main>
+    <div className="shell">
       <article>
-        <div className="max-w-2xl mx-auto w-full">
-          <div className="mt-4">
-            <PostHeader post={post} />
-          </div>
-          <AdBlock
-            title={sponsorshipConfig.title}
-            description={sponsorshipConfig.description}
-            url={sponsorshipConfig.url}
-            isVisible={sponsorshipConfig.isVisible}
-          />
-          <div className="prose dark:prose-dark w-full max-w-none">
+        <PostHeader post={post} />
+        <div className="article-wrap">
+          <div className="article">
+            <AdBlock
+              title={sponsorshipConfig.title}
+              description={sponsorshipConfig.description}
+              url={sponsorshipConfig.url}
+              isVisible={sponsorshipConfig.isVisible}
+            />
             {content}
           </div>
         </div>
       </article>
-      <div className="max-w-2xl mx-auto w-full">
+      <div className="post-end">
         <PostActions post={post} />
         {previousPost && <ReadNext post={previousPost} />}
       </div>
-    </main>
+    </div>
   )
 }
 

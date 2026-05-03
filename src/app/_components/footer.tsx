@@ -1,59 +1,44 @@
-import type { IconType } from "react-icons"
-import { FaGithub, FaLinkedin } from "react-icons/fa"
-import { FaXTwitter } from "react-icons/fa6"
-
-const socialLinks = [
-  {
-    href: "https://x.com/iosartem",
-    label: "X (Twitter)",
-    Icon: FaXTwitter,
-  },
-  {
-    href: "https://github.com/artemnovichkov",
-    label: "GitHub",
-    Icon: FaGithub,
-  },
-  {
-    href: "https://www.linkedin.com/in/artemnovichkov",
-    label: "LinkedIn",
-    Icon: FaLinkedin,
-  },
+const links = [
+  { href: "https://x.com/iosartem", label: "X / Twitter" },
+  { href: "https://github.com/artemnovichkov", label: "GitHub" },
+  { href: "https://www.linkedin.com/in/artemnovichkov", label: "LinkedIn" },
+  { href: "/feed.xml", label: "RSS" },
 ]
-
-function SocialButton({
-  href,
-  label,
-  Icon,
-}: {
-  href: string
-  label: string
-  Icon: IconType
-}) {
-  return (
-    <a
-      rel="noopener noreferrer"
-      target="_blank"
-      href={href}
-      aria-label={label}
-      className="p-3 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-    >
-      <Icon className="w-5 h-5 text-gray-900 dark:text-white" />
-    </a>
-  )
-}
 
 export default function Footer() {
   return (
-    <footer>
-      <div className="text-center py-8">
-        <div className="flex flex-row gap-16 place-content-center">
-          {socialLinks.map((item) => (
-            <SocialButton key={item.href} {...item} />
-          ))}
+    <footer className="foot">
+      <div className="shell">
+        <div className="foot-inner">
+          <div className="foot-mark">
+            Artem<span>.</span>
+          </div>
+          <div className="foot-links">
+            {links.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                target={l.href.startsWith("http") ? "_blank" : undefined}
+                rel={
+                  l.href.startsWith("http") ? "noopener noreferrer" : undefined
+                }
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
         </div>
-        <p className="pt-4 text-gray-900 dark:text-white">
+        <div
+          style={{
+            marginTop: 24,
+            fontFamily: "var(--mono)",
+            fontSize: 11,
+            color: "var(--ink-3)",
+            letterSpacing: "0.04em",
+          }}
+        >
           Made with ❤️ by Artem Novichkov
-        </p>
+        </div>
       </div>
     </footer>
   )

@@ -1,76 +1,101 @@
-export default function Projects() {
-  return (
-    <div>
-      <p className="font-bold text-3xl tracking-tight mb-2 text-zinc-800 dark:text-gray-100">
-        Current Projects
-      </p>
-      <p className="mb-4 text-zinc-500 dark:text-gray-400">
-        Projects I&apos;m currently working on:
-      </p>
-      <ul className="flex flex-col gap-3">
-        {projects.map((project) => (
-          <li key={project.name}>
-            {project.emoji && <span>{project.emoji} </span>}
-            <a
-              className="text-base underline text-zinc-800 dark:text-gray-100"
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {project.name}
-            </a>
-            <span className="text-zinc-800 dark:text-gray-100">
-              {" — "}
-              {project.description}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
 const projects = [
   {
-    emoji: "🎨",
     name: "asset-catalog-viewer",
     url: "https://github.com/artemnovichkov/asset-catalog-viewer",
     description: "VS Code extension for .xcassets preview",
+    stack: "TypeScript · VS Code",
   },
   {
-    emoji: "🏠",
     name: "atmoshome",
     url: "https://atmoshome.vercel.app",
     description: "Home environment monitoring dashboard",
+    stack: "Next.js · IoT",
   },
   {
-    emoji: "🔌",
     name: "claude-code-plugins",
     url: "https://github.com/artemnovichkov/claude-code-plugins",
     description: "Claude Code plugins collection",
+    stack: "Node · CLI",
   },
   {
-    emoji: "🔮",
     name: "horoscope",
     url: "https://github.com/artemnovichkov/horoscope",
     description: "Dev horoscope powered by Foundation Models",
+    stack: "Swift · FM",
   },
   {
-    emoji: "🆕",
     name: "iOS-26-by-Examples",
     url: "https://github.com/artemnovichkov/iOS-26-by-Examples",
     description: "Hands-on iOS 26 feature examples",
+    stack: "Swift · UIKit",
   },
   {
-    emoji: "⌨️",
     name: "shortcuts-mcp-server",
     url: "https://github.com/artemnovichkov/shortcuts-mcp-server",
     description: "Shortcuts + MCP",
+    stack: "Swift · MCP",
   },
   {
-    emoji: "🐛",
     name: "TranscriptDebugMenu",
     url: "https://github.com/artemnovichkov/TranscriptDebugMenu",
     description: "Debug menu for LanguageModelSession transcripts",
+    stack: "Swift · SwiftUI",
   },
 ]
+
+const ArrowOut = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M7 17 17 7M9 7h8v8" />
+  </svg>
+)
+
+export default function Projects() {
+  return (
+    <section className="projects">
+      <div className="grid12 projects-head">
+        <div className="left">
+          <div className="eyebrow">
+            <span>Current Projects</span>
+          </div>
+          <h2 style={{ marginTop: 14 }}>
+            Open-source <em>in flight</em>
+          </h2>
+        </div>
+        <div className="right">
+          <div>{projects.length} active repositories</div>
+          <div style={{ marginTop: 6 }}>github.com/artemnovichkov</div>
+        </div>
+      </div>
+
+      <div className="proj-list">
+        {projects.map((p) => (
+          <a
+            key={p.name}
+            className="proj"
+            href={p.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className="name">
+              {p.name}
+              <span className="arrow">→</span>
+            </div>
+            <div className="desc">{p.description}</div>
+            <div className="stack">{p.stack}</div>
+            <div className="ext">
+              <ArrowOut />
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}

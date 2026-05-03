@@ -11,29 +11,34 @@ export default async function CategoryPage(props: Params) {
   const categories = getAllCategories()
 
   return (
-    <main>
-      <p className="flex items-center font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">
-        Category: {categoryTitleMap[name] || name}
-      </p>
-      <section>
-        {posts.length > 0 ? (
-          <div>
-            <p className="mb-4 text-zinc-500 dark:text-gray-400">
-              {posts.length} post{posts.length === 1 ? "" : "s"} found in this
-              category:
-            </p>
-            <PostList posts={posts} />
+    <div className="shell">
+      <section className="idx-hero">
+        <h1>
+          Category: <em>{categoryTitleMap[name] || name}</em>
+        </h1>
+        <div className="meta">
+          <div className="count">
+            {posts.length} {posts.length === 1 ? "post" : "posts"}
           </div>
-        ) : (
-          <div className="flex flex-col gap-4">
-            <p className="text-zinc-500 dark:text-gray-400">
-              No posts found in this category. You can browse other categories:
-            </p>
-            <CategoryList categories={categories} />
-          </div>
-        )}
+        </div>
       </section>
-    </main>
+      {posts.length > 0 ? (
+        <PostList posts={posts} />
+      ) : (
+        <div style={{ marginTop: 32 }}>
+          <p
+            style={{
+              color: "var(--ink-3)",
+              marginBottom: 16,
+              fontSize: 14,
+            }}
+          >
+            No posts found in this category. Browse other categories:
+          </p>
+          <CategoryList categories={categories} />
+        </div>
+      )}
+    </div>
   )
 }
 

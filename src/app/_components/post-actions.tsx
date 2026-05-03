@@ -11,23 +11,12 @@ const editUrl = (slug: string): string =>
 
 export default function PostActions({ post }: { post: Post }) {
   return (
-    <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-      <a
-        href={twitterShareUrl(post)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline"
-      >
-        {"Share on X"}
+    <div className="post-actions">
+      <a href={twitterShareUrl(post)} target="_blank" rel="noopener noreferrer">
+        Share on X
       </a>
-      {` • `}
-      <a
-        href={editUrl(post.slug)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline"
-      >
-        {"Found a typo? Edit this post on GitHub"}
+      <a href={editUrl(post.slug)} target="_blank" rel="noopener noreferrer">
+        Found a typo? Edit on GitHub
       </a>
     </div>
   )

@@ -32,14 +32,15 @@ export default async function SponsorshipPage() {
   const content = await markdownToHtml(mdxContent)
 
   return (
-    <main>
-      <article>
-        <div className="max-w-2xl mx-auto w-full mt-4">
-          <div className="prose dark:prose-dark w-full max-w-none">
-            {content}
-          </div>
-        </div>
+    <div className="shell">
+      <section className="post-hero">
+        <h1 className="reveal">
+          <em>Sponsorship</em>
+        </h1>
+      </section>
+      <article className="article-wrap reveal d2">
+        <div className="article">{content}</div>
       </article>
-    </main>
+    </div>
   )
 }

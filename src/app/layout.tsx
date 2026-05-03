@@ -1,10 +1,33 @@
 import type { Metadata } from "next"
+import { Fraunces, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google"
 import { about, name, title } from "@/lib/const"
 import "@/app/globals.css"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Footer from "./_components/footer"
 import Header from "./_components/header"
+
+const display = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+  style: ["normal", "italic"],
+  weight: ["300", "400", "500"],
+})
+
+const body = IBM_Plex_Sans({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+  weight: ["300", "400", "500", "600"],
+})
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+  weight: ["400", "500"],
+})
 
 export const metadata: Metadata = {
   title: name,
@@ -38,18 +61,26 @@ export const metadata: Metadata = {
   },
 }
 
+const themeInitScript = `(()=>{try{const s=localStorage.getItem('theme');const m=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=s||(m?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();`
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="bg-zinc-100 dark:bg-gray-900">
+    <html
+      lang="en"
+      className={`${display.variable} ${body.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: theme init must run before paint */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="grain">
         <Header />
-        <main className="flex flex-col justify-center max-w-2xl mx-auto px-4 sm:px-0">
-          {children}
-        </main>
+        <main>{children}</main>
         <Footer />
         <Analytics />
         <SpeedInsights />

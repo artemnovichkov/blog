@@ -15,12 +15,14 @@ export default async function Playground() {
   const content = await markdownToHtml(markdown)
 
   return (
-    <div>
-      <article>
-        <h1 className="my-4 font-bold text-3xl tracking-tight text-zinc-800 dark:text-gray-100">
-          Playground
+    <div className="shell">
+      <section className="post-hero">
+        <h1>
+          <em>Playground</em>
         </h1>
-        <div className="prose dark:prose-dark">{content}</div>
+      </section>
+      <article className="article-wrap">
+        <div className="article">{content}</div>
       </article>
     </div>
   )

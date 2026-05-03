@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
-import { getAllPosts } from "@/lib/api"
+import { getAllCategories, getAllPosts } from "@/lib/api"
 import { about, name } from "@/lib/const"
-import PostList from "../_components/post-list"
+import BlogIndex from "../_components/blog-index"
 
 const title = `${name} | Blog`
 
@@ -27,14 +27,6 @@ export const metadata: Metadata = {
 
 export default function Blog() {
   const posts = getAllPosts()
-  return (
-    <main>
-      <p className="font-bold text-4xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">
-        Blog
-      </p>
-      <section>
-        <PostList posts={posts} />
-      </section>
-    </main>
-  )
+  const tags = getAllCategories()
+  return <BlogIndex posts={posts} tags={tags} />
 }

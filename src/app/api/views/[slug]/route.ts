@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server"
 import { Redis } from "@upstash/redis"
+import { NextResponse } from "next/server"
 
 const redis = new Redis({
   url: process.env.KV_REST_API_URL!,

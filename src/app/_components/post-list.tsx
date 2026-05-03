@@ -1,14 +1,12 @@
-import PostPreview from "@/app/_components/post-preview"
 import type { Post } from "@/interfaces/post"
+import PostPreview from "./post-preview"
 
 export default function PostList({ posts }: { posts: Post[] }) {
   return (
-    <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+    <div className="idx-list">
       {posts.map((post) => (
-        <li key={post.slug}>
-          <PostPreview post={post} />
-        </li>
+        <PostPreview key={post.slug} post={post} />
       ))}
-    </ul>
+    </div>
   )
 }

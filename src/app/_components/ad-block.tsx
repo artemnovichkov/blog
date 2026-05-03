@@ -16,26 +16,27 @@ const AdBlock = ({
   }
 
   return (
-    <div className="ad-block p-4 rounded-md bg-blue-100 border-blue-200 dark:bg-blue-900/30 dark:border-blue-200/30 border my-6">
-      <div className="flex items-start gap-3">
-        <span className="text-xl">📢</span>
-        <div className="flex flex-col gap-2">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Sponsored</p>
-          <h3 className="font-semibold text-gray-900 dark:text-white">
-            {title}
-          </h3>
-          <p className="text-gray-700 dark:text-gray-300">{description}</p>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-block w-fit px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors dark:bg-blue-500 dark:hover:bg-blue-600"
-          >
-            Learn More →
-          </a>
-        </div>
+    <aside className="ad-block">
+      <div
+        style={{
+          fontFamily: "var(--mono)",
+          fontSize: 10,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: "var(--ink-4)",
+          marginBottom: 6,
+        }}
+      >
+        Sponsored
       </div>
-    </div>
+      <h3>{title}</h3>
+      <p>{description}</p>
+      <div style={{ marginTop: 12 }}>
+        <a href={url} target="_blank" rel="noopener noreferrer" className="btn">
+          Learn More →
+        </a>
+      </div>
+    </aside>
   )
 }
 

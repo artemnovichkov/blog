@@ -28,14 +28,16 @@ export default function CodeBlock({ children, ...props }: CodeBlockProps) {
   }
 
   return (
-    <div className="relative">
+    <>
       <button
+        type="button"
         onClick={handleCopy}
-        className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center text-sm cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 px-1 py-0.5 shadow"
+        className={`code-copy-btn${copied ? " ok" : ""}`}
+        aria-label={copied ? "Copied" : "Copy code"}
       >
         {copied ? <GoCheck /> : <GoCopy />}
       </button>
       <pre {...props}>{children}</pre>
-    </div>
+    </>
   )
 }
