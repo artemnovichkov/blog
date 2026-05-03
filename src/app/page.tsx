@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <div className="shell">
       <section className="home-hero">
-        <div className="grid12">
+        <div className="hero-row">
           <div className="head-col reveal">
             <h1>
               Hey, I&apos;m
@@ -17,23 +17,21 @@ export default function Home() {
               <em>Artem</em> <span className="ampersand">&amp;</span>
               <br />I write Swift.
             </h1>
+            <div className="strap reveal d2">
+              <p>
+                iOS developer at Salmon Group Ltd, building{" "}
+                <a
+                  href="https://salmon.ph"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  the Salmon app
+                </a>{" "}
+                — a fintech super app bringing accessible financial services to
+                millions of Filipinos.
+              </p>
+            </div>
           </div>
-
-          <div className="strap reveal d2">
-            <p>
-              iOS developer at Salmon Group Ltd, building{" "}
-              <a
-                href="https://salmon.ph"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                the Salmon app
-              </a>{" "}
-              — a fintech super app bringing accessible financial services to
-              millions of Filipinos.
-            </p>
-          </div>
-
           <div className="portrait reveal d3">
             <Image
               src="/images/avatar.jpg"
@@ -41,7 +39,7 @@ export default function Home() {
               priority
               width={720}
               height={900}
-              sizes="(max-width: 900px) 100vw, 480px"
+              sizes="(max-width: 900px) 240px, 360px"
             />
           </div>
         </div>

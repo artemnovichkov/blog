@@ -69,10 +69,6 @@ export default function Projects() {
             Open-source <em>in flight</em>
           </h2>
         </div>
-        <div className="right">
-          <div>{projects.length} active repositories</div>
-          <div style={{ marginTop: 6 }}>github.com/artemnovichkov</div>
-        </div>
       </div>
 
       <div className="proj-list">
@@ -84,10 +80,7 @@ export default function Projects() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <div className="name">
-              {p.name}
-              <span className="arrow">→</span>
-            </div>
+            <div className="name">{p.name}</div>
             <div className="desc">{p.description}</div>
             <div className="stack">{p.stack}</div>
             <div className="ext">

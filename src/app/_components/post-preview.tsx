@@ -9,9 +9,10 @@ const fmtDate = (iso: string) =>
     .toUpperCase()
 
 export default function PostPreview({ post }: { post: Post }) {
+  const href = `/blog/${encodeURIComponent(post.slug)}`
   return (
-    <Link href={`/blog/${encodeURIComponent(post.slug)}`} className="idx-row">
-      <div className="cover">
+    <article className="idx-row">
+      <Link href={href} className="cover">
         <Image
           src={post.cover}
           alt=""
@@ -19,21 +20,31 @@ export default function PostPreview({ post }: { post: Post }) {
           height={300}
           sizes="(max-width: 600px) 100vw, (max-width: 900px) 140px, 200px"
         />
-      </div>
+      </Link>
       <div className="date">{fmtDate(post.date)}</div>
       <div className="body">
-        <div className="idx-title">{post.title}</div>
+        <Link href={href} className="idx-title">
+          {post.title}
+        </Link>
         <div className="dek">{post.description}</div>
         {post.categories && (
           <div className="tags">
             {post.categories.map((t) => (
-              <span key={t}>{t}</span>
+              <Link
+                key={t}
+                href={`/blog/category/${encodeURIComponent(t)}`}
+                className="tag"
+              >
+                {t}
+              </Link>
             ))}
           </div>
         )}
       </div>
       <div className="read">{readingTime(post.content).text}</div>
-      <div className="arrow">→</div>
-    </Link>
+      <Link href={href} className="arrow" aria-label={post.title}>
+        →
+      </Link>
+    </article>
   )
 }

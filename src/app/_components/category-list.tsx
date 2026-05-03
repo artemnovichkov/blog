@@ -3,14 +3,14 @@ import { categoryTitleMap } from "@/lib/const"
 
 export default function CategoryList({ categories }: { categories: string[] }) {
   return (
-    <div className="meta-tags">
+    <div className="tags">
       {categories.map((category) => (
         <Link
           key={category}
           href={`/blog/category/${encodeURIComponent(category)}`}
-          className="meta-tag"
+          className="tag"
         >
-          #{categoryTitleMap[category] || category}
+          {categoryTitleMap[category] || category}
         </Link>
       ))}
     </div>

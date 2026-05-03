@@ -10,9 +10,6 @@ export default function Footer() {
     <footer className="foot">
       <div className="shell">
         <div className="foot-inner">
-          <div className="foot-mark">
-            Artem<span>.</span>
-          </div>
           <div className="foot-links">
             {links.map((l) => (
               <a

@@ -7,6 +7,8 @@ import { flushSync } from "react-dom"
 import readingTime from "reading-time"
 import type { Post } from "@/interfaces/post"
 
+const CHIPS_COLLAPSED = 6
+
 const fmtDate = (iso: string) => {
   const d = new Date(iso)
   return d
@@ -22,6 +24,9 @@ export default function BlogIndex({
   tags: string[]
 }) {
   const [tag, setTag] = useState<string>("all")
+  const [chipsExpanded, setChipsExpanded] = useState(false)
+  const visibleTags = chipsExpanded ? tags : tags.slice(0, CHIPS_COLLAPSED)
+  const hiddenCount = tags.length - visibleTags.length
 
   const selectTag = useCallback((next: string) => {
     const doc = document as Document & {
@@ -85,7 +90,7 @@ export default function BlogIndex({
           >
             All
           </button>
-          {tags.map((t) => (
+          {visibleTags.map((t) => (
             <button
               type="button"
               key={t}
@@ -95,6 +100,15 @@ export default function BlogIndex({
               #{t}
             </button>
           ))}
+          {tags.length > CHIPS_COLLAPSED && (
+            <button
+              type="button"
+              className="chip chip-more"
+              onClick={() => setChipsExpanded((v) => !v)}
+            >
+              {chipsExpanded ? "Less" : `+${hiddenCount} More`}
+            </button>
+          )}
         </div>
         <div className="count">
           {filtered.length} {filtered.length === 1 ? "result" : "results"}
@@ -105,41 +119,53 @@ export default function BlogIndex({
         {byYear.map(([year, list]) => (
           <div key={year} className="year-grp">
             <div className="y">{year}</div>
-            <div>
-              {list.map((p) => (
-                <Link
-                  key={p.slug}
-                  href={`/blog/${encodeURIComponent(p.slug)}`}
-                  className="idx-row"
-                  style={{
-                    viewTransitionName: `post-${p.slug.replace(/[^a-z0-9-]/gi, "_")}`,
-                  }}
-                >
-                  <div className="cover">
-                    <Image
-                      src={p.cover}
-                      alt=""
-                      width={400}
-                      height={300}
-                      sizes="(max-width: 600px) 100vw, (max-width: 900px) 140px, 200px"
-                    />
-                  </div>
-                  <div className="date">{fmtDate(p.date)}</div>
-                  <div className="body">
-                    <div className="idx-title">{p.title}</div>
-                    <div className="dek">{p.description}</div>
-                    {p.categories && (
-                      <div className="tags">
-                        {p.categories.map((t) => (
-                          <span key={t}>{t}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="read">{readingTime(p.content).text}</div>
-                  <div className="arrow">→</div>
-                </Link>
-              ))}
+            <div className="year-grid">
+              {list.map((p) => {
+                const href = `/blog/${encodeURIComponent(p.slug)}`
+                return (
+                  <article
+                    key={p.slug}
+                    className="idx-row"
+                    style={{
+                      viewTransitionName: `post-${p.slug.replace(/[^a-z0-9-]/gi, "_")}`,
+                    }}
+                  >
+                    <Link href={href} className="cover">
+                      <Image
+                        src={p.cover}
+                        alt=""
+                        width={400}
+                        height={300}
+                        sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 400px"
+                      />
+                    </Link>
+                    <div className="date">{fmtDate(p.date)}</div>
+                    <div className="body">
+                      <Link href={href} className="idx-title">
+                        {p.title}
+                      </Link>
+                      <div className="dek">{p.description}</div>
+                      {p.categories && (
+                        <div className="tags">
+                          {p.categories.map((t) => (
+                            <Link
+                              key={t}
+                              href={`/blog/category/${encodeURIComponent(t)}`}
+                              className="tag"
+                            >
+                              {t}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="read">{readingTime(p.content).text}</div>
+                    <Link href={href} className="arrow" aria-label={p.title}>
+                      →
+                    </Link>
+                  </article>
+                )
+              })}
             </div>
           </div>
         ))}
