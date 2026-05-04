@@ -31,17 +31,17 @@ export const metadata: Metadata = {
 export default async function NotFound() {
   const mdxPath = join(process.cwd(), "content", "404.mdx")
   const mdxContent = readFileSync(mdxPath, "utf8")
-  const highlightedContent = await markdownToHtml(mdxContent)
+  const { content } = await markdownToHtml(mdxContent)
 
   return (
     <div className="shell">
-      <section className="post-hero">
-        <h1>
-          <em>404</em> — Page Not Found
-        </h1>
-      </section>
-      <div className="article-wrap">
-        <div className="article">{highlightedContent}</div>
+      <div className="article">
+        <section className="post-hero">
+          <h1>
+            <em>404</em> — Page Not Found
+          </h1>
+        </section>
+        <div className="reveal d2">{content}</div>
       </div>
     </div>
   )

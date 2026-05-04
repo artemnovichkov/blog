@@ -4,6 +4,7 @@ import AdBlock from "@/app/_components/ad-block"
 import PostActions from "@/app/_components/post-actions"
 import PostHeader from "@/app/_components/post-header"
 import ReadNext from "@/app/_components/read-next"
+import TableOfContents from "@/app/_components/toc"
 import { getAllPosts, getPostBySlug, getPreviousPost } from "@/lib/api"
 import { name } from "@/lib/const"
 import markdownToHtml from "@/lib/markdownToHtml"
@@ -13,22 +14,29 @@ export default async function BlogPost(props: Params) {
   const params = await props.params
   const post = getPostBySlug(params.slug)
   if (!post) notFound()
-  const content = await markdownToHtml(post.content || "")
+  const { content, toc } = await markdownToHtml(post.content || "")
   const previousPost = getPreviousPost(params.slug)
 
   return (
     <div className="shell">
-      <article>
+      <article className="post-article">
         <PostHeader post={post} />
-        <div className="article-wrap">
-          <div className="article">
-            <AdBlock
-              title={sponsorshipConfig.title}
-              description={sponsorshipConfig.description}
-              url={sponsorshipConfig.url}
-              isVisible={sponsorshipConfig.isVisible}
-            />
-            {content}
+        <div className="post-layout">
+          <aside className="post-sidebar">
+            <TableOfContents toc={toc} />
+          </aside>
+          <div className="post-main">
+            <div className="article-wrap">
+              <div className="article">
+                <AdBlock
+                  title={sponsorshipConfig.title}
+                  description={sponsorshipConfig.description}
+                  url={sponsorshipConfig.url}
+                  isVisible={sponsorshipConfig.isVisible}
+                />
+                {content}
+              </div>
+            </div>
           </div>
         </div>
       </article>

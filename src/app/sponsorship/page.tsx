@@ -29,18 +29,18 @@ export const metadata: Metadata = {
 export default async function SponsorshipPage() {
   const mdxPath = join(process.cwd(), "content", "sponsorship.mdx")
   const mdxContent = readFileSync(mdxPath, "utf8")
-  const content = await markdownToHtml(mdxContent)
+  const { content } = await markdownToHtml(mdxContent)
 
   return (
     <div className="shell">
-      <section className="post-hero">
-        <h1 className="reveal">
-          <em>Sponsorship</em>
-        </h1>
+      <section className="idx-hero">
+        <h1 className="reveal">Sponsorship</h1>
       </section>
-      <article className="article-wrap reveal d2">
-        <div className="article">{content}</div>
-      </article>
+      <div className="article">
+        <article className="reveal d2">
+          {content}
+        </article>
+      </div>
     </div>
   )
 }

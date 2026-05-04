@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import ScrollProgress from "./scroll-progress"
 import ThemeToggle from "./theme-toggle"
 
 const links = [
@@ -15,6 +16,9 @@ export default function Header() {
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href)
+
+  const showProgress =
+    pathname.startsWith("/blog/") && !pathname.startsWith("/blog/category")
 
   return (
     <header className="topbar">
@@ -37,6 +41,7 @@ export default function Header() {
           <ThemeToggle />
         </div>
       </div>
+      {showProgress && <ScrollProgress />}
     </header>
   )
 }

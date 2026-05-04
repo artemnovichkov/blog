@@ -1,27 +1,26 @@
 "use client"
 
-import Image from "next/image"
-import Link from "next/link"
 import { useCallback, useMemo, useState } from "react"
 import { flushSync } from "react-dom"
-import readingTime from "reading-time"
 import type { Post } from "@/interfaces/post"
+import PostPreview from "./post-preview"
 
 const CHIPS_COLLAPSED = 6
-
-const fmtDate = (iso: string) => {
-  const d = new Date(iso)
-  return d
-    .toLocaleDateString("en-GB", { month: "short", day: "2-digit" })
-    .toUpperCase()
-}
 
 export default function BlogIndex({
   posts,
   tags,
+  title,
+  subtitle,
+  showFilter = true,
+  showPostTags = true,
 }: {
   posts: Post[]
   tags: string[]
+  title?: React.ReactNode
+  subtitle?: React.ReactNode
+  showFilter?: boolean
+  showPostTags?: boolean
 }) {
   const [tag, setTag] = useState<string>("all")
   const [chipsExpanded, setChipsExpanded] = useState(false)
@@ -70,102 +69,67 @@ export default function BlogIndex({
     <div className="shell">
       <section className="idx-hero">
         <h1 className="reveal">
-          Field notes <em>on shipping</em>
-          <br />
-          iOS in public.
+          {title || (
+            <>
+              Field notes on shipping
+              <br />
+              iOS in public.
+            </>
+          )}
         </h1>
         <div className="meta reveal d2">
           <div className="count">{posts.length} posts</div>
-          <div style={{ marginTop: 6, color: "var(--ink-4)" }}>{yearRange}</div>
+          <div style={{ marginTop: 6, color: "var(--ink-4)" }}>
+            {subtitle || yearRange}
+          </div>
         </div>
       </section>
 
-      <div className="idx-controls reveal d3">
-        <span className="lbl">Filter ›</span>
-        <div className="chips">
-          <button
-            type="button"
-            className={"chip" + (tag === "all" ? " active" : "")}
-            onClick={() => selectTag("all")}
-          >
-            All
-          </button>
-          {visibleTags.map((t) => (
+      {showFilter && (
+        <div className="idx-controls reveal d3">
+          <span className="lbl">Filter ›</span>
+          <div className="chips">
             <button
               type="button"
-              key={t}
-              className={"chip" + (tag === t ? " active" : "")}
-              onClick={() => selectTag(t)}
+              className={"chip" + (tag === "all" ? " active" : "")}
+              onClick={() => selectTag("all")}
             >
-              #{t}
+              All
             </button>
-          ))}
-          {tags.length > CHIPS_COLLAPSED && (
-            <button
-              type="button"
-              className="chip chip-more"
-              onClick={() => setChipsExpanded((v) => !v)}
-            >
-              {chipsExpanded ? "Less" : `+${hiddenCount} More`}
-            </button>
-          )}
+            {visibleTags.map((t) => (
+              <button
+                type="button"
+                key={t}
+                className={"chip" + (tag === t ? " active" : "")}
+                onClick={() => selectTag(t)}
+              >
+                #{t}
+              </button>
+            ))}
+            {tags.length > CHIPS_COLLAPSED && (
+              <button
+                type="button"
+                className="chip chip-more"
+                onClick={() => setChipsExpanded((v) => !v)}
+              >
+                {chipsExpanded ? "Less" : `+${hiddenCount} More`}
+              </button>
+            )}
+          </div>
+          <div className="count">
+            {filtered.length} {filtered.length === 1 ? "result" : "results"}
+          </div>
         </div>
-        <div className="count">
-          {filtered.length} {filtered.length === 1 ? "result" : "results"}
-        </div>
-      </div>
+      )}
 
       <div className="idx-list">
         {byYear.map(([year, list]) => (
           <div key={year} className="year-grp">
             <div className="y">{year}</div>
             <div className="year-grid">
-              {list.map((p) => {
-                const href = `/blog/${encodeURIComponent(p.slug)}`
-                return (
-                  <article
-                    key={p.slug}
-                    className="idx-row"
-                    style={{
-                      viewTransitionName: `post-${p.slug.replace(/[^a-z0-9-]/gi, "_")}`,
-                    }}
-                  >
-                    <Link href={href} className="cover">
-                      <Image
-                        src={p.cover}
-                        alt=""
-                        width={400}
-                        height={300}
-                        sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 400px"
-                      />
-                    </Link>
-                    <div className="date">{fmtDate(p.date)}</div>
-                    <div className="body">
-                      <Link href={href} className="idx-title">
-                        {p.title}
-                      </Link>
-                      <div className="dek">{p.description}</div>
-                      {p.categories && (
-                        <div className="tags">
-                          {p.categories.map((t) => (
-                            <Link
-                              key={t}
-                              href={`/blog/category/${encodeURIComponent(t)}`}
-                              className="tag"
-                            >
-                              {t}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="read">{readingTime(p.content).text}</div>
-                    <Link href={href} className="arrow" aria-label={p.title}>
-                      →
-                    </Link>
-                  </article>
-                )
-              })}
+              {list.map((p) => (
+                <PostPreview key={p.slug} post={p} showTags={showPostTags} />
+              ))}
             </div>
           </div>
         ))}

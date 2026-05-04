@@ -1,28 +1,22 @@
-import CategoryList from "@/app/_components/category-list"
-import { getAllCategories } from "@/lib/api"
+import { getAllCategories, getAllPosts } from "@/lib/api"
+import BlogIndex from "../../_components/blog-index"
 
 export default function Categories() {
+  const posts = getAllPosts()
   const categories = getAllCategories()
 
   return (
-    <div className="shell">
-      <section className="idx-hero">
-        <h1>
-          <em>Categories</em>
-        </h1>
-        <div className="meta">
-          <div className="count">{categories.length} topics</div>
-        </div>
-      </section>
-      {categories.length > 0 ? (
-        <div style={{ marginTop: 24 }}>
-          <CategoryList categories={categories} />
-        </div>
-      ) : (
-        <p style={{ color: "var(--ink-3)", marginTop: 24 }}>
-          No categories found.
-        </p>
-      )}
-    </div>
+    <BlogIndex
+      posts={posts}
+      tags={categories}
+      title={
+        <>
+          All <em>Categories</em>
+        </>
+      }
+      subtitle={`${categories.length} topics across ${posts.length} posts`}
+      showFilter={false}
+      showPostTags={false}
+    />
   )
 }

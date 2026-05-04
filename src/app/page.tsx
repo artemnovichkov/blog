@@ -14,7 +14,7 @@ export default function Home() {
             <h1>
               Hey, I&apos;m
               <br />
-              <em>Artem</em> <span className="ampersand">&amp;</span>
+              Artem <span className="ampersand">&amp;</span>
               <br />I write Swift.
             </h1>
             <div className="strap reveal d2">
@@ -37,8 +37,8 @@ export default function Home() {
               src="/images/avatar.jpg"
               alt="Artem Novichkov"
               priority
-              width={720}
-              height={900}
+              width={800}
+              height={800}
               sizes="(max-width: 900px) 240px, 360px"
             />
           </div>
@@ -49,18 +49,6 @@ export default function Home() {
         <div className="grid12">
           <div className="label">About</div>
           <div className="body">
-            <p>
-              iOS developer at{" "}
-              <a
-                href="https://salmon.ph"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Salmon Group Ltd
-              </a>
-              , building the Salmon app — a fintech super app bringing
-              accessible financial services to millions of Filipinos.
-            </p>
             <p>
               From time to time, I do <em>mentoring and consulting</em> for
               developers and companies navigating iOS development challenges.

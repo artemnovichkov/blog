@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Fraunces, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google"
+import { Inter, JetBrains_Mono, Fraunces } from "next/font/google"
 import { about, name, title } from "@/lib/const"
 import "@/app/globals.css"
 import { Analytics } from "@vercel/analytics/react"
@@ -7,19 +7,17 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import Footer from "./_components/footer"
 import Header from "./_components/header"
 
+const body = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+})
+
 const display = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
   style: ["normal", "italic"],
-  weight: ["300", "400", "500"],
-})
-
-const body = IBM_Plex_Sans({
-  subsets: ["latin"],
-  variable: "--font-body",
-  display: "swap",
-  weight: ["300", "400", "500", "600"],
 })
 
 const mono = JetBrains_Mono({
@@ -71,7 +69,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${body.variable} ${mono.variable}`}
+      className={`${body.variable} ${display.variable} ${mono.variable}`}
       suppressHydrationWarning
     >
       <head>

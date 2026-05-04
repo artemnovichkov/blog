@@ -12,18 +12,18 @@ export default async function Playground() {
     "src/app/playground/markdown.mdx"
   )
   const markdown = await fs.readFile(markdownPath, "utf-8")
-  const content = await markdownToHtml(markdown)
+  const { content } = await markdownToHtml(markdown)
 
   return (
     <div className="shell">
-      <section className="post-hero">
-        <h1>
-          <em>Playground</em>
-        </h1>
-      </section>
-      <article className="article-wrap">
-        <div className="article">{content}</div>
-      </article>
+      <div className="article">
+        <section className="post-hero">
+          <h1>
+            <em>Playground</em>
+          </h1>
+        </section>
+        <div className="reveal d2">{content}</div>
+      </div>
     </div>
   )
 }

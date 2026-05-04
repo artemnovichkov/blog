@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
-import CategoryList from "@/app/_components/category-list"
-import PostList from "@/app/_components/post-list"
+import BlogIndex from "@/app/_components/blog-index"
 import { getAllCategories, getAllPosts } from "@/lib/api"
 import { categoryTitleMap, name as siteName } from "@/lib/const"
 
@@ -11,34 +10,17 @@ export default async function CategoryPage(props: Params) {
   const categories = getAllCategories()
 
   return (
-    <div className="shell">
-      <section className="idx-hero">
-        <h1>
+    <BlogIndex
+      posts={posts}
+      tags={categories}
+      showFilter={false}
+      showPostTags={false}
+      title={
+        <>
           Category: <em>{categoryTitleMap[name] || name}</em>
-        </h1>
-        <div className="meta">
-          <div className="count">
-            {posts.length} {posts.length === 1 ? "post" : "posts"}
-          </div>
-        </div>
-      </section>
-      {posts.length > 0 ? (
-        <PostList posts={posts} />
-      ) : (
-        <div style={{ marginTop: 32 }}>
-          <p
-            style={{
-              color: "var(--ink-3)",
-              marginBottom: 16,
-              fontSize: 14,
-            }}
-          >
-            No posts found in this category. Browse other categories:
-          </p>
-          <CategoryList categories={categories} />
-        </div>
-      )}
-    </div>
+        </>
+      }
+    />
   )
 }
 

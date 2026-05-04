@@ -10,6 +10,7 @@ export default function Footer() {
     <footer className="foot">
       <div className="shell">
         <div className="foot-inner">
+          <div className="made-with">Made with ❤️ by Artem Novichkov</div>
           <div className="foot-links">
             {links.map((l) => (
               <a
@@ -24,17 +25,6 @@ export default function Footer() {
               </a>
             ))}
           </div>
-        </div>
-        <div
-          style={{
-            marginTop: 24,
-            fontFamily: "var(--mono)",
-            fontSize: 11,
-            color: "var(--ink-3)",
-            letterSpacing: "0.04em",
-          }}
-        >
-          Made with ❤️ by Artem Novichkov
         </div>
       </div>
     </footer>
