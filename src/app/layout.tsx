@@ -4,6 +4,7 @@ import "@/app/globals.css"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Script from "next/script"
+import AppearanceAnimation from "./_components/appearance-animation"
 import Footer from "./_components/footer"
 import Header from "./_components/header"
 
@@ -63,7 +64,7 @@ export default function RootLayout({
       <body className="bg-zinc-100 dark:bg-gray-900">
         <Header />
         <main className="mx-auto flex max-w-2xl flex-col justify-center px-4 sm:px-0">
-          {children}
+          <AppearanceAnimation>{children}</AppearanceAnimation>
         </main>
         <Footer />
         <Analytics />

@@ -25,6 +25,7 @@ export default function ViewCounter({
 }: ViewCounterProps): React.ReactElement {
   const { data } = useSWR<ViewData>(`/api/views/${slug}`, fetcher)
   const views = Number(data?.total)
+  const formattedViews = views > 0 ? views.toLocaleString() : "0"
 
   useEffect(() => {
     const registerView = () =>
@@ -35,5 +36,19 @@ export default function ViewCounter({
     registerView()
   }, [slug])
 
-  return <span>{views > 0 ? views.toLocaleString() : "–––"} views</span>
+  return (
+    <span className="view-counter" aria-live="polite">
+      {data ? (
+        <span className="view-counter-value" key={formattedViews}>
+          {formattedViews}
+        </span>
+      ) : (
+        <>
+          <span className="view-counter-skeleton" aria-hidden="true" />
+          <span className="sr-only">Loading</span>
+        </>
+      )}{" "}
+      views
+    </span>
+  )
 }
