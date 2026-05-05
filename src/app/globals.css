@@ -113,6 +113,10 @@ code[data-line-numbers] > [data-line]::before {
   padding: 0.25rem;
 }
 
+.prose h2[id] {
+  scroll-margin-top: 6rem;
+}
+
 /* Dark mode typography colors */
 .dark {
   .prose {
