@@ -9,12 +9,12 @@ export default function PostPreview({ post }: { post: Post }) {
   return (
     <div className="flex flex-col">
       <Link
-        className="w-full flex flex-col gap-2 mb-2 no-underline"
+        className="group mb-2 flex w-full flex-col gap-2 no-underline"
         href={`/blog/${encodeURIComponent(post.slug)}`}
       >
-        <div className="w-full">
+        <div className="w-full overflow-hidden rounded">
           <Image
-            className="rounded w-full h-auto object-cover"
+            className="h-auto w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             priority
             src={post.cover}
             alt={`Cover image for ${post.title}`}
@@ -24,15 +24,15 @@ export default function PostPreview({ post }: { post: Post }) {
             style={{ width: "100%", height: "auto" }}
           />
         </div>
-        <h4 className="text-xl font-medium text-zinc-800 dark:text-gray-100 mt-0">
+        <h4 className="mt-0 font-medium text-xl text-zinc-800 dark:text-gray-100">
           {post.title}
         </h4>
-        <h4 className="text-base font-normal text-zinc-500 dark:text-gray-400">
+        <h4 className="font-normal text-base text-zinc-500 dark:text-gray-400">
           {post.description}
         </h4>
       </Link>
       {post.categories && <CategoryList categories={post.categories} />}
-      <div className="text-sm font-normal font-xs text-zinc-500 dark:text-gray-400 mt-2">
+      <div className="mt-2 font-normal font-xs text-sm text-zinc-500 dark:text-gray-400">
         <PostDate dateString={post.date} />
         {` • `}
         {readingTime(post.content).text}
