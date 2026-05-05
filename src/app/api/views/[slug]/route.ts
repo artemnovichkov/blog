@@ -1,12 +1,25 @@
-import { NextResponse } from "next/server"
 import { Redis } from "@upstash/redis"
+import { NextResponse } from "next/server"
 
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!,
-})
+const redisUrl = process.env.KV_REST_API_URL
+const redisToken = process.env.KV_REST_API_TOKEN
+
+const redis =
+  redisUrl && redisToken
+    ? new Redis({
+        url: redisUrl,
+        token: redisToken,
+      })
+    : null
 
 export async function GET(request: Request): Promise<Response> {
+  if (!redis) {
+    return NextResponse.json(
+      { error: "Views backend is not configured" },
+      { status: 503 }
+    )
+  }
+
   const slug = request.url.split("/").pop()
 
   if (!slug) {
@@ -18,6 +31,13 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  if (!redis) {
+    return NextResponse.json(
+      { error: "Views backend is not configured" },
+      { status: 503 }
+    )
+  }
+
   const slug = request.url.split("/").pop()
 
   if (!slug) {

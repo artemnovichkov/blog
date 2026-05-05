@@ -6,7 +6,7 @@ export default function Categories() {
 
   return (
     <main>
-      <p className="font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">
+      <p className="my-4 font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
         Categories
       </p>
       {categories.length > 0 ? (

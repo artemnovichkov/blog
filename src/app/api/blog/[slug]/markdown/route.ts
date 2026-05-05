@@ -1,5 +1,5 @@
-import { getPostBySlug } from "@/lib/api"
 import { NextResponse } from "next/server"
+import { getPostBySlug } from "@/lib/api"
 
 export async function GET(
   request: Request,

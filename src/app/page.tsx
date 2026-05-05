@@ -3,7 +3,7 @@ import Projects from "./_components/projects"
 
 export default function Home() {
   return (
-    <div className="flex flex-col justify-center items-start mt-4">
+    <div className="mt-4 flex flex-col items-start justify-center">
       <Image
         className="rounded-full"
         priority
@@ -12,10 +12,10 @@ export default function Home() {
         width={144}
         alt="Artem Novichkov"
       />
-      <p className="font-bold text-3xl tracking-tight mt-4 mb-2 text-zinc-800 dark:text-gray-100">
+      <p className="mt-4 mb-2 font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
         Hey, I&apos;m Artem Novichkov
       </p>
-      <div className="flex flex-col gap-2 mb-8 text-zinc-800 dark:text-gray-100">
+      <div className="mb-8 flex flex-col gap-2 text-zinc-800 dark:text-gray-100">
         <p>
           I&apos;m an iOS developer at Salmon Group Ltd, building the&nbsp;
           <a

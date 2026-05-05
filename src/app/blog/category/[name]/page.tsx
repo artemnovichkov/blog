@@ -12,7 +12,7 @@ export default async function CategoryPage(props: Params) {
 
   return (
     <main>
-      <p className="flex items-center font-bold text-3xl tracking-tight my-4 text-zinc-800 dark:text-gray-100">
+      <p className="my-4 flex items-center font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
         Category: {categoryTitleMap[name] || name}
       </p>
       <section>
@@ -49,7 +49,9 @@ export async function generateStaticParams() {
 
   posts.forEach((post) => {
     if (post.categories) {
-      post.categories.forEach((category) => categories.add(category))
+      for (const category of post.categories) {
+        categories.add(category)
+      }
     }
   })
 

@@ -7,12 +7,12 @@ import ViewCounter from "./view-counter"
 
 export default function PostHeader({ post }: { post: Post }) {
   return (
-    <div className="flex flex-col w-full items-center text-center gap-4">
-      <p className="flex items-center font-bold text-3xl tracking-tight text-zinc-800 dark:text-gray-100">
+    <div className="flex w-full flex-col items-center gap-4 text-center">
+      <p className="flex items-center font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
         {post.title}
       </p>
-      <div className="flex flex-col w-full text-sm text-gray-500 dark:text-gray-400 items-center">
-        <span className="flex flex-row gap-2 items-center justify-center whitespace-nowrap">
+      <div className="flex w-full flex-col items-center text-gray-500 text-sm dark:text-gray-400">
+        <span className="flex flex-row items-center justify-center gap-2 whitespace-nowrap">
           <PostDate dateString={post.date} />
           <span>•</span>
           <span>{readingTime(post.content).text}</span>
@@ -29,7 +29,7 @@ export default function PostHeader({ post }: { post: Post }) {
         height={740}
       />
       {post.categories && (
-        <div className="w-full flex justify-start">
+        <div className="flex w-full justify-start">
           <CategoryList categories={post.categories} />
         </div>
       )}

@@ -1,6 +1,6 @@
-import { readFileSync } from "fs"
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
 import type { Metadata } from "next"
-import { join } from "path"
 import { about, name } from "@/lib/const"
 import markdownToHtml from "@/lib/markdownToHtml"
 
@@ -34,12 +34,12 @@ export default async function NotFound() {
   const highlightedContent = await markdownToHtml(mdxContent)
 
   return (
-    <div className="flex flex-col justify-center items-start mt-8">
-      <h1 className="font-bold text-4xl tracking-tight mb-4 text-zinc-800 dark:text-gray-100">
+    <div className="mt-8 flex flex-col items-start justify-center">
+      <h1 className="mb-4 font-bold text-4xl text-zinc-800 tracking-tight dark:text-gray-100">
         404 - Page Not Found
       </h1>
 
-      <div className="prose dark:prose-dark w-full max-w-none mb-8">
+      <div className="prose dark:prose-dark mb-8 w-full max-w-none">
         {highlightedContent}
       </div>
     </div>

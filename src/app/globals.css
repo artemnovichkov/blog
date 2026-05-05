@@ -9,10 +9,10 @@
   --color-accent: #007aff;
   
   /* Typography colors for light mode */
-  --color-prose: theme(colors.black);
-  --color-prose-headings: theme(colors.black);
-  --color-prose-links: theme(colors.black);
-  --color-prose-bold: theme(colors.black);
+  --color-prose: #000000;
+  --color-prose-headings: #000000;
+  --color-prose-links: #000000;
+  --color-prose-bold: #000000;
 }
 
 @font-face {
@@ -97,14 +97,14 @@ a.underline:hover,
   width: 2.25rem;
   height: 0.75rem;
   border-radius: 999px;
-  background-color: theme(colors.gray.300);
+  background-color: #d1d5db;
   vertical-align: -0.0625rem;
   animation: view-counter-skeleton 1.2s ease-in-out infinite;
 }
 
 .dark {
   .view-counter-skeleton {
-    background-color: theme(colors.gray.700);
+    background-color: #374151;
   }
 }
 
@@ -176,12 +176,12 @@ code[data-line-numbers] > [data-line]::before {
   width: 1rem;
   margin-right: 0.5rem;
   text-align: right;
-  color: theme(colors.gray.400);
+  color: #9ca3af;
 }
 
 .dark {
   code[data-line-numbers] > [data-line]::before {
-    color: theme(colors.gray.600);
+    color: #4b5563;
   }
 }
 
@@ -217,17 +217,17 @@ code[data-line-numbers] > [data-line]::before {
     --tw-prose-headings: white;
     --tw-prose-links: white;
     --tw-prose-bold: white;
-    --tw-prose-counters: theme(colors.gray.400);
-    --tw-prose-bullets: theme(colors.gray.600);
-    --tw-prose-hr: theme(colors.gray.700);
-    --tw-prose-quotes: theme(colors.white);
-    --tw-prose-quote-borders: theme(colors.gray.600);
-    --tw-prose-captions: theme(colors.gray.400);
-    --tw-prose-code: theme(colors.white);
-    --tw-prose-pre-code: theme(colors.gray.200);
-    --tw-prose-pre-bg: theme(colors.gray.900);
-    --tw-prose-th-borders: theme(colors.gray.600);
-    --tw-prose-td-borders: theme(colors.gray.700);
+    --tw-prose-counters: #9ca3af;
+    --tw-prose-bullets: #4b5563;
+    --tw-prose-hr: #374151;
+    --tw-prose-quotes: #ffffff;
+    --tw-prose-quote-borders: #4b5563;
+    --tw-prose-captions: #9ca3af;
+    --tw-prose-code: #ffffff;
+    --tw-prose-pre-code: #e5e7eb;
+    --tw-prose-pre-bg: #111827;
+    --tw-prose-th-borders: #4b5563;
+    --tw-prose-td-borders: #374151;
   }
   
   /* Global text colors for dark mode */
@@ -257,8 +257,8 @@ code[data-line-numbers] > [data-line]::before {
 
   [data-rehype-pretty-code-title] {
     @apply pl-4 py-2 text-sm font-medium rounded-t border-b border-slate-400;
-    color: theme(colors.slate.700) !important;
-    background-color: theme(colors.slate.200) !important;
+    color: #334155 !important;
+    background-color: #e2e8f0 !important;
   }
 
   [data-highlighted-line] {
@@ -285,8 +285,8 @@ code[data-line-numbers] > [data-line]::before {
     }
 
     [data-rehype-pretty-code-title] {
-      color: theme(colors.slate.300) !important;
-      background-color: theme(colors.gray.700) !important;
+      color: #cbd5e1 !important;
+      background-color: #374151 !important;
       @apply border-b border-gray-600;
     }
 

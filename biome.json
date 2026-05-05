@@ -42,7 +42,7 @@
     }
   },
   "files": {
-    "includes": ["src/**/*", "*.ts", "*.js", "*.json"],
+    "includes": ["src/**/*.{ts,tsx,js,jsx,json}", "*.{ts,js,json}"],
     "ignoreUnknown": false
   },
   "vcs": {
