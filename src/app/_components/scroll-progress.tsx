@@ -72,10 +72,7 @@ export default function ScrollProgress() {
       aria-hidden="true"
       className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden bg-transparent"
     >
-      <div
-        ref={progressRef}
-        className="h-full w-0 bg-zinc-900 dark:bg-gray-100"
-      />
+      <div ref={progressRef} className="h-full w-0 bg-accent" />
     </div>
   )
 }

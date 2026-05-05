@@ -14,19 +14,19 @@ export default function Header() {
         <div className="flex w-full min-w-0 flex-1 items-center sm:w-auto">
           <Link
             href="/"
-            className="shrink-0 px-2 py-2 text-gray-900 hover:text-gray-600 sm:px-3 dark:text-gray-100"
+            className="shrink-0 px-2 py-2 text-gray-900 transition-colors hover:text-accent sm:px-3 dark:text-gray-100 dark:hover:text-accent"
           >
             Home
           </Link>
           <Link
             href="/blog"
-            className="shrink-0 px-2 py-2 text-gray-900 hover:text-gray-600 sm:px-3 dark:text-gray-100"
+            className="shrink-0 px-2 py-2 text-gray-900 transition-colors hover:text-accent sm:px-3 dark:text-gray-100 dark:hover:text-accent"
           >
             Blog
           </Link>
           <Link
             href="/sponsorship"
-            className="min-w-0 px-2 py-2 text-gray-900 hover:text-gray-600 sm:px-3 dark:text-gray-100"
+            className="min-w-0 px-2 py-2 text-gray-900 transition-colors hover:text-accent sm:px-3 dark:text-gray-100 dark:hover:text-accent"
           >
             Sponsorship
           </Link>

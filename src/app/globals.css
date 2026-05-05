@@ -6,6 +6,7 @@
   --font-family-sans:
     "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --color-accent: #007aff;
   
   /* Typography colors for light mode */
   --color-prose: theme(colors.black);
@@ -48,6 +49,28 @@
 .ad-block h3 {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+a {
+  text-underline-offset: 0.28em;
+}
+
+a.underline,
+.prose :where(a):not(:where(.not-prose *)) {
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 0.08em;
+  transition:
+    color 150ms ease-out,
+    text-decoration-color 150ms ease-out;
+}
+
+a.underline:hover,
+.prose :where(a):not(:where(.not-prose *)):hover {
+  color: var(--color-accent);
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 
 .ad-block a {

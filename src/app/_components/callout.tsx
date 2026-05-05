@@ -10,7 +10,7 @@ const Callout = ({ type = "info", emoji, children }: CalloutProps) => {
   const baseStyles = "callout p-4 rounded-md flex flex-col gap-2"
 
   const typeStyles: Record<string, string> = {
-    info: "bg-blue-100 border-blue-200 dark:bg-blue-900/30 dark:border-blue-200/30 border",
+    info: "border border-accent/25 bg-accent/10 dark:border-accent/35 dark:bg-accent/15",
     warning:
       "bg-yellow-50 border-yellow-100 dark:bg-yellow-700/30 dark:border-yellow-200/30 border",
     error:

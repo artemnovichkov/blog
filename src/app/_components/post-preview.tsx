@@ -24,7 +24,7 @@ export default function PostPreview({ post }: { post: Post }) {
             style={{ width: "100%", height: "auto" }}
           />
         </div>
-        <h4 className="mt-0 font-medium text-xl text-zinc-800 dark:text-gray-100">
+        <h4 className="mt-0 font-medium text-xl text-zinc-800 transition-colors group-hover:text-accent dark:text-gray-100 dark:group-hover:text-accent">
           {post.title}
         </h4>
         <h4 className="font-normal text-base text-zinc-500 dark:text-gray-400">

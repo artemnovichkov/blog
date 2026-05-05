@@ -1,4 +1,5 @@
 export const iconButtonClassName =
-  "p-3 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+  "group rounded-full p-3 transition-colors hover:bg-accent/10 dark:hover:bg-accent/20"
 
-export const iconButtonIconClassName = "w-5 h-5 text-gray-900 dark:text-white"
+export const iconButtonIconClassName =
+  "h-5 w-5 text-gray-900 transition-colors group-hover:text-accent dark:text-white dark:group-hover:text-accent"
