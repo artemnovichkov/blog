@@ -5,7 +5,12 @@ import PostActions from "@/app/_components/post-actions"
 import PostHeader from "@/app/_components/post-header"
 import PostTableOfContents from "@/app/_components/post-table-of-contents"
 import ReadNext from "@/app/_components/read-next"
-import { getAllPosts, getPostBySlug, getPreviousPost } from "@/lib/api"
+import {
+  getAllPosts,
+  getNextPost,
+  getPostBySlug,
+  getPreviousPost,
+} from "@/lib/api"
 import { name } from "@/lib/const"
 import markdownToHtml from "@/lib/markdownToHtml"
 import { sponsorshipConfig } from "@/lib/sponsorship-config"
@@ -16,6 +21,11 @@ export default async function BlogPost(props: Params) {
   if (!post) notFound()
   const content = await markdownToHtml(post.content || "")
   const previousPost = getPreviousPost(params.slug)
+  const nextPost = getNextPost(params.slug)
+  const readNextPosts: Parameters<typeof ReadNext>[0]["posts"] = []
+  if (previousPost)
+    readNextPosts.push({ relation: "previous", post: previousPost })
+  if (nextPost) readNextPosts.push({ relation: "next", post: nextPost })
 
   return (
     <main>
@@ -43,7 +53,7 @@ export default async function BlogPost(props: Params) {
       </article>
       <div className="mx-auto w-full max-w-2xl">
         <PostActions post={post} />
-        {previousPost && <ReadNext post={previousPost} />}
+        {readNextPosts.length > 0 && <ReadNext posts={readNextPosts} />}
       </div>
     </main>
   )

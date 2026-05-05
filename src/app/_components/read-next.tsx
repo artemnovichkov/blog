@@ -1,41 +1,61 @@
 import Image from "next/image"
 import Link from "next/link"
+import { FiArrowLeft, FiArrowRight } from "react-icons/fi"
 import type { Post } from "@/interfaces/post"
 import PostDate from "./post-date"
 
-export default function ReadNext({ post }: { post: Post }) {
+type ReadNextPost = {
+  relation: "previous" | "next"
+  post: Post
+}
+
+export default function ReadNext({ posts }: { posts: ReadNextPost[] }) {
   return (
-    <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
-      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-        Read Next
-      </h3>
-      <Link
-        href={`/blog/${encodeURIComponent(post.slug)}`}
-        className="flex flex-col sm:flex-row gap-4 no-underline"
-      >
-        <div className="flex-shrink-0 sm:w-48">
-          <Image
-            className="rounded w-full h-auto object-cover"
-            src={post.cover}
-            alt={`Cover image for ${post.title}`}
-            width={800}
-            height={400}
-            sizes="(max-width: 640px) 100vw, 192px"
-            style={{ width: "100%", height: "auto" }}
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-2">
-            {post.title}
-          </h4>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-            {post.description}
-          </p>
-          <div className="text-xs text-gray-500 dark:text-gray-500">
-            <PostDate dateString={post.date} />
-          </div>
-        </div>
-      </Link>
+    <div className="mt-8 border-gray-200 border-t pt-8 dark:border-gray-800">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {posts.map(({ relation, post }) => {
+          const isNext = relation === "next"
+          const Icon = isNext ? FiArrowRight : FiArrowLeft
+
+          return (
+            <Link
+              key={post.slug}
+              href={`/blog/${encodeURIComponent(post.slug)}`}
+              className="flex flex-col gap-3 no-underline"
+            >
+              <div
+                className={
+                  isNext
+                    ? "flex justify-end text-gray-500 dark:text-gray-500"
+                    : "flex justify-start text-gray-500 dark:text-gray-500"
+                }
+              >
+                <Icon className="h-5 w-5" />
+              </div>
+              <Image
+                className="h-auto w-full rounded object-cover"
+                src={post.cover}
+                alt={`Cover image for ${post.title}`}
+                width={800}
+                height={400}
+                sizes="(max-width: 640px) 100vw, 320px"
+                style={{ width: "100%", height: "auto" }}
+              />
+              <div className="min-w-0">
+                <h4 className="mb-2 font-medium text-base text-gray-900 dark:text-gray-100">
+                  {post.title}
+                </h4>
+                <p className="mb-2 text-gray-600 text-sm dark:text-gray-400">
+                  {post.description}
+                </p>
+                <div className="text-gray-500 text-xs dark:text-gray-500">
+                  <PostDate dateString={post.date} />
+                </div>
+              </div>
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }
