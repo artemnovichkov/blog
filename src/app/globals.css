@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-family-sans:
@@ -63,7 +64,7 @@ code[data-theme*=" "] span {
   color: var(--shiki-light);
 }
 
-@media (prefers-color-scheme: dark) {
+.dark {
   code[data-theme*=" "],
   code[data-theme*=" "] span {
     color: var(--shiki-dark);
@@ -85,7 +86,7 @@ code[data-line-numbers] > [data-line]::before {
   color: theme(colors.gray.400);
 }
 
-@media (prefers-color-scheme: dark) {
+.dark {
   code[data-line-numbers] > [data-line]::before {
     color: theme(colors.gray.600);
   }
@@ -113,7 +114,7 @@ code[data-line-numbers] > [data-line]::before {
 }
 
 /* Dark mode typography colors */
-@media (prefers-color-scheme: dark) {
+.dark {
   .prose {
     --tw-prose-body: white;
     --tw-prose-headings: white;
@@ -171,7 +172,7 @@ code[data-line-numbers] > [data-line]::before {
     @apply bg-slate-300 rounded;
   }
 
-  @media (prefers-color-scheme: dark) {
+  .dark {
     .sticky-nav {
       @apply bg-gray-900 border-gray-800;
     }

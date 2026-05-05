@@ -1,6 +1,10 @@
 import type { IconType } from "react-icons"
 import { FaGithub, FaLinkedin } from "react-icons/fa"
 import { FaXTwitter } from "react-icons/fa6"
+import {
+  iconButtonClassName,
+  iconButtonIconClassName,
+} from "./icon-button-styles"
 
 const socialLinks = [
   {
@@ -35,9 +39,9 @@ function SocialButton({
       target="_blank"
       href={href}
       aria-label={label}
-      className="p-3 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+      className={iconButtonClassName}
     >
-      <Icon className="w-5 h-5 text-gray-900 dark:text-white" />
+      <Icon className={iconButtonIconClassName} />
     </a>
   )
 }
@@ -45,8 +49,8 @@ function SocialButton({
 export default function Footer() {
   return (
     <footer>
-      <div className="text-center py-8">
-        <div className="flex flex-row gap-16 place-content-center">
+      <div className="py-8 text-center">
+        <div className="flex flex-row place-content-center gap-16">
           {socialLinks.map((item) => (
             <SocialButton key={item.href} {...item} />
           ))}
