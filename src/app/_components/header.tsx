@@ -1,4 +1,5 @@
 import Link from "next/link"
+import ScrollProgress from "./scroll-progress"
 
 export default function Header() {
   return (
@@ -29,6 +30,7 @@ export default function Header() {
           RSS
         </Link>
       </nav>
+      <ScrollProgress />
     </header>
   )
 }
