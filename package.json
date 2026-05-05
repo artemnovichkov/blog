@@ -35,15 +35,15 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.2",
-    "@tailwindcss/postcss": "^4.1.13",
-    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/postcss": "^4.2.4",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/rss": "^0.0.32",
-    "postcss": "^8",
+    "postcss": "^8.5.14",
     "rss": "^1.2.2",
-    "tailwindcss": "^4.0.6",
+    "tailwindcss": "^4.2.4",
     "typescript": "^5"
   }
 }
