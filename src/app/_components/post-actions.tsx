@@ -11,7 +11,7 @@ const editUrl = (slug: string): string =>
 
 export default function PostActions({ post }: { post: Post }) {
   return (
-    <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+    <div className="mt-4 text-gray-500 text-sm dark:text-gray-400">
       <a
         href={twitterShareUrl(post)}
         target="_blank"

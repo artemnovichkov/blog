@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const accept = request.headers.get("accept") ?? ""
   if (accept.includes("text/markdown")) {
     const slug = request.nextUrl.pathname.split("/").pop()

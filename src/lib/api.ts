@@ -1,6 +1,6 @@
-import fs from "fs"
+import fs from "node:fs"
+import { join } from "node:path"
 import matter from "gray-matter"
-import { join } from "path"
 import type { Post } from "@/interfaces/post"
 
 const postsDirectory = join(process.cwd(), "content/posts")
@@ -49,13 +49,26 @@ export function getPreviousPost(currentSlug: string): Post | null {
   return posts[currentIndex + 1]
 }
 
+export function getNextPost(currentSlug: string): Post | null {
+  const posts = getAllPosts()
+  const currentIndex = posts.findIndex((post) => post.slug === currentSlug)
+
+  if (currentIndex <= 0) {
+    return null
+  }
+
+  return posts[currentIndex - 1]
+}
+
 export function getAllCategories(): string[] {
   const posts = getAllPosts()
   const categoriesSet = new Set<string>()
 
   posts.forEach((post) => {
     if (post.categories) {
-      post.categories.forEach((category) => categoriesSet.add(category))
+      post.categories.forEach((category) => {
+        categoriesSet.add(category)
+      })
     }
   })
 

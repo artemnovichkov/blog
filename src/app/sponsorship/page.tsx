@@ -1,6 +1,6 @@
-import { readFileSync } from "fs"
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
 import type { Metadata } from "next"
-import { join } from "path"
 import { about, name } from "@/lib/const"
 import markdownToHtml from "@/lib/markdownToHtml"
 
@@ -34,7 +34,7 @@ export default async function SponsorshipPage() {
   return (
     <main>
       <article>
-        <div className="max-w-2xl mx-auto w-full mt-4">
+        <div className="mx-auto mt-4 w-full max-w-2xl">
           <div className="prose dark:prose-dark w-full max-w-none">
             {content}
           </div>

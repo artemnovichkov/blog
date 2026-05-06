@@ -8,7 +8,7 @@ export default function CategoryList({ categories }: { categories: string[] }) {
         <Link
           key={category}
           href={`/blog/category/${encodeURIComponent(category)}`}
-          className="text-sm px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+          className="rounded-full border border-accent/20 bg-zinc-200/70 px-3 py-1 text-sm text-zinc-700 transition-colors hover:bg-accent/10 hover:text-accent dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-accent/20 dark:hover:text-accent"
         >
           {categoryTitleMap[category] || category}
         </Link>

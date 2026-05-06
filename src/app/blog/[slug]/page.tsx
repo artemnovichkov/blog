@@ -3,8 +3,14 @@ import { notFound } from "next/navigation"
 import AdBlock from "@/app/_components/ad-block"
 import PostActions from "@/app/_components/post-actions"
 import PostHeader from "@/app/_components/post-header"
+import PostTableOfContents from "@/app/_components/post-table-of-contents"
 import ReadNext from "@/app/_components/read-next"
-import { getAllPosts, getPostBySlug, getPreviousPost } from "@/lib/api"
+import {
+  getAllPosts,
+  getNextPost,
+  getPostBySlug,
+  getPreviousPost,
+} from "@/lib/api"
 import { name } from "@/lib/const"
 import markdownToHtml from "@/lib/markdownToHtml"
 import { sponsorshipConfig } from "@/lib/sponsorship-config"
@@ -15,11 +21,16 @@ export default async function BlogPost(props: Params) {
   if (!post) notFound()
   const content = await markdownToHtml(post.content || "")
   const previousPost = getPreviousPost(params.slug)
+  const nextPost = getNextPost(params.slug)
+  const readNextPosts: Parameters<typeof ReadNext>[0]["posts"] = []
+  if (previousPost)
+    readNextPosts.push({ relation: "previous", post: previousPost })
+  if (nextPost) readNextPosts.push({ relation: "next", post: nextPost })
 
   return (
     <main>
       <article>
-        <div className="max-w-2xl mx-auto w-full">
+        <div className="mx-auto w-full max-w-2xl">
           <div className="mt-4">
             <PostHeader post={post} />
           </div>
@@ -29,14 +40,20 @@ export default async function BlogPost(props: Params) {
             url={sponsorshipConfig.url}
             isVisible={sponsorshipConfig.isVisible}
           />
-          <div className="prose dark:prose-dark w-full max-w-none">
+        </div>
+        <div className="-translate-x-1/2 relative left-1/2 w-screen px-4 sm:px-0">
+          <PostTableOfContents className="absolute top-0 bottom-0 left-[max(1rem,calc(50%-36.5rem))] w-52" />
+          <div
+            className="prose dark:prose-dark mx-auto w-full max-w-2xl"
+            data-post-content
+          >
             {content}
           </div>
         </div>
       </article>
-      <div className="max-w-2xl mx-auto w-full">
+      <div className="mx-auto w-full max-w-2xl">
         <PostActions post={post} />
-        {previousPost && <ReadNext post={previousPost} />}
+        {readNextPosts.length > 0 && <ReadNext posts={readNextPosts} />}
       </div>
     </main>
   )
