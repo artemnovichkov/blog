@@ -87,8 +87,6 @@ a.underline:hover,
 
 .view-counter-value {
   display: inline-block;
-  min-width: 2.25rem;
-  text-align: right;
   animation: view-counter-appearance 280ms ease-out both;
 }
 
