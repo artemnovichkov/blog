@@ -1,0 +1,261 @@
+---
+title: Task Names in Swift Concurrency
+description: Name Swift tasks for clearer debugging and profiling
+cover: /images/task-names-in-swift-concurrency/cover.png
+date: '2026-05-30'
+categories: swift-concurrency
+author:
+  - artem-novichkov
+---
+
+When a crash happens deep inside concurrent code, the first question is always: *which task did this?* Pthreads had names, Grand Central Dispatch had queue labels — they show up in stack traces, in Instruments lanes, in debugger output. Swift Concurrency had none of that until [SE-0469](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0469-task-names.md), implemented in Swift 6.2.
+
+## Naming tasks
+
+The name parameter is optional on most explicit task creation APIs, so adoption is purely additive. The examples below all build on the same scenario: loading a user's data.
+
+Let's start with unstructured tasks:
+
+```swift
+Task(name: "Load profile \(userID)") {
+    await loadProfile(id: userID)
+}
+```
+
+Detached tasks inherit no actor context, so they suit background work like prefetching:
+
+```swift
+Task.detached(name: "Prefetch profile \(userID)") {
+    await loadProfile(id: userID)
+}
+```
+
+Task groups let you name each concurrent piece of work independently:
+
+```swift
+Task(name: "Load user \(userID)") {
+    await withTaskGroup(of: Void.self) { group in
+        group.addTask(name: "Load profile \(userID)") {
+            await loadProfile(id: userID)
+        }
+        group.addTask(name: "Load posts \(userID)") {
+            await loadPosts(id: userID)
+        }
+        await group.waitForAll()
+    }
+}
+```
+
+The same `name` parameter is also available on `addTaskUnlessCancelled`, and on all throwing and discarding task group variants.
+
+A few rules: names are set at creation only — there is no setter — and the parameter is optional everywhere, so unnamed tasks remain the default.
+
+## SwiftUI task modifier
+
+The `.task` view modifier also accepts a `name` parameter:
+
+```swift
+struct ContentView: View {
+    let userID: Int
+
+    var body: some View {
+        UserProfileView()
+            .task(name: "Load profile \(userID)") {
+                await loadProfile(id: userID)
+            }
+    }
+}
+```
+
+The `id` variant cancels and restarts the task whenever `userID` changes, keeping the name in sync:
+
+```swift
+.task(id: userID, name: "Load profile \(userID)") {
+    await loadProfile(id: userID)
+}
+```
+
+If you leave `name` as `nil` on a supported operating system, SwiftUI generates a default name from the call site using `file` and `line`, for example:
+
+> View.task @ TaskExample/ContentView.swift:6
+
+This is useful when you want every view task to be identifiable without hand-writing a label for each one.
+
+The SwiftUI overloads keep the existing `.task` behaviour on older operating systems, but the `name`, `file`, and `line` arguments are ignored before Apple platforms 26.4. The task still starts, cancels, and restarts as usual; it just does not receive your custom or generated name.
+
+Once a task has a name, you can read that name from inside the task body.
+
+## Reading the name at runtime
+
+A static property gives you the current task's name from inside the task body:
+
+```swift
+Task(name: "Load profile \(userID)") {
+    print(Task.name ?? "unnamed") // "Load profile 42"
+    await loadProfile(id: userID)
+}
+```
+
+Inside a task group the same property resolves to each child's own name:
+
+```swift
+group.addTask(name: "Load profile \(userID)") {
+    print(Task.name ?? "unnamed") // "Load profile 42"
+    await loadProfile(id: userID)
+}
+```
+
+<Callout type="warning" emoji="⚠️">
+  At the time of writing, Swift 6.4 is not yet bundled with Xcode. To try the Swift 6.4 instance APIs today, download a development snapshot from [swift.org/install](https://www.swift.org/install) and select it as the active toolchain in Xcode settings.
+</Callout>
+
+Starting in Swift 6.4, the instance property lets you read the name off a task reference after creation:
+
+```swift
+let task = Task(name: "Load profile \(userID)") {
+    await loadProfile(id: userID)
+}
+print(task.name ?? "unnamed") // "Load profile 42"
+```
+
+`UnsafeCurrentTask` gains the same instance property under the same unsafe lifetime rules as its other properties:
+
+```swift
+withUnsafeCurrentTask { task in
+    print(task?.name ?? "unnamed")
+}
+```
+
+Custom `TaskExecutor` implementations can use `job.unsafeCurrentTask?.name` to log which named task they are about to run — useful when you want executor-level tracing without adding instrumentation inside every closure.
+
+## Debugging with LLDB
+
+When paused at a breakpoint inside an async function, `language swift task info` prints information about the current task. Start with a simple named task:
+
+```swift
+Task(name: "Load profile \(userID)") {
+    await loadProfile(id: userID) // set breakpoint here
+}
+```
+
+```
+(lldb) language swift task info
+(UnsafeCurrentTask) current_task = "Load profile 42" id:5 flags:running {
+  address = 0x104049a40
+  id = 5
+  enqueuePriority = .high
+  parent = nil
+  children = {}
+}
+```
+
+The name appears right after `current_task =`. With a task group, `language swift task info` has a limitation — it only traverses the parent task's runtime children linked list, and task group children are linked there one at a time. In current LLDB output, you may only see one group child, even if several are running concurrently.
+
+To see all named children at once, use Xcode's Variables View panel instead. Set a breakpoint on `await group.waitForAll()` — in this example, the child tasks are long-running enough to inspect while the parent is waiting. Expand the `group` variable in the bottom panel:
+
+![Xcode Variables View panel showing all three named task group children](/images/task-names-in-swift-concurrency/lldb-xcode-panel.png)
+
+You can also hover over the `group` variable in the code and click the eye icon to get a Quick Look popup with the same data:
+
+![Quick Look popup for the group variable showing named task group children](/images/task-names-in-swift-concurrency/lldb-variables.png)
+
+Cancellation is also reflected in the flags. Set a breakpoint inside a child's cancellation catch block to catch the moment after `task.cancel()` propagates:
+
+```swift
+let task = Task(name: "Load user \(userID)") {
+    try await withThrowingTaskGroup(of: Void.self) { group in
+        group.addTask(name: "Load profile \(userID)") {
+            do {
+                try Task.checkCancellation()
+                await loadProfile(id: userID)
+            } catch is CancellationError {
+                print("\(Task.name!) cancelled") // set breakpoint here
+            }
+        }
+        group.addTask(name: "Load posts \(userID)") {
+            await loadPosts(id: userID)
+        }
+        try await group.waitForAll()
+    }
+}
+
+task.cancel()
+```
+
+When the breakpoint hits inside `"Load profile 42"`, `language swift task info` shows the child's own cancelled state:
+
+```
+(UnsafeCurrentTask) current_task = "Load profile 42" id:2 flags:running|cancelled|groupChildTask {
+  address = 0x106248c80
+  id = 2
+  enqueuePriority = .high
+  parent = 0x10624b700 {}
+  children = {}
+}
+```
+
+## The async let limitation
+
+`async let` tasks cannot be named — there is no place in the syntax to attach a string. The limitation is visible in the debugger. Take this variant of the loading example:
+
+```swift
+let task = Task(name: "Load user \(userID)") {
+    async let profile = loadProfile(id: userID)
+    async let posts = loadPosts(id: userID)
+    _ = await (profile, posts) // set breakpoint here
+}
+```
+
+Pausing inside the parent body and running `language swift task info` shows the children without names:
+
+```
+(UnsafeCurrentTask) current_task = "Load user 42" id:1 flags:running {
+  address = 0x106438dc0
+  id = 1
+  enqueuePriority = .high
+  parent = nil
+  children = {
+    0 = id:3 flags:suspended|enqueued|asyncLetTask {
+      address = 0x1064f8a10
+      id = 3
+      enqueuePriority = .high
+      parent = 0x106438dc0 {}
+      children = {}
+    }
+    1 = id:2 flags:suspended|enqueued|asyncLetTask {
+      address = 0x1064f8790
+      id = 2
+      enqueuePriority = .high
+      parent = 0x106438dc0 {}
+      children = {}
+    }
+  }
+}
+```
+
+The parent has its name, but the children show only address and id. The `asyncLetTask` flag confirms how they were created. If you need named children, use a task group instead.
+
+## Profiling named tasks in Instruments
+
+The Swift Concurrency template in Xcode Instruments displays named tasks as separate rows in the timeline. In this trace, the parent `"Load user 42"` task is selected, while child tasks such as `"Load profile 42"`, `"Load posts 42"`, and `"Load followers 42"` appear above it with their own state bars. The detail panes show when the selected task was running or suspended, and the creation backtrace points back to the `Task(name:priority:operation:)` call that created it.
+
+![Instruments Swift Concurrency template showing named task lanes](/images/task-names-in-swift-concurrency/instruments.png)
+
+## Availability
+
+Task naming is split between Swift language support and framework or runtime support. The core task creation APIs and `Task.name` are available with Swift 6.2, but SwiftUI task names depend on the operating system because the modifier is implemented by SwiftUI.
+
+| API | Minimum |
+|-----|---------|
+| `Task(name:)`, `Task.detached(name:)`, `addTask(name:)`, `addTaskUnlessCancelled(name:)` | Swift 6.2 |
+| `Task.name` (static, reads current task) | Swift 6.2 |
+| `.task(name:)`, `.task(id:name:)` (SwiftUI) | Apple platforms 26.4 for task names; older `.task` behaviour is unchanged |
+| `task.name` (instance), `UnsafeCurrentTask.name` | Swift 6.4 |
+
+The static `Task.name` property landed with the main proposal, so it is the portable way to read the current task's name from inside task code. The instance `task.name` property was added later as an amendment after the original proposal accidentally omitted it, so it requires Swift 6.4.
+
+## Naming guidance
+
+Treat task names as diagnostics, not program state. They should help you identify work in a debugger, profiler, or log, but your app logic should still use explicit values or task-local state.
+
+Keep names short and action-oriented. `"Load profile"` is often enough, and `"Load profile \(userID)"` is useful when several similar tasks can run at once. Avoid putting secrets, access tokens, email addresses, full URLs, or other sensitive values in task names because they can appear in debugger output and profiling traces.

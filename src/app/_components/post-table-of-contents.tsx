@@ -116,7 +116,7 @@ export default function PostTableOfContents({
                   }}
                   className={`block border-l-2 py-1 pl-3 text-sm transition-colors duration-150 ease-out ${
                     isActive
-                      ? "-ml-px border-accent font-medium text-accent"
+                      ? "-ml-px border-accent text-accent"
                       : "-ml-px border-transparent text-zinc-500 hover:text-accent dark:text-gray-400 dark:hover:text-accent"
                   }`}
                 >
