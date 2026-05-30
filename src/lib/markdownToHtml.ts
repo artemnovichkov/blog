@@ -1,5 +1,5 @@
 import { compileMDX } from "next-mdx-remote/rsc"
-import { Tweet } from "react-tweet"
+import { SafeTweet } from "../app/_components/safe-tweet"
 import rehypePrettyCode from "rehype-pretty-code"
 import rehypeSlug from "rehype-slug"
 import remarkGfm from "remark-gfm"
@@ -28,7 +28,7 @@ export default async function markdownToHtml(markdown: string) {
       },
     },
     components: {
-      Tweet,
+      Tweet: SafeTweet,
       Callout,
       FileTree,
       AudioPlayer,

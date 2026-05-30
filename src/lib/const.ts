@@ -26,6 +26,7 @@ export const categoryTitleMap: Record<string, string> = {
   shazamkit: "ShazamKit",
   swift: "Swift",
   "swift-charts": "Swift Charts",
+  "swift-concurrency": "Swift Concurrency",
   "swift-package-manager": "Swift Package Manager",
   swiftui: "SwiftUI",
   texteditor: "TextEditor",
