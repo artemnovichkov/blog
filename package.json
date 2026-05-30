@@ -41,7 +41,6 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/rss": "^0.0.32",
-    "patch-package": "^8.0.1",
     "postcss": "^8.5.14",
     "rss": "^1.2.2",
     "tailwindcss": "^4.2.4",
