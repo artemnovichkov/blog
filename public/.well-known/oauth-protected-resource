@@ -1,0 +1,6 @@
+{
+  "resource": "https://artemnovichkov.com",
+  "authorization_servers": ["https://artemnovichkov.com"],
+  "scopes_supported": [],
+  "bearer_methods_supported": ["header"]
+}

@@ -1,0 +1,10 @@
+{
+  "issuer": "https://artemnovichkov.com",
+  "scopes_supported": [],
+  "agent_auth": {
+    "skill": "https://artemnovichkov.com/auth.md",
+    "register_uri": "https://artemnovichkov.com/auth.md",
+    "identity_types_supported": ["anonymous"],
+    "credential_types_supported": []
+  }
+}
