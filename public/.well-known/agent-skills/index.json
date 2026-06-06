@@ -1,4 +1,12 @@
 {
   "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
-  "skills": []
+  "skills": [
+    {
+      "name": "read-blog",
+      "type": "skill-md",
+      "description": "List and read blog posts from artemnovichkov.com. Covers iOS and Swift development topics.",
+      "url": "/.well-known/agent-skills/read-blog/SKILL.md",
+      "digest": "sha256:70f66cb61f4a67be709cfbaf3421a3a60b5528c71bec8e375bb57cfa839553db"
+    }
+  ]
 }
