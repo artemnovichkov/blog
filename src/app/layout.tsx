@@ -7,6 +7,7 @@ import Script from "next/script"
 import AppearanceAnimation from "./_components/appearance-animation"
 import Footer from "./_components/footer"
 import Header from "./_components/header"
+import WebMcpTools from "./_components/webmcp-tools"
 
 export const metadata: Metadata = {
   title: name,
@@ -67,6 +68,7 @@ export default function RootLayout({
           <AppearanceAnimation>{children}</AppearanceAnimation>
         </main>
         <Footer />
+        <WebMcpTools />
         <Analytics />
         <SpeedInsights />
       </body>
