@@ -4,7 +4,7 @@ const protectedResource = {
   resource: BASE,
   resource_name: "Artem Novichkov's Blog",
   authorization_servers: [BASE],
-  scopes_supported: [],
+  scopes_supported: ["read"],
   bearer_methods_supported: ["header"],
 }
 
