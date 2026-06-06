@@ -11,6 +11,7 @@ const nextConfig = {
               '</feed.xml>; rel="alternate"; type="application/rss+xml"; title="Artem Novichkov Blog"',
               '</sitemap.xml>; rel="sitemap"; type="application/xml"',
               '</.well-known/api-catalog>; rel="api-catalog"',
+              '</.well-known/oauth-protected-resource>; rel="oauth-protected-resource"',
             ].join(", "),
           },
         ],

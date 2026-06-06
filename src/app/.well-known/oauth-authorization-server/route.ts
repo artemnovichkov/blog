@@ -6,6 +6,10 @@ const authorizationServer = {
     skill: `${BASE}/auth.md`,
     register_uri: `${BASE}/auth.md`,
     identity_types_supported: ["anonymous"],
+    anonymous: {
+      credential_types_supported: [],
+      claim_uri: `${BASE}/auth.md`,
+    },
   },
 }
 
