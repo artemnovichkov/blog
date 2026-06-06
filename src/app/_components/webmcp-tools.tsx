@@ -2,32 +2,40 @@
 
 import { useEffect } from "react"
 
+type ModelContextTool = {
+  name: string
+  title?: string
+  description: string
+  inputSchema?: object
+  annotations?: { readOnlyHint?: boolean; openWorldHint?: boolean }
+  execute: (input: Record<string, unknown>) => Promise<unknown>
+}
+
+type ModelContext = {
+  registerTool: (
+    tool: ModelContextTool,
+    options?: { signal?: AbortSignal }
+  ) => void
+}
+
 declare global {
+  interface Navigator {
+    modelContext?: ModelContext
+  }
   interface Document {
-    modelContext?: {
-      registerTool: (
-        tool: {
-          name: string
-          title?: string
-          description: string
-          inputSchema?: object
-          annotations?: { readOnlyHint?: boolean; openWorldHint?: boolean }
-          execute: (input: Record<string, unknown>) => Promise<unknown>
-        },
-        options?: { signal?: AbortSignal }
-      ) => void
-    }
+    modelContext?: ModelContext
   }
 }
 
 export default function WebMcpTools() {
   useEffect(() => {
-    if (!document.modelContext) return
+    const mc = navigator.modelContext ?? document.modelContext
+    if (!mc) return
 
     const controller = new AbortController()
     const { signal } = controller
 
-    document.modelContext.registerTool(
+    mc.registerTool(
       {
         name: "list_posts",
         title: "List Blog Posts",
@@ -43,7 +51,7 @@ export default function WebMcpTools() {
       { signal }
     )
 
-    document.modelContext.registerTool(
+    mc.registerTool(
       {
         name: "get_post",
         title: "Get Blog Post",
@@ -67,7 +75,7 @@ export default function WebMcpTools() {
       { signal }
     )
 
-    document.modelContext.registerTool(
+    mc.registerTool(
       {
         name: "navigate",
         title: "Navigate",
