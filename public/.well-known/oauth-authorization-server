@@ -1,5 +1,6 @@
 {
   "issuer": "https://artemnovichkov.com",
+  "scopes_supported": ["read"],
   "agent_auth": {
     "skill": "https://artemnovichkov.com/auth.md",
     "register_uri": "https://artemnovichkov.com/auth.md",

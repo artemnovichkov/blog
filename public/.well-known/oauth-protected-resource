@@ -2,6 +2,6 @@
   "resource": "https://artemnovichkov.com",
   "resource_name": "Artem Novichkov's Blog",
   "authorization_servers": ["https://artemnovichkov.com"],
-  "scopes_supported": [],
+  "scopes_supported": ["read"],
   "bearer_methods_supported": ["header"]
 }
