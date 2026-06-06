@@ -5,10 +5,10 @@ const authorizationServer = {
   agent_auth: {
     skill: `${BASE}/auth.md`,
     register_uri: `${BASE}/auth.md`,
+    claim_uri: `${BASE}/auth.md`,
     identity_types_supported: ["anonymous"],
     anonymous: {
-      credential_types_supported: [],
-      claim_uri: `${BASE}/auth.md`,
+      credential_types_supported: ["urn:ietf:params:oauth:token-type:access_token"],
     },
   },
 }
