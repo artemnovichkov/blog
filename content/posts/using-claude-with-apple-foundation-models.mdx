@@ -8,7 +8,7 @@ author:
   - artem-novichkov
 ---
 
-At WWDC26 Apple extended the Foundation Models framework with support for server-side language models. The idea is simple: the same `LanguageModelSession` API that drives the on-device model can now drive any remote model that conforms to the `LanguageModel` protocol. Anthropic was quick to adopt it and released [ClaudeForFoundationModels](https://github.com/anthropics/ClaudeForFoundationModels) — a Swift package that makes Claude a drop-in model for your sessions. Streaming, guided generation with `@Generable`, and tool calling work exactly the same way.
+At WWDC26, Apple extended the Foundation Models framework with support for server-side language models. The idea is simple: the same `LanguageModelSession` API that drives the on-device model can now drive any remote model that conforms to the `LanguageModel` protocol. Anthropic was quick to adopt it and released [ClaudeForFoundationModels](https://github.com/anthropics/ClaudeForFoundationModels) — a Swift package that makes Claude a drop-in model for your sessions. Streaming, guided generation with `@Generable`, and tool calling work the same way.
 
 In this post, we'll build GiftGenie — a small app that generates gift ideas — and let the user switch between the on-device model and Claude with their own API key.
 
@@ -51,7 +51,7 @@ print(response.content)
 That's the whole integration. Everything else — instructions, transcripts, structured output — works like with `SystemLanguageModel`.
 
 <Callout>
-A key bundled into an app is extractable from the shipping binary. Use `.apiKey` for development or BYOK scenarios only. For production, the package provides `.proxied(headers:)` mode that routes requests through your own backend, and Anthropic promises App Attest-based authentication soon.
+A key bundled into an app is extractable from the shipping binary. Use `.apiKey` for development or BYOK scenarios only. For production, the package provides `.proxied(headers:)` mode that routes requests through your own backend, and Anthropic says App Attest-based authentication is coming soon.
 </Callout>
 
 ## Generating gift ideas
@@ -78,7 +78,7 @@ struct GiftIdeas: Equatable {
 }
 ```
 
-Under the hood the package uses [structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs), so the response is guaranteed to match the schema. If you pick a model without structured output support, the package throws `LanguageModelError.unsupportedGenerationGuide` instead of silently degrading.
+Under the hood, the package uses [structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs), so the response is constrained to the generated schema. If you pick a model without structured output support, the package throws `LanguageModelError.unsupportedGenerationGuide` instead of silently degrading.
 
 Where do the recipient details come from? The app's main screen is a form where the user describes who the gift is for. Its fields are collected into a plain struct:
 
@@ -121,7 +121,7 @@ struct GiftInstructions: DynamicInstructions {
 }
 ```
 
-Next, `DynamicProfile` orchestrates which profile is active. A profile associates instructions with session-level configuration via modifiers, and `.model()` accepts any `LanguageModel` — including `ClaudeLanguageModel`:
+Next, `DynamicProfile` selects which profile is active. A profile associates instructions with session-level configuration via modifiers, and `.model()` accepts any `LanguageModel` — including `ClaudeLanguageModel`:
 
 ```swift
 struct GiftProfile: LanguageModelSession.DynamicProfile {
@@ -148,7 +148,7 @@ struct GiftProfile: LanguageModelSession.DynamicProfile {
 }
 ```
 
-The result builder enforces at compile time that exactly one profile is active. Because `body` re-evaluates before each request, changing the model in Settings takes effect on the next request — even in a long-lived session. Profiles support more modifiers like `.temperature()`, `.reasoningLevel()`, and `.maximumResponseTokens()`, lifecycle hooks like `onToolCall` for approval gates, and `historyTransform` — a neat trick for multi-model apps: compress the history for the small on-device context window and send the full history to Claude.
+Profiles support more modifiers like `.temperature()`, `.reasoningLevel()`, and `.maximumResponseTokens()`, lifecycle hooks like `onToolCall` for approval gates, and `historyTransform` — a neat trick for multi-model apps: compress the history for the small on-device context window and send the full history to Claude.
 
 When should you escalate to Claude? Apple's on-device model is fast, private, and works offline, but it's sized for lightweight tasks and limited by a 4096-token context window — I covered measuring it in [Tracking token usage in Foundation Models](https://www.artemnovichkov.com/blog/tracking-token-usage-in-foundation-models). Claude brings larger context, frontier reasoning, and server-side tools. With dynamic profiles, switching is one branch in `GiftProfile`.
 
@@ -206,7 +206,7 @@ Let's check the result — every row is mapped from the `GiftIdea` schema:
 </p>
 
 <Callout>
-In my testing, streaming didn't work — neither on the Simulator nor on a device: the response arrives only as a final snapshot. I haven't found a solution yet; remember that both the OS betas and the package are in beta. I'll update the article once it's resolved.
+In my testing, streaming didn't work — neither on the Simulator nor on a device: the response arrived only as a final snapshot. I haven't found a solution yet; remember that both the OS betas and the package are in beta. I'll update the article once it's resolved.
 </Callout>
 
 ## Error handling
