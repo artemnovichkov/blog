@@ -5,6 +5,7 @@ export const title: string = `${name} – ${about}`
 export const categoryTitleMap: Record<string, string> = {
   ai: "AI",
   avkit: "AVKit",
+  claude: "Claude",
   combine: "Combine",
   concurrency: "Concurrency",
   "core-animation": "Core Animation",
