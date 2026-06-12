@@ -1,0 +1,256 @@
+---
+title: Using Claude with Apple Foundation Models
+description: Bringing frontier models to LanguageModelSession with model selection and BYOK
+cover: /images/using-claude-with-apple-foundation-models/cover.png
+date: '2026-06-12'
+categories: foundation-models, ai, llm, claude
+author:
+  - artem-novichkov
+---
+
+At WWDC26, Apple extended the Foundation Models framework with support for server-side language models. The idea is simple: the same `LanguageModelSession` API that drives the on-device model can now drive any remote model that conforms to the `LanguageModel` protocol. Anthropic was quick to adopt it and released [ClaudeForFoundationModels](https://github.com/anthropics/ClaudeForFoundationModels) — a Swift package that makes Claude a drop-in model for your sessions. Streaming, guided generation with `@Generable`, and tool calling work the same way.
+
+In this post, we'll build GiftGenie — a small app that generates gift ideas — and let the user switch between the on-device model and Claude with their own API key.
+
+## Requirements
+
+- Xcode 27 beta;
+- iOS 27 beta (macOS, visionOS, and watchOS 27 are supported as well);
+- A Claude API key from [Claude Console](https://platform.claude.com).
+
+Requests go directly from the app to the Claude API — Apple is not in the request path and doesn't see prompts or responses. Usage is billed to your Anthropic account at standard API pricing.
+
+## Adding the package
+
+Add the package via **File > Add Package Dependencies…** or directly in `Package.swift`:
+
+```swift
+dependencies: [
+  .package(url: "https://github.com/anthropics/ClaudeForFoundationModels.git", from: "0.1.0")
+]
+```
+
+## First request
+
+`ClaudeLanguageModel` is the entry point. Pass it to `LanguageModelSession` and use the session as usual:
+
+```swift
+import FoundationModels
+import ClaudeForFoundationModels
+
+let model = ClaudeLanguageModel(
+    name: .sonnet4_6,
+    auth: .apiKey("YOUR_API_KEY")
+)
+
+let session = LanguageModelSession(model: model)
+let response = try await session.respond(to: "Suggest a gift for a sci-fi fan.")
+print(response.content)
+```
+
+That's the whole integration. Everything else — instructions, transcripts, structured output — works like with `SystemLanguageModel`.
+
+<Callout>
+A key bundled into an app is extractable from the shipping binary. Use `.apiKey` for development or BYOK scenarios only. For production, the package provides `.proxied(headers:)` mode that routes requests through your own backend, and Anthropic says App Attest-based authentication is coming soon.
+</Callout>
+
+## Generating gift ideas
+
+GiftGenie collects a few details about the recipient and asks the model for structured suggestions. The `@Generable` macro works with Claude out of the box:
+
+```swift
+@Generable
+struct GiftIdea: Equatable {
+    @Guide(description: "Short, catchy gift name")
+    var name: String
+    @Guide(description: "Why this gift fits the recipient")
+    var reasoning: String
+    @Guide(description: "Estimated price range, e.g. $20–40")
+    var estimatedPrice: String
+    @Guide(description: "Category, e.g. Tech, Books, Experience")
+    var category: String
+}
+
+@Generable
+struct GiftIdeas: Equatable {
+    @Guide(description: "Gift ideas ordered by relevance", .count(5))
+    var ideas: [GiftIdea]
+}
+```
+
+Under the hood, the package uses [structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs), so the response is constrained to the generated schema. If you pick a model without structured output support, the package throws `LanguageModelError.unsupportedGenerationGuide` instead of silently degrading.
+
+Where do the recipient details come from? The app's main screen is a form where the user describes who the gift is for. Its fields are collected into a plain struct:
+
+```swift
+struct GiftRequest {
+    var relationship: String = ""
+    var age: Int = 30
+    var interests: String = ""
+    var occasion: String = ""
+    var budget: String = ""
+}
+```
+
+The form stays deliberately small — five fields are enough to build focused instructions without turning the UI into prompt engineering. Throughout this post I'm looking for a surprise gift for my wife who likes hiking and knitting, with a $50 budget:
+
+<p align="center">
+  <img src="/images/using-claude-with-apple-foundation-models/gift-form.jpg" alt="GiftGenie form filled with a gift request for a wife who likes hiking and knitting" style={{maxWidth: "50%"}} />
+</p>
+
+## Dynamic instructions and profiles
+
+Both `SystemLanguageModel` and `ClaudeLanguageModel` conform to the `LanguageModel` protocol, so models are interchangeable — the session doesn't care which one it gets. GiftGenie stores the user's choice in an observable `AppSettings` object backed by `UserDefaults` and Keychain; check the example project for the implementation. But how do we hand the selected model to the session? iOS 27 brings one more API that fits perfectly here — [dynamic profiles](https://developer.apple.com/documentation/foundationmodels/composing-dynamic-sessions-with-instructions-and-profiles). By default a session evaluates instructions once at initialization, and they stay static. With dynamic profiles, the framework re-evaluates instructions, tools, and model configuration before every model request, so the session always sees a snapshot of the current app state.
+
+Start with `DynamicInstructions` — a declarative type whose `body` builds instructions from the gift request:
+
+```swift
+struct GiftInstructions: DynamicInstructions {
+
+    var request: GiftRequest
+
+    var body: some DynamicInstructions {
+        Instructions {
+            "You are a thoughtful gift advisor. Suggest specific, creative gifts."
+            "Recipient: \(request.relationship), age \(request.age)."
+            "Interests: \(request.interests)."
+            "Occasion: \(request.occasion)."
+            "Budget: \(request.budget)."
+        }
+    }
+}
+```
+
+Next, `DynamicProfile` selects which profile is active. A profile associates instructions with session-level configuration via modifiers, and `.model()` accepts any `LanguageModel` — including `ClaudeLanguageModel`:
+
+```swift
+struct GiftProfile: LanguageModelSession.DynamicProfile {
+
+    var settings: AppSettings
+    var request: GiftRequest
+
+    var body: some LanguageModelSession.DynamicProfile {
+        switch settings.modelChoice {
+        case .onDevice:
+            Profile {
+                GiftInstructions(request: request)
+            }
+        case .claude:
+            Profile {
+                GiftInstructions(request: request)
+            }
+            .model(ClaudeLanguageModel(
+                name: settings.claudeModel,
+                auth: .apiKey(settings.apiKey)
+            ))
+        }
+    }
+}
+```
+
+Profiles support more modifiers like `.temperature()`, `.reasoningLevel()`, and `.maximumResponseTokens()`, lifecycle hooks like `onToolCall` for approval gates, and `historyTransform` — a neat trick for multi-model apps: compress the history for the small on-device context window and send the full history to Claude.
+
+When should you escalate to Claude? Apple's on-device model is fast, private, and works offline, but it's sized for lightweight tasks and limited by a 4096-token context window — I covered measuring it in [Tracking token usage in Foundation Models](https://www.artemnovichkov.com/blog/tracking-token-usage-in-foundation-models). Claude brings larger context, frontier reasoning, and server-side tools. With dynamic profiles, switching is one branch in `GiftProfile`.
+
+## Streaming partial content
+
+Frontier models take longer to respond than the on-device one, so streaming is a must for good UX. `streamResponse(to:generating:)` returns cumulative snapshots of partially generated content, and the UI updates as new gift ideas arrive:
+
+```swift
+struct GiftResultsView: View {
+
+    let request: GiftRequest
+
+    @Environment(AppSettings.self) private var settings
+    @State private var giftIdeas: GiftIdeas.PartiallyGenerated?
+    @State private var errorMessage: String?
+
+    var body: some View {
+        List {
+            ForEach(giftIdeas?.ideas ?? []) { idea in
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(idea.name ?? "")
+                        .font(.headline)
+                    Text(idea.reasoning ?? "")
+                }
+            }
+        }
+        .task {
+            await generate()
+        }
+    }
+
+    private func generate() async {
+        do {
+            let session = LanguageModelSession(
+                profile: GiftProfile(settings: settings, request: request)
+            )
+            let stream = session.streamResponse(to: "Suggest gift ideas for the recipient.",
+                                                generating: GiftIdeas.self)
+            for try await partial in stream {
+                giftIdeas = partial.content
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+}
+```
+
+Every field of `PartiallyGenerated` is optional, so each row renders what has already arrived. The full version in the example project shows all fields, fades them in with opacity transitions, and covers the wait before the first snapshot with a progress overlay. If you want to polish the streaming UI without burning tokens, check out my post about [working with partially generated content in Xcode Previews](https://www.artemnovichkov.com/blog/working-with-partially-generated-content-in-xcode-previews).
+
+Let's check the result — every row is mapped from the `GiftIdea` schema:
+
+<p align="center">
+  <img src="/images/using-claude-with-apple-foundation-models/generated-ideas.jpg" alt="GiftGenie generated ideas screen with Claude suggestions for hiking and knitting gifts" style={{maxWidth: "50%"}} />
+</p>
+
+<Callout>
+In my testing, streaming didn't work — neither on the Simulator nor on a device: the response arrived only as a final snapshot. I haven't found a solution yet; remember that both the OS betas and the package are in beta. I'll update the article once it's resolved.
+</Callout>
+
+## Error handling
+
+The package maps Claude API errors onto Apple's `LanguageModelError` where one fits: context-window overflow surfaces as `.contextSizeExceeded`, HTTP 429 as `.rateLimited`, and request timeouts as `.timeout`. Provider-specific errors surface as `ClaudeError`:
+
+```swift
+do {
+    let response = try await session.respond(to: prompt)
+} catch ClaudeError.missingCredential {
+    // Prompt for an API key
+} catch let error as LanguageModelError {
+    // Rate limits, guardrails, context length
+} catch {
+    // Transport errors
+}
+```
+
+## Bonus: server-side tools
+
+Claude can use server-side tools — web search, web fetch, and code execution — that run on Anthropic's infrastructure within a single round trip. They are configured on the model rather than on the session, because the session type belongs to Apple:
+
+```swift
+let model = ClaudeLanguageModel(
+    name: .sonnet4_6,
+    auth: auth,
+    serverTools: [
+        .webSearch(maxUses: 5),
+        .codeExecution,
+    ]
+)
+```
+
+With web search enabled, GiftGenie could check actual prices or find trending gifts.
+
+## Conclusion
+
+Foundation Models is becoming a universal interface for language models on Apple platforms: one session API, one `@Generable` macro, and swappable models — from on-device to frontier. The integration takes minutes, and dynamic profiles make model selection declarative — your users choose between privacy and power, the session picks it up on the next request.
+
+If you like this approach but can't require iOS 27, check out [AnyLanguageModel](https://github.com/huggingface/AnyLanguageModel) from Hugging Face — a drop-in replacement for the Foundation Models framework that works back to iOS 17 and supports many backends behind the same session API: MLX, llama.cpp, Ollama, Core ML, and remote providers like Anthropic, OpenAI, and Gemini.
+
+I created [GiftGenieExample](https://github.com/artemnovichkov/GiftGenieExample) with all the code from this post, so you can run it in Xcode right away. Note that both the OS 27 betas and the package are in beta, so APIs may change before general availability. Happy gifting!
+
+## Resources
+
+- [Composing dynamic sessions with instructions and profiles](https://developer.apple.com/documentation/FoundationModels/composing-dynamic-sessions-with-instructions-and-profiles) — Apple Documentation
+- [What's new in the Foundation Models framework](https://developer.apple.com/videos/play/wwdc2026/241/) — WWDC26 session
