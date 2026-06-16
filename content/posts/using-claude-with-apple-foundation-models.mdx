@@ -51,7 +51,13 @@ print(response.content)
 That's the whole integration. Everything else — instructions, transcripts, structured output — works like with `SystemLanguageModel`.
 
 <Callout>
-A key bundled into an app is extractable from the shipping binary. Use `.apiKey` for development or BYOK scenarios only. For production, the package provides `.proxied(headers:)` mode that routes requests through your own backend, and Anthropic says App Attest-based authentication is coming soon.
+A key bundled into an app is extractable from the shipping binary. The package provides three auth modes:
+
+- `.apiKey("...")` — development only. Never ship this in production.
+- `.proxied(headers:)` + `baseURL` — production. Your backend adds the credential; the app ships no key. Pass any headers the proxy needs to authorize the caller (or `[:]` if none).
+- **App Attest (coming soon)** — production without your own backend. Each install authenticates via App Attest and usage is billed to your Anthropic workspace.
+
+Until App Attest ships, use `.proxied` for production releases.
 </Callout>
 
 ## Generating gift ideas
@@ -204,10 +210,6 @@ Let's check the result — every row is mapped from the `GiftIdea` schema:
 <p align="center">
   <img src="/images/using-claude-with-apple-foundation-models/generated-ideas.jpg" alt="GiftGenie generated ideas screen with Claude suggestions for hiking and knitting gifts" style={{maxWidth: "50%"}} />
 </p>
-
-<Callout>
-In my testing, streaming didn't work — neither on the Simulator nor on a device: the response arrived only as a final snapshot. I haven't found a solution yet; remember that both the OS betas and the package are in beta. I'll update the article once it's resolved.
-</Callout>
 
 ## Error handling
 
