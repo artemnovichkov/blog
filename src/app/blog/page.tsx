@@ -1,29 +1,16 @@
 import type { Metadata } from "next"
 import { getAllPosts } from "@/lib/api"
 import { about, name } from "@/lib/const"
+import { buildMetadata } from "@/lib/metadata"
 import PostList from "../_components/post-list"
 
 const title = `${name} | Blog`
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title,
-  openGraph: {
-    title: title,
-    description: about,
-    url: "https://artemnovichkov.com/",
-    siteName: title,
-    images: ["https://artemnovichkov.com/images/banner.png"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: title,
-    description: about,
-    siteId: "3081906297",
-    creator: "@iosartem",
-    creatorId: "3081906297",
-    images: ["https://artemnovichkov.com/images/banner.png"],
-  },
-}
+  description: about,
+  path: "/blog",
+})
 
 export default function Blog() {
   const posts = getAllPosts()

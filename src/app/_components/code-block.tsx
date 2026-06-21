@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useRef, useState } from "react"
+import type React from "react"
+import { useRef, useState } from "react"
 import { GoCheck, GoCopy } from "react-icons/go"
 
 interface CodeBlockProps extends React.HTMLAttributes<HTMLPreElement> {
@@ -27,7 +28,9 @@ export default function CodeBlock({ children, ...props }: CodeBlockProps) {
       >
         {copied ? <GoCheck /> : <GoCopy />}
       </button>
-      <pre ref={preRef} {...props}>{children}</pre>
+      <pre ref={preRef} {...props}>
+        {children}
+      </pre>
     </div>
   )
 }

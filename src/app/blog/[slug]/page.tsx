@@ -13,6 +13,7 @@ import {
 } from "@/lib/api"
 import { name } from "@/lib/const"
 import markdownToHtml from "@/lib/markdownToHtml"
+import { buildMetadata } from "@/lib/metadata"
 import { sponsorshipConfig } from "@/lib/sponsorship-config"
 
 export default async function BlogPost(props: Params) {
@@ -69,26 +70,13 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
   const params = await props.params
   const post = getPostBySlug(params.slug)
   if (!post) return {}
-  return {
+  return buildMetadata({
     title: post.title,
     description: post.description,
-    openGraph: {
-      title: post.title,
-      description: post.description,
-      url: `https://artemnovichkov.com/blog/${post.slug}`,
-      siteName: name,
-      images: [post.cover],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: post.title,
-      description: post.description,
-      siteId: "3081906297",
-      creator: "@iosartem",
-      creatorId: "3081906297",
-      images: [post.cover],
-    },
-  }
+    path: `/blog/${post.slug}`,
+    siteName: name,
+    images: [post.cover],
+  })
 }
 
 export async function generateStaticParams() {

@@ -1,7 +1,7 @@
 import { Suspense } from "react"
-import { getTweet } from "react-tweet/api"
 import { EmbeddedTweet, TweetNotFound, TweetSkeleton } from "react-tweet"
 import type { Tweet, TweetEntities } from "react-tweet/api"
+import { getTweet } from "react-tweet/api"
 
 function asArray<T>(value: T | T[] | undefined | null): T[] {
   if (value == null) return []

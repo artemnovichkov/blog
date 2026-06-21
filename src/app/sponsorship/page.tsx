@@ -3,28 +3,15 @@ import { join } from "node:path"
 import type { Metadata } from "next"
 import { about, name } from "@/lib/const"
 import markdownToHtml from "@/lib/markdownToHtml"
+import { buildMetadata } from "@/lib/metadata"
 
 const title = `${name} | Sponsorship`
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title,
-  openGraph: {
-    title: title,
-    description: about,
-    url: "https://artemnovichkov.com/",
-    siteName: title,
-    images: ["https://artemnovichkov.com/images/banner.png"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: title,
-    description: about,
-    siteId: "3081906297",
-    creator: "@iosartem",
-    creatorId: "3081906297",
-    images: ["https://artemnovichkov.com/images/banner.png"],
-  },
-}
+  description: about,
+  path: "/sponsorship",
+})
 
 export default async function SponsorshipPage() {
   const mdxPath = join(process.cwd(), "content", "sponsorship.mdx")

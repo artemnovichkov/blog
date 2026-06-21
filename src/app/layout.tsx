@@ -4,14 +4,19 @@ import "@/app/globals.css"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Script from "next/script"
+import { buildMetadata } from "@/lib/metadata"
 import AppearanceAnimation from "./_components/appearance-animation"
 import Footer from "./_components/footer"
 import Header from "./_components/header"
 import WebMcpTools from "./_components/webmcp-tools"
 
 export const metadata: Metadata = {
-  title: name,
-  description: about,
+  ...buildMetadata({
+    title: name,
+    description: about,
+    path: "/",
+    siteName: title,
+  }),
   robots: {
     index: true,
     follow: true,
@@ -19,22 +24,6 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://artemnovichkov.com/"),
   alternates: {
     canonical: "/",
-  },
-  openGraph: {
-    title: name,
-    description: about,
-    url: "https://artemnovichkov.com/",
-    siteName: title,
-    images: ["https://artemnovichkov.com/images/banner.png"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: name,
-    description: about,
-    siteId: "3081906297",
-    creator: "@iosartem",
-    creatorId: "3081906297",
-    images: ["https://artemnovichkov.com/images/banner.png"],
   },
   other: {
     "yandex-verification": "0dbe1f786dcb070d",

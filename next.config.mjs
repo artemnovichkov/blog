@@ -37,7 +37,7 @@ const nextConfig = {
     }
     return config;
   },
-  
+
   // Image optimization
   images: {
     // Enable modern image formats for better compression

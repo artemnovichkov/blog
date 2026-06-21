@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server"
+import { projects } from "@/lib/const"
+import { markdownResponse } from "@/lib/markdown-response"
 
-const body = `# Artem Novichkov
+const bio = `# Artem Novichkov
 
 I'm an iOS developer at Salmon Group Ltd, building the [Salmon app](https://salmon.ph) — a fintech super app bringing accessible financial services to millions of Filipinos.
 
@@ -10,29 +11,20 @@ I'm passionate about Swift and open-source. You can find my projects on [GitHub]
 
 I write blog posts mostly about SwiftUI and occasionally share knowledge through public speaking. Check out my talks on [YouTube](https://www.youtube.com/playlist?list=PLRSU1SC70qRudLaYKSjM14tJmA-J-dRvU).
 
-In my free time, I enjoy flying FPV drones and editing the videos I capture. I also like playing video games on my Nintendo Switch 2 and PS 5.
+In my free time, I enjoy flying FPV drones and editing the videos I capture. I also like playing video games on my Nintendo Switch 2 and PS 5.`
 
-## Current Projects
+function projectsMarkdown() {
+  const items = projects
+    .map(
+      (project) =>
+        `- ${project.emoji ? `${project.emoji} ` : ""}[${project.name}](${project.url}) — ${project.description}`
+    )
+    .join("\n")
+  return `## Current Projects\n\n${items}\n`
+}
 
-- 🎨 [asset-catalog-viewer](https://github.com/artemnovichkov/asset-catalog-viewer) — VS Code extension for .xcassets preview
-- 🏠 [atmoshome](https://atmoshome.vercel.app) — Home environment monitoring dashboard
-- 🔌 [claude-code-plugins](https://github.com/artemnovichkov/claude-code-plugins) — Claude Code plugins collection
-- 🔮 [horoscope](https://github.com/artemnovichkov/horoscope) — Dev horoscope powered by Foundation Models
-- 🆕 [iOS-26-by-Examples](https://github.com/artemnovichkov/iOS-26-by-Examples) — Hands-on iOS 26 feature examples
-- ⌨️ [shortcuts-mcp-server](https://github.com/artemnovichkov/shortcuts-mcp-server) — Shortcuts + MCP
-- 🐛 [TranscriptDebugMenu](https://github.com/artemnovichkov/TranscriptDebugMenu) — Debug menu for LanguageModelSession transcripts
-`
+const body = `${bio}\n\n${projectsMarkdown()}`
 
 export async function GET(request: Request) {
-  const accept = request.headers.get("accept") ?? ""
-  if (!accept.includes("text/markdown")) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 })
-  }
-  const tokens = Math.ceil(body.length / 4)
-  return new Response(body, {
-    headers: {
-      "Content-Type": "text/markdown; charset=utf-8",
-      "x-markdown-tokens": String(tokens),
-    },
-  })
+  return markdownResponse(request, body)
 }

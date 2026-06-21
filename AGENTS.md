@@ -37,10 +37,30 @@ kebab-cased, matching the filename in `content/posts/`.
 
 ## Content Guidelines
 
-Each blog post should include frontmatter consumed by `src/lib/api.ts`, such as
-`title`, `description`, `date`, cover image, and categories. Code examples in
-posts commonly target Swift/iOS development; preserve accurate language tags
-for syntax highlighting.
+Each blog post needs frontmatter consumed by `src/lib/api.ts`:
+
+```yaml
+---
+title: Post Title
+description: One-line summary
+cover: /images/<slug>/cover.png
+date: '2026-06-21'
+categories:
+  - swiftui
+  - wwdc25
+---
+```
+
+`categories` is a YAML list (not a comma-separated string). The cover image
+and any inline images live in `public/images/<slug>/`, matching the post's
+slug/filename. Code examples commonly target Swift/iOS development; preserve
+accurate language tags for syntax highlighting.
+
+MDX components available in post bodies (registered in
+`src/lib/markdownToHtml.ts`): `<Callout type="info|warning|error" emoji="...">`,
+`<FileTree>` / `<FileTree.File>` / `<FileTree.Folder>`, `<AudioPlayer src="...">`,
+and `<Tweet id="...">`. `<AdBlock>` is injected automatically on post pages from
+`src/lib/sponsorship-config.ts` and doesn't need to be authored inline.
 
 ## Commit & Pull Request Guidelines
 

@@ -8,7 +8,9 @@ const authorizationServer = {
     claim_uri: `${BASE}/auth.md`,
     identity_types_supported: ["anonymous"],
     anonymous: {
-      credential_types_supported: ["urn:ietf:params:oauth:token-type:access_token"],
+      credential_types_supported: [
+        "urn:ietf:params:oauth:token-type:access_token",
+      ],
     },
   },
 }

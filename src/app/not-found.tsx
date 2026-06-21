@@ -3,29 +3,19 @@ import { join } from "node:path"
 import type { Metadata } from "next"
 import { about, name } from "@/lib/const"
 import markdownToHtml from "@/lib/markdownToHtml"
+import { buildMetadata } from "@/lib/metadata"
 
 const title = `${name} | Page Not Found`
 
 export const metadata: Metadata = {
-  title,
+  ...buildMetadata({
+    title,
+    description: about,
+    // No real canonical path for a 404 page; root is the closest sensible url.
+    path: "/",
+  }),
   description:
     "Oops! This page seems to have wandered off into the digital void.",
-  openGraph: {
-    title: title,
-    description: about,
-    url: "https://artemnovichkov.com/",
-    siteName: title,
-    images: ["https://artemnovichkov.com/images/banner.png"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: title,
-    description: about,
-    siteId: "3081906297",
-    creator: "@iosartem",
-    creatorId: "3081906297",
-    images: ["https://artemnovichkov.com/images/banner.png"],
-  },
 }
 
 export default async function NotFound() {

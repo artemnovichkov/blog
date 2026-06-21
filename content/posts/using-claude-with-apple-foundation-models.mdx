@@ -3,9 +3,11 @@ title: Using Claude with Apple Foundation Models
 description: Bringing frontier models to LanguageModelSession with model selection and BYOK
 cover: /images/using-claude-with-apple-foundation-models/cover.png
 date: '2026-06-12'
-categories: foundation-models, ai, llm, claude
-author:
-  - artem-novichkov
+categories:
+  - foundation-models
+  - ai
+  - llm
+  - claude
 ---
 
 At WWDC26, Apple extended the Foundation Models framework with support for server-side language models. The idea is simple: the same `LanguageModelSession` API that drives the on-device model can now drive any remote model that conforms to the `LanguageModel` protocol. Anthropic was quick to adopt it and released [ClaudeForFoundationModels](https://github.com/anthropics/ClaudeForFoundationModels) — a Swift package that makes Claude a drop-in model for your sessions. Streaming, guided generation with `@Generable`, and tool calling work the same way.

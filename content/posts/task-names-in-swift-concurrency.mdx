@@ -3,9 +3,8 @@ title: Task Names in Swift Concurrency
 description: Name Swift tasks for clearer debugging and profiling
 cover: /images/task-names-in-swift-concurrency/cover.png
 date: '2026-05-30'
-categories: swift-concurrency
-author:
-  - artem-novichkov
+categories:
+  - swift-concurrency
 ---
 
 When a crash happens deep inside concurrent code, the first question is always: *which task did this?* Pthreads had names, Grand Central Dispatch had queue labels — they show up in stack traces, in Instruments lanes, in debugger output. Swift Concurrency had none of that until [SE-0469](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0469-task-names.md), implemented in Swift 6.2.

@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next"
-import { getAllPosts } from "@/lib/api"
+import { getAllCategories, getAllPosts } from "@/lib/api"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://artemnovichkov.com"
   const posts = getAllPosts()
+  const categories = getAllCategories()
 
   const staticEntries = [
     {
@@ -30,5 +31,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }))
 
-  return [...staticEntries, ...postEntries]
+  const categoryEntries = categories.map((category) => ({
+    url: `${baseUrl}/blog/category/${category}`,
+    priority: 0.6,
+  }))
+
+  return [...staticEntries, ...postEntries, ...categoryEntries]
 }

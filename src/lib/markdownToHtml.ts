@@ -1,5 +1,4 @@
 import { compileMDX } from "next-mdx-remote/rsc"
-import { SafeTweet } from "../app/_components/safe-tweet"
 import rehypePrettyCode from "rehype-pretty-code"
 import rehypeSlug from "rehype-slug"
 import remarkGfm from "remark-gfm"
@@ -8,6 +7,7 @@ import AudioPlayer from "../app/_components/audio-player"
 import Callout from "../app/_components/callout"
 import CodeBlock from "../app/_components/code-block"
 import { FileTree } from "../app/_components/filetree"
+import { SafeTweet } from "../app/_components/safe-tweet"
 
 const options = {
   theme: {
