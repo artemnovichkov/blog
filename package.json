@@ -3,7 +3,7 @@
   "version": "2.0",
   "private": true,
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "dev": "next dev",
@@ -41,7 +41,7 @@
     "@biomejs/biome": "^2.2.2",
     "@tailwindcss/postcss": "^4.2.4",
     "@tailwindcss/typography": "^0.5.19",
-    "@types/node": "^20",
+    "@types/node": "^24",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/rss": "^0.0.32",
