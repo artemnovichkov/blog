@@ -7,6 +7,7 @@ import AudioPlayer from "../app/_components/audio-player"
 import Callout from "../app/_components/callout"
 import CodeBlock from "../app/_components/code-block"
 import { FileTree } from "../app/_components/filetree"
+import PostImage from "../app/_components/post-image"
 import { SafeTweet } from "../app/_components/safe-tweet"
 
 const options = {
@@ -33,6 +34,7 @@ export default async function markdownToHtml(markdown: string) {
       FileTree,
       AudioPlayer,
       pre: CodeBlock,
+      img: PostImage,
       AdBlock,
     },
   })

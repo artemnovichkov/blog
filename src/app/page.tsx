@@ -12,9 +12,9 @@ export default function Home() {
         width={144}
         alt="Artem Novichkov"
       />
-      <p className="mt-4 mb-2 font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
+      <h1 className="mt-4 mb-2 font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
         Hey, I&apos;m Artem Novichkov
-      </p>
+      </h1>
       <div className="mb-8 flex flex-col gap-2 text-zinc-800 dark:text-gray-100">
         <p>
           I&apos;m an iOS developer at Salmon Group Ltd, building the&nbsp;

@@ -19,7 +19,7 @@ export default async function SponsorshipPage() {
   const content = await markdownToHtml(mdxContent)
 
   return (
-    <main>
+    <div>
       <article>
         <div className="mx-auto mt-4 w-full max-w-2xl">
           <div className="prose dark:prose-dark w-full max-w-none">
@@ -27,6 +27,6 @@ export default async function SponsorshipPage() {
           </div>
         </div>
       </article>
-    </main>
+    </div>
   )
 }

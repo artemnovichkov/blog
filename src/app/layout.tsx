@@ -22,9 +22,6 @@ export const metadata: Metadata = {
     follow: true,
   },
   metadataBase: new URL("https://artemnovichkov.com/"),
-  alternates: {
-    canonical: "/",
-  },
   other: {
     "yandex-verification": "0dbe1f786dcb070d",
   },

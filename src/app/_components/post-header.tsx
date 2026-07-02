@@ -8,9 +8,9 @@ import ViewCounter from "./view-counter"
 export default function PostHeader({ post }: { post: Post }) {
   return (
     <div className="flex w-full flex-col items-center gap-4 text-center">
-      <p className="flex items-center font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
+      <h1 className="flex items-center font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
         {post.title}
-      </p>
+      </h1>
       <div className="flex w-full flex-col items-center text-gray-500 text-sm dark:text-gray-400">
         <span className="flex flex-row items-center justify-center gap-2 whitespace-nowrap">
           <PostDate dateString={post.date} />
