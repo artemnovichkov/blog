@@ -29,7 +29,7 @@ export default async function BlogPost(props: Params) {
   if (nextPost) readNextPosts.push({ relation: "next", post: nextPost })
 
   return (
-    <main>
+    <div>
       <article>
         <div className="mx-auto w-full max-w-2xl">
           <div className="mt-4">
@@ -56,7 +56,7 @@ export default async function BlogPost(props: Params) {
         <PostActions post={post} />
         {readNextPosts.length > 0 && <ReadNext posts={readNextPosts} />}
       </div>
-    </main>
+    </div>
   )
 }
 

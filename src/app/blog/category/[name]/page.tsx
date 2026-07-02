@@ -12,10 +12,10 @@ export default async function CategoryPage(props: Params) {
   const categories = getAllCategories()
 
   return (
-    <main>
-      <p className="my-4 flex items-center font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
+    <div>
+      <h1 className="my-4 flex items-center font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
         Category: {categoryTitleMap[name] || name}
-      </p>
+      </h1>
       <section>
         {posts.length > 0 ? (
           <div>
@@ -34,7 +34,7 @@ export default async function CategoryPage(props: Params) {
           </div>
         )}
       </section>
-    </main>
+    </div>
   )
 }
 

@@ -15,13 +15,13 @@ export const metadata: Metadata = buildMetadata({
 export default function Blog() {
   const posts = getAllPosts()
   return (
-    <main>
-      <p className="my-4 font-bold text-4xl text-zinc-800 tracking-tight dark:text-gray-100">
+    <div>
+      <h1 className="my-4 font-bold text-4xl text-zinc-800 tracking-tight dark:text-gray-100">
         Blog
-      </p>
+      </h1>
       <section>
         <PostList posts={posts} />
       </section>
-    </main>
+    </div>
   )
 }
