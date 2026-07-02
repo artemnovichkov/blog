@@ -4,6 +4,9 @@ import { WatchingYouVideo } from "./watching-you-video"
 export const metadata: Metadata = {
   title: "Artem Novichkov is watching you",
   description: "Move your cursor and watch what happens",
+  alternates: {
+    canonical: "/is-watching-you",
+  },
 }
 
 export default function WatchingYouPage() {

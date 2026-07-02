@@ -2,7 +2,15 @@
 
 import { promises as fs } from "node:fs"
 import path from "node:path"
+import type { Metadata } from "next"
 import markdownToHtml from "@/lib/markdownToHtml"
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default async function Playground() {
   if (process.env.NODE_ENV === "production") return null
