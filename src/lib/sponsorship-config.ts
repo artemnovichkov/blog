@@ -7,8 +7,8 @@ export interface SponsorshipConfig {
 
 export const sponsorshipConfig: SponsorshipConfig = {
   isVisible: true,
-  title: "Sponsor This Blog",
+  title: "Glaze by Raycast",
   description:
-    "Connect with a targeted audience of iOS developers and Swift engineers. Promote your developer tools, courses, or services.",
-  url: "https://artemnovichkov.com/sponsorship",
+    "Desktop apps, reimagined by you. Create software for you and your team — it lives on your Mac and connects to your files, tools, and hardware.",
+  url: "https://glz.so/r/uxqxjuhx",
 }
