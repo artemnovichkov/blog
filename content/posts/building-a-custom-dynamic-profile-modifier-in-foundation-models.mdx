@@ -1,0 +1,258 @@
+---
+title: Building a custom DynamicProfileModifier in Foundation Models
+description: Create a reusable economy mode that switches LanguageModelSession on device, caps responses, and trims history with any remote model
+cover: /images/building-a-custom-dynamic-profile-modifier-in-foundation-models/cover.png
+date: '2026-07-15'
+categories:
+  - foundation-models
+  - ai
+  - llm
+---
+
+Dynamic profiles are the headline addition to the Foundation Models framework this year: a session can now switch models, instructions, tools, and generation options at runtime. Most of the attention goes to profiles themselves, but a small protocol next to them deserves a closer look: [`LanguageModelSession.DynamicProfileModifier`](https://developer.apple.com/documentation/foundationmodels/languagemodelsession/dynamicprofilemodifier).
+
+If you write SwiftUI, you already know this pattern. `DynamicProfileModifier` is to a profile what `ViewModifier` is to a view: a reusable bundle of configuration you attach with a single call. It keeps repeated setup in one place, gives it a meaningful name, and hides details that don't belong at every call site.
+
+We'll build a practical one: an **economy mode** that switches a profile to the on-device model, gives it a smaller view of the conversation, and caps the response. It can preserve a person's daily Private Cloud Compute allowance, reduce spend with a commercial provider, keep a feature working offline, or reduce latency when a larger model isn't necessary. Think Low Power Mode, but for model capacity.
+
+## Requirements
+
+- Xcode 27 beta and an iOS 27, iPadOS 27, macOS 27, or visionOS 27 beta deployment target;
+- a device that supports Apple Intelligence, with Apple Intelligence enabled;
+- a remote `LanguageModel` if you want to run the model-switching branch. You can use Private Cloud Compute, Claude, OpenAI, or your own provider.
+
+Private Cloud Compute requires a managed entitlement. Anthropic, OpenAI, and other commercial providers require their own credentials and network connection. The APIs in this post are beta, so check availability and test again with the final SDK and operating system before shipping.
+
+## Understanding dynamic profiles
+
+Before iOS 27, a session's instructions, tools, and model were fixed at initialization. [Dynamic profiles](https://developer.apple.com/documentation/foundationmodels/composing-dynamic-sessions-with-instructions-and-profiles) change that: a `LanguageModelSession.DynamicProfile` re-evaluates its `body` before every model request, so the session can switch models, instructions, tools, and generation options as your app's state changes. A `Profile` binds instructions and tools to configuration modifiers. Here's the assistant we'll work with throughout the post:
+
+```swift
+import FoundationModels
+
+struct BasicAssistantProfile: LanguageModelSession.DynamicProfile {
+    var body: some LanguageModelSession.DynamicProfile {
+        Profile {
+            Instructions("You are a helpful assistant.")
+        }
+        .model(PrivateCloudComputeLanguageModel())
+        .temperature(0.7)
+    }
+}
+```
+
+The session takes the whole thing via a new initializer:
+
+```swift
+let session = LanguageModelSession(profile: BasicAssistantProfile())
+```
+
+The framework ships a set of built-in modifiers — `model(_:)`, `temperature(_:)`, `samplingMode(_:)`, `reasoningLevel(_:)`, `maximumResponseTokens(_:)`, `historyTransform(_:)`, and lifecycle callbacks like `onResponse(perform:)`. These settings tend to travel in groups. An on-device fallback might always use the same model, response limit, and context window; a creative configuration might repeat another trio. Copying those lines between profiles is exactly the problem `DynamicProfileModifier` solves.
+
+## Building the modifier
+
+The protocol has a single requirement — `body(content:)` — which receives the wrapped profile as `Content` and returns a new profile with your configuration applied:
+
+```swift
+struct EconomyModeModifier:
+    LanguageModelSession.DynamicProfileModifier
+{
+    let maximumResponseTokens: Int
+    let historyEntries: Int
+
+    func body(
+        content: Content
+    ) -> some LanguageModelSession.DynamicProfile {
+        content
+            // 1
+            .model(SystemLanguageModel.default)
+            // 2
+            .temperature(0.3)
+            // 3
+            .maximumResponseTokens(maximumResponseTokens)
+            // 4
+            .historyTransform { history in
+                Array(history.suffix(historyEntries))
+            }
+    }
+}
+```
+
+And, just like with `ViewModifier`, an extension turns it into a nice call site. Parameters keep the defaults convenient without making the abstraction rigid:
+
+```swift
+extension LanguageModelSession.DynamicProfile {
+    func economyMode(
+        maximumResponseTokens: Int = 250,
+        historyEntries: Int = 8
+    ) -> some LanguageModelSession.DynamicProfile {
+        modifier(
+            EconomyModeModifier(
+                maximumResponseTokens: maximumResponseTokens,
+                historyEntries: historyEntries
+            )
+        )
+    }
+}
+```
+
+The values `250` and `8` are deliberately small demo defaults, not universal recommendations. Keep both parameters positive and tune them against representative conversations.
+
+Let's unpack what each line buys us:
+
+1. Routes the request to the on-device model. Model inference works without a network connection and stays on device. Tools attached to the profile may still access the network, so review them separately.
+2. Uses a lower temperature to make utility answers more focused and predictable. Temperature changes token selection, not the number of tokens the model produces, so the next setting is what constrains length;
+3. Protects against unexpectedly verbose responses. If the model reaches the limit before finishing naturally, the framework stops generation without throwing an error. A hard cap can therefore produce an incomplete sentence or malformed structured output. Use it for bounded free-form answers, combine it with instructions that ask for brevity, and choose the value through evaluation rather than guesswork;
+4. Sends only the last few transcript entries to the model. The on-device context window is smaller than PCC's — you can inspect it at runtime via `SystemLanguageModel.default.contextSize` — so a long conversation may not fit. I covered context limits and token counting in [Tracking token usage in Foundation Models](https://www.artemnovichkov.com/blog/tracking-token-usage-in-foundation-models). The transform is local and lossless with respect to the session: it changes what the model sees for this request, while `session.transcript` keeps the complete conversation.
+
+One important simplification: transcript entries aren't the same as conversation turns. Prompts, responses, tool calls, and tool outputs are separate entries, so a blind `suffix(8)` can split a logical sequence. Our assistant has no tools, which keeps the example readable. In a tool-heavy profile, first remove completed tool interactions as complete units, then apply a rolling window.
+
+## Applying the modifier
+
+The payoff comes when a dynamic profile switches configuration based on live app state. That mutable state needs to be shared beyond the profile value copied into the session. Following Apple's WWDC example, both the app and the profile reference the same object:
+
+```swift
+import Observation
+
+@Observable
+final class AssistantState {
+    var usesEconomyMode = false
+}
+
+struct AssistantProfile<RemoteModel: LanguageModel>:
+    LanguageModelSession.DynamicProfile
+{
+    let state: AssistantState
+    let remoteModel: RemoteModel
+
+    var body: some LanguageModelSession.DynamicProfile {
+        if state.usesEconomyMode {
+            Profile {
+                Instructions("You are a helpful assistant.")
+            }
+            .economyMode()
+        } else {
+            Profile {
+                Instructions("You are a helpful assistant.")
+            }
+            .model(remoteModel)
+            .temperature(0.7)
+        }
+    }
+}
+```
+
+Create the state and model once, then pass them into the profile. Private Cloud Compute keeps the dependency-free version entirely inside Apple's framework:
+
+```swift
+let state = AssistantState()
+let remoteModel = PrivateCloudComputeLanguageModel()
+let session = LanguageModelSession(
+    profile: AssistantProfile(
+        state: state,
+        remoteModel: remoteModel
+    )
+)
+```
+
+Because `body` re-evaluates before every request, changing `state.usesEconomyMode` affects the next request:
+
+```swift
+let remoteResponse = try await session.respond(
+    to: "Explain dynamic profiles in three sentences."
+)
+print(remoteResponse.content)
+
+state.usesEconomyMode = true
+
+let localResponse = try await session.respond(
+    to: "Now summarize that in one sentence."
+)
+print(localResponse.content)
+```
+
+The modifier configures what economy mode means; it doesn't decide when to enable it. Keep that policy in app state, where it can react to a person's toggle, Low Power Mode, network reachability, a provider spending limit, or `PrivateCloudComputeLanguageModel.quotaUsage`. If a remote request fails, only retry errors that the specific provider documents as transient or quota-related — don't turn every model refusal or malformed request into an automatic retry.
+
+The session and global transcript remain the same when the mode changes. Only the active model configuration and its view of history change.
+
+## Using Claude or OpenAI instead of PCC
+
+`AssistantProfile` is generic over `LanguageModel`, so PCC isn't special. Anthropic's [ClaudeForFoundationModels](https://github.com/anthropics/ClaudeForFoundationModels) package provides a model you can pass to the same profile:
+
+```swift
+import ClaudeForFoundationModels
+
+let remoteModel = ClaudeLanguageModel(
+    name: .sonnet4_6,
+    auth: .apiKey("YOUR_API_KEY")
+)
+```
+
+For OpenAI, Apple's [Foundation Models Utilities](https://github.com/apple/foundation-models-utilities) package includes `ChatCompletionsLanguageModel`, which works with OpenAI-compatible endpoints:
+
+```swift
+import Foundation
+import FoundationModelsUtilities
+
+let remoteModel = ChatCompletionsLanguageModel(
+    name: "YOUR_MODEL_ID",
+    url: URL(string: "https://api.openai.com/v1")!,
+    additionalHeaders: [
+        "Authorization": "Bearer YOUR_API_KEY"
+    ],
+    supportsGuidedGeneration: false
+)
+```
+
+Set `supportsGuidedGeneration` to `true` only when the selected provider and model support strict structured outputs.
+
+Both values can replace `PrivateCloudComputeLanguageModel()` without changing `AssistantProfile` or `LanguageModelSession`. I walked through the provider-specific setup in [Using Claude with Apple Foundation Models](https://www.artemnovichkov.com/blog/using-claude-with-apple-foundation-models) and the OpenAI-compatible adapter in [Exploring Foundation Models Utilities](https://www.artemnovichkov.com/blog/exploring-foundation-models-utilities).
+
+<Callout type="warning">
+Never ship a commercial provider's API key in an app binary. The literal keys above are development placeholders. Use a backend proxy that authenticates the app and attaches the provider credential in production.
+</Callout>
+
+## Handling modifier precedence
+
+One subtlety worth internalizing. When the same value appears at multiple levels, precedence runs from highest to lowest:
+
+1. matching `GenerationOptions` passed to `respond(to:options:)` at the call site;
+2. the modifier closest to the `Profile` declaration;
+3. outer dynamic profile modifiers.
+
+Our `economyMode()` wraps the content from the outside, so anything set closer to the `Profile` wins:
+
+```swift
+Profile {
+    Instructions("You are a helpful assistant.")
+}
+.temperature(0.9) // Closer to Profile, so it beats economyMode's 0.3.
+.economyMode()
+```
+
+The same rule applies to `.model(...)`: despite its name, `economyMode()` provides defaults rather than enforcement. If the wrapped profile specifies a model closer to its declaration, that model wins. Design the call site so profiles using economy mode don't set conflicting inner values when model selection is a policy requirement.
+
+Call-site `GenerationOptions` only override matching generation values, such as temperature or maximum response tokens. They don't replace the profile's model, history transform, or lifecycle callbacks.
+
+Lifecycle callbacks also compose differently from value modifiers. If both a profile and an outer custom modifier register `onResponse`, the framework runs both callbacks instead of choosing one by precedence. That makes custom modifiers useful for cross-cutting behaviors such as logging and metrics, but it also means each callback needs to tolerate the others.
+
+## Paying the cache tax
+
+Rewriting history isn't free. Appending to the transcript typically preserves the key-value cache, while removing entries, changing tools, or swapping instructions can invalidate it and increase time-to-first-token. `historyTransform` returns the same entries until the history grows beyond our limit. After that, every new entry can shift the rolling window and change its prefix — a cache-unfriendly pattern for models that cache that prefix.
+
+Switching between a remote and on-device model prevents one model from reusing the other's cache, but that only explains the cost of the transition. If economy mode stays active for several turns, the sliding window may continue to invalidate the on-device model's cache. A smaller context can still be the right tradeoff, but it isn't automatically free. Measure the real workflow with the upgraded Foundation Models instrument in Xcode 27, which exposes cache usage and time-to-first-token.
+
+## Conclusion
+
+`DynamicProfileModifier` is a small protocol, but it completes the SwiftUI-like composition model of the Foundation Models framework: declarative profiles, composable instructions, and reusable configuration policies. Economy mode is one useful example, and it works with any `LanguageModel`, not only PCC.
+
+History redaction, quota accounting, and other security- or billing-sensitive policies also fit the abstraction, but the modifier itself is only the wrapper. Their correctness still depends on robust transcript handling, availability checks, and evaluations.
+
+Happy modifying!
+
+## Resources
+
+- [Composing dynamic sessions with instructions and profiles](https://developer.apple.com/documentation/foundationmodels/composing-dynamic-sessions-with-instructions-and-profiles)
+- [Build agentic app experiences with the Foundation Models framework](https://developer.apple.com/videos/play/wwdc2026/242/)
+- [Debug and profile agentic app experiences with Instruments](https://developer.apple.com/videos/play/wwdc2026/243/)
+- [Tracking token usage in Foundation Models](https://www.artemnovichkov.com/blog/tracking-token-usage-in-foundation-models)
