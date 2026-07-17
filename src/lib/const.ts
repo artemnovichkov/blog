@@ -91,6 +91,7 @@ export const categoryTitleMap: Record<string, string> = {
   webkit: "WebKit",
   wwdc21: "WWDC21",
   wwdc25: "WWDC25",
+  wwdc26: "WWDC26",
   xcode: "Xcode",
   "xcode-extension": "Xcode Extension",
 }
