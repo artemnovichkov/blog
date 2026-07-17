@@ -12,6 +12,7 @@ import {
   getPreviousPost,
 } from "@/lib/api"
 import { name } from "@/lib/const"
+import { buildBlogPostingJsonLd, JsonLd } from "@/lib/json-ld"
 import markdownToHtml from "@/lib/markdownToHtml"
 import { buildMetadata } from "@/lib/metadata"
 import { sponsorshipConfig } from "@/lib/sponsorship-config"
@@ -30,6 +31,7 @@ export default async function BlogPost(props: Params) {
 
   return (
     <div>
+      <JsonLd data={buildBlogPostingJsonLd(post)} />
       <article>
         <div className="mx-auto w-full max-w-2xl">
           <div className="mt-4">

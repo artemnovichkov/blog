@@ -1,9 +1,11 @@
 import Image from "next/image"
+import { buildHomeJsonLd, JsonLd } from "@/lib/json-ld"
 import Projects from "./_components/projects"
 
 export default function Home() {
   return (
     <div className="mt-4 flex flex-col items-start justify-center">
+      <JsonLd data={buildHomeJsonLd()} />
       <Image
         className="rounded-full"
         priority
