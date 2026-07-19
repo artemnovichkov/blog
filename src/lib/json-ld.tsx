@@ -22,7 +22,7 @@ export function buildBlogPostingJsonLd(post: Post) {
     headline: post.title,
     description: post.description,
     image: `${SITE_URL}${post.cover}`,
-    datePublished: post.date,
+    datePublished: new Date(post.date).toISOString(),
     url,
     mainEntityOfPage: {
       "@type": "WebPage",
