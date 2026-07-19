@@ -1,5 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      // Legacy Teletype blog subdomain
+      {
+        source: "/",
+        has: [{ type: "host", value: "blog.artemnovichkov.com" }],
+        destination: "https://artemnovichkov.com/blog",
+        permanent: true,
+      },
+      {
+        source: "/:slug*",
+        has: [{ type: "host", value: "blog.artemnovichkov.com" }],
+        destination: "https://artemnovichkov.com/blog/:slug*",
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {

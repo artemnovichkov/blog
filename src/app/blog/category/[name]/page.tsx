@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
-import CategoryList from "@/app/_components/category-list"
+import { notFound } from "next/navigation"
 import PostList from "@/app/_components/post-list"
-import { getAllCategories, getAllPosts } from "@/lib/api"
+import { getAllPosts } from "@/lib/api"
 import { categoryTitleMap, name as siteName } from "@/lib/const"
 import { buildMetadata } from "@/lib/metadata"
 
@@ -9,7 +9,10 @@ export default async function CategoryPage(props: Params) {
   const params = await props.params
   const name = params.name.toLowerCase()
   const posts = getAllPosts().filter((post) => post.categories?.includes(name))
-  const categories = getAllCategories()
+
+  if (posts.length === 0) {
+    notFound()
+  }
 
   return (
     <div>
@@ -17,22 +20,13 @@ export default async function CategoryPage(props: Params) {
         Category: {categoryTitleMap[name] || name}
       </h1>
       <section>
-        {posts.length > 0 ? (
-          <div>
-            <p className="mb-4 text-zinc-500 dark:text-gray-400">
-              {posts.length} post{posts.length === 1 ? "" : "s"} found in this
-              category:
-            </p>
-            <PostList posts={posts} />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4">
-            <p className="text-zinc-500 dark:text-gray-400">
-              No posts found in this category. You can browse other categories:
-            </p>
-            <CategoryList categories={categories} />
-          </div>
-        )}
+        <div>
+          <p className="mb-4 text-zinc-500 dark:text-gray-400">
+            {posts.length} post{posts.length === 1 ? "" : "s"} found in this
+            category:
+          </p>
+          <PostList posts={posts} />
+        </div>
       </section>
     </div>
   )
