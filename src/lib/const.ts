@@ -7,6 +7,10 @@ export type Project = {
   name: string
   url: string
   description: string
+  cta?: {
+    label: string
+    url: string
+  }
 }
 
 // Shared between the Projects component and the /api/home/markdown route.
@@ -25,9 +29,13 @@ export const projects: Project[] = [
   },
   {
     emoji: "🔌",
-    name: "claude-code-plugins",
-    url: "https://github.com/artemnovichkov/claude-code-plugins",
-    description: "Claude Code plugins collection",
+    name: "skills",
+    url: "https://github.com/artemnovichkov/skills",
+    description: "Agent skills, MCP servers & subagents",
+    cta: {
+      label: "Install in Xcode",
+      url: "xcode://agent-plugin-clone?repo=https%3A%2F%2Fgithub.com%2Fartemnovichkov%2Fskills.git",
+    },
   },
   {
     emoji: "🔮",

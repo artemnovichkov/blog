@@ -1,3 +1,4 @@
+import { SiXcode } from "react-icons/si"
 import { projects } from "@/lib/const"
 
 export default function Projects() {
@@ -25,6 +26,16 @@ export default function Projects() {
               {" — "}
               {project.description}
             </span>
+            {project.cta && (
+              <a
+                className="project-cta"
+                href={project.cta.url}
+                title="Clone & import in Xcode 27+"
+              >
+                <SiXcode className="project-cta-icon" aria-hidden="true" />
+                {project.cta.label}
+              </a>
+            )}
           </li>
         ))}
       </ul>

@@ -15,10 +15,12 @@ In my free time, I enjoy flying FPV drones and editing the videos I capture. I a
 
 function projectsMarkdown() {
   const items = projects
-    .map(
-      (project) =>
-        `- ${project.emoji ? `${project.emoji} ` : ""}[${project.name}](${project.url}) — ${project.description}`
-    )
+    .map((project) => {
+      const cta = project.cta
+        ? ` · [${project.cta.label}](${project.cta.url})`
+        : ""
+      return `- ${project.emoji ? `${project.emoji} ` : ""}[${project.name}](${project.url}) — ${project.description}${cta}`
+    })
     .join("\n")
   return `## Current Projects\n\n${items}\n`
 }
