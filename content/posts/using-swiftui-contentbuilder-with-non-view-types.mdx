@@ -1,0 +1,479 @@
+---
+title: 'Using SwiftUI’s ContentBuilder with Non-View Types'
+description: 'Using SwiftUI’s result builder to assemble a type-safe deep-link router.'
+cover: /images/using-swiftui-contentbuilder-with-non-view-types/cover.png
+date: '2026-08-04'
+categories:
+  - swiftui
+  - result-builders
+  - wwdc26
+---
+
+SwiftUI's result-builder syntax is usually associated with views. When I used
+the same language feature [to compose action sheets](/blog/result-builders), I
+had to declare a custom `@resultBuilder` and implement every form of control
+flow the API needed.
+
+The Xcode 27 SDK changes that. `@ContentBuilder` can assemble values that don't
+conform to `View`. We'll use it to build a type-safe deep-link router, then
+preserve the same syntax for earlier deployment targets.
+
+The key idea is simple: instead of teaching a new builder how to combine
+routes, we'll teach SwiftUI's containers how to route.
+
+## The deep-link router we want
+
+The finished DSL should read like an ordered routing table:
+
+```swift
+@ContentBuilder
+func appRoutes(
+    subscriptionsEnabled: Bool,
+    debugBuild: Bool,
+    campaigns: [Campaign]
+) -> some AppRoute {
+    SettingsRoute()
+    ProfileRoute()
+
+    if subscriptionsEnabled {
+        SubscriptionRoute()
+    }
+
+    if debugBuild {
+        DebugRoute()
+    } else {
+        DisabledDebugRoute()
+    }
+
+    ForEach(campaigns) { campaign in
+        CampaignRoute(campaign: campaign)
+    }
+
+    FallbackRoute()
+}
+```
+
+Routes are evaluated in declaration order, and the first match wins. A
+feature flag can remove a route, build configuration can choose a branch, and
+the active campaigns determine a dynamic group of routes.
+
+From the outside, the whole block behaves like one route:
+
+```swift
+let campaigns = [
+    Campaign(id: "summer-2026", slug: "summer")
+]
+let routes = appRoutes(
+    subscriptionsEnabled: true,
+    debugBuild: false,
+    campaigns: campaigns
+)
+let url = URL(string: "myapp://campaign/summer")!
+
+assert(routes.destination(for: url) == .campaign(id: "summer-2026"))
+```
+
+The protocol behind the DSL is deliberately ordinary:
+
+```swift
+protocol AppRoute {
+    func destination(for url: URL) -> AppDestination?
+}
+
+enum AppDestination: Hashable {
+    case settings
+    case profile(userID: String)
+    case subscription
+    case campaign(id: String)
+    case debug
+    case unavailable
+    case notFound
+}
+```
+
+Each route owns one matching rule. The composition only decides their order:
+
+```swift
+private extension URL {
+    var isAppDeepLink: Bool { scheme == "myapp" }
+}
+
+struct SettingsRoute: AppRoute {
+    func destination(for url: URL) -> AppDestination? {
+        url.isAppDeepLink && url.host == "settings" ? .settings : nil
+    }
+}
+
+struct Campaign: Identifiable {
+    let id: String
+    let slug: String
+}
+
+struct CampaignRoute: AppRoute {
+    let campaign: Campaign
+
+    func destination(for url: URL) -> AppDestination? {
+        guard url.isAppDeepLink, url.host == "campaign",
+              url.path == "/\(campaign.slug)"
+        else {
+            return nil
+        }
+        return .campaign(id: campaign.id)
+    }
+}
+
+struct FallbackRoute: AppRoute {
+    func destination(for url: URL) -> AppDestination? {
+        url.isAppDeepLink ? .notFound : nil
+    }
+}
+```
+
+`ProfileRoute`, `SubscriptionRoute`, `DebugRoute` and `DisabledDebugRoute`
+follow the same pattern, so I'll skip them here.
+
+<Callout type="warning">
+`FallbackRoute` intentionally matches every valid app deep link, so it must
+stay last. A route declared after it is unreachable.
+</Callout>
+
+## What the stock `ContentBuilder` does
+
+Start with two statements and none of the control flow:
+
+```swift
+@available(iOS 27.0, *)
+@ContentBuilder
+func appRoutes() -> some AppRoute {
+    SettingsRoute()
+    ProfileRoute()
+}
+```
+
+The compiler gets surprisingly far before it reports the problem:
+
+```
+error: return type of global function 'appRoutes()' requires that
+'TupleContent<SettingsRoute, ProfileRoute>' conform to 'AppRoute'
+```
+
+The builder already accepted two values that aren't views. It assembled them
+into `TupleContent`; the result just doesn't conform to our protocol yet.
+
+`ContentBuilder` itself isn't a new builder. It is a typealias:
+
+```swift
+public typealias ContentBuilder = ViewBuilder
+```
+
+The important change in the Xcode 27 SDK is an unconstrained overload on
+`ViewBuilder`:
+
+```swift
+@available(iOS 27.0, *)
+public static func buildBlock<each Content>(
+    _ content: repeat each Content
+) -> TupleContent<repeat each Content>
+```
+
+There is no `where Content: View` constraint. `TupleContent` is likewise an
+unconstrained generic container; its `View` conformance is conditional. That
+leaves room for another conditional conformance for our domain:
+
+```swift
+@available(iOS 26.0, *)
+extension TupleContent: AppRoute where repeat each Content: AppRoute {
+    func destination(for url: URL) -> AppDestination? {
+        for route in repeat each content {
+            if let destination = route.destination(for: url) {
+                return destination
+            }
+        }
+        return nil
+    }
+}
+```
+
+This is the intended integration point rather than an accidental loophole:
+[Apple's documentation](https://developer.apple.com/documentation/swiftui/tuplecontent)
+describes `TupleContent` as a type that custom builder DSL protocols should
+conform to.
+
+The type itself is available from iOS 26, while the `buildBlock` overload that
+produces it is available from iOS 27. For two unconditional routes, this is all
+an iOS 27 app needs. The opening DSL also contains conditions and dynamic
+content, so the containers behind those constructs need the same treatment.
+
+## Teaching SwiftUI's containers to route
+
+Each piece of control flow becomes a concrete type, and that type needs to
+behave as an `AppRoute`:
+
+| DSL construct | Type in the result |
+| --- | --- |
+| multiple route statements | `TupleContent` |
+| `if` without `else` | `Optional` |
+| `if`/`else` | `_ConditionalContent` |
+| dynamic routes | `ForEach` |
+
+A bare `if` produces an optional route:
+
+```swift
+extension Optional: AppRoute where Wrapped: AppRoute {
+    func destination(for url: URL) -> AppDestination? {
+        self?.destination(for: url)
+    }
+}
+```
+
+An `if`/`else` produces SwiftUI's conditional container:
+
+```swift
+extension _ConditionalContent: AppRoute
+where TrueContent: AppRoute, FalseContent: AppRoute {
+    func destination(for url: URL) -> AppDestination? {
+        switch storage {
+        case .trueContent(let content):
+            content.destination(for: url)
+        case .falseContent(let content):
+            content.destination(for: url)
+        }
+    }
+}
+```
+
+<Callout type="warning">
+`_ConditionalContent` is an underscored SwiftUI type with no source
+compatibility guarantee. That can be a reasonable tradeoff for internal app
+code, but it deserves more caution in a public library.
+</Callout>
+
+Dynamic campaign routes need one more conformance:
+
+```swift
+extension ForEach: AppRoute where Content: AppRoute {
+    func destination(for url: URL) -> AppDestination? {
+        for element in data {
+            if let destination = content(element).destination(for: url) {
+                return destination
+            }
+        }
+        return nil
+    }
+}
+```
+
+`ForEach` isn't produced by a builder method. It's an ordinary value that can
+participate in the block because its initializers no longer require
+`Content: View`. Campaigns also have meaningful stable IDs, so identity isn't
+being manufactured merely to satisfy a SwiftUI type.
+
+Together, these four conformances complete the DSL from the opening example
+on iOS 27, without declaring a custom `@resultBuilder`.
+
+## Using the router from SwiftUI
+
+`AppDestination` is `Hashable`, so the router's output can feed directly into
+a `NavigationPath`:
+
+```swift
+struct RootView: View {
+    @State private var path = NavigationPath()
+
+    let subscriptionsEnabled: Bool
+    let debugBuild: Bool
+    let campaigns: [Campaign]
+
+    private var routes: some AppRoute {
+        appRoutes(
+            subscriptionsEnabled: subscriptionsEnabled,
+            debugBuild: debugBuild,
+            campaigns: campaigns
+        )
+    }
+
+    var body: some View {
+        NavigationStack(path: $path) {
+            HomeView()
+                .navigationDestination(for: AppDestination.self) {
+                    AppDestinationView(destination: $0)
+                }
+        }
+        .onOpenURL { url in
+            if let destination = routes.destination(for: url) {
+                path.append(destination)
+            }
+        }
+    }
+}
+```
+
+`HomeView` and `AppDestinationView` are app-specific. The routing layer only
+parses a URL and returns a value; navigation remains at the SwiftUI boundary.
+
+The sample intentionally keeps parsing small to highlight the builder. A
+production router will often add `URLComponents`, query-item validation,
+percent-decoding and universal-link handling without changing the composition
+mechanism.
+
+## Back-deploying the DSL to iOS 17
+
+This still requires the Xcode 27 SDK. The extension lowers the app's deployment
+target; it doesn't make `ContentBuilder` available to older toolchains.
+
+First, replace `TupleContent` with a domain-owned container of the same broad
+shape:
+
+```swift
+struct TupleAppRoute<each Content: AppRoute>: AppRoute {
+    let content: (repeat each Content)
+
+    init(_ content: (repeat each Content)) {
+        self.content = content
+    }
+
+    func destination(for url: URL) -> AppDestination? {
+        for route in repeat each content {
+            if let destination = route.destination(for: url) {
+                return destination
+            }
+        }
+        return nil
+    }
+}
+```
+
+Generic parameter packs in types set the deployment floor at iOS 17. Unlike
+`TupleContent`, `TupleAppRoute` is constrained directly to `AppRoute` because
+it belongs to the routing domain and doesn't need to conditionally become a
+`View`.
+
+Now add one overload to `ContentBuilder`:
+
+```swift
+extension ContentBuilder {
+    static func buildBlock<each Content: AppRoute>(
+        _ content: repeat each Content
+    ) -> TupleAppRoute<repeat each Content> {
+        TupleAppRoute((repeat each content))
+    }
+}
+```
+
+Because `ContentBuilder` is a typealias, this still extends the underlying
+`ViewBuilder` and the method is visible through both names. The overload is
+more specialized than SwiftUI's unconstrained iOS 27 version: when all
+statements are `AppRoute` values, it consistently returns `TupleAppRoute`
+across supported deployment targets.
+
+The pack also accepts a single route, so a one-statement branch becomes
+`TupleAppRoute<SubscriptionRoute>` instead of plain `SubscriptionRoute`. That
+adds one forwarding container but doesn't change matching, order or
+short-circuiting. The `Optional`, `_ConditionalContent` and `ForEach`
+conformances from the iOS 27 version can be reused unchanged.
+
+The iOS 17 support comes from our module-level extension. The stock
+`ContentBuilder` still requires iOS 27 to assemble multiple non-`View` values.
+
+## What `some AppRoute` hides
+
+The back-deployed version also makes its static structure easy to see.
+`some AppRoute` is an opaque return type, not a type-erased `any AppRoute`.
+Callers only depend on the protocol, but the compiler still knows the one
+concrete type produced by the function:
+
+```swift
+TupleAppRoute<
+    Pack{
+        SettingsRoute,
+        ProfileRoute,
+        TupleAppRoute<Pack{SubscriptionRoute}>?,
+        _ConditionalContent<
+            TupleAppRoute<Pack{DebugRoute}>,
+            TupleAppRoute<Pack{DisabledDebugRoute}>
+        >,
+        ForEach<
+            [Campaign],
+            String,
+            TupleAppRoute<Pack{CampaignRoute}>
+        >,
+        FallbackRoute
+    }
+>
+```
+
+`Pack{...}` is the compiler's AST notation for the concrete types substituted
+into the variadic `each Content` parameter. It isn't syntax we write in Swift.
+The outer pack contains every statement in `appRoutes`, while the one-element
+packs come from the same variadic `buildBlock` handling conditional branches
+and the `ForEach` content closure. `String` is `Campaign.ID` in this example.
+
+Runtime values don't change the type. A disabled subscription is represented
+by an empty `Optional`, `if`/`else` selects storage inside
+`_ConditionalContent`, and changing the campaigns only changes the data stored
+by `ForEach`.
+
+## Limits and choosing a builder
+
+Borrowing `ContentBuilder` also means borrowing the grammar of `ViewBuilder`.
+Two limits matter directly to this router.
+
+First, an ordinary `for` loop doesn't compile because `ViewBuilder` has no
+`buildArray(_:)`:
+
+```swift
+for campaign in campaigns {
+    CampaignRoute(campaign: campaign)
+}
+```
+
+`ForEach` is the way to express dynamic data. If the domain has no meaningful
+identity, inventing IDs only to use a SwiftUI container is a sign that a
+custom `@resultBuilder` may fit better.
+
+Second, an availability condition inside the DSL goes through SwiftUI's
+`buildLimitedAvailability`, whose result still requires `View`. Gating the
+whole router function instead of individual route statements is the simplest
+workaround. A custom constrained `buildLimitedAvailability` is possible, but
+it makes the integration larger.
+
+There are architectural costs too. The composition layer now depends on
+SwiftUI, and `if`/`else` exposes `_ConditionalContent`. Both can be acceptable
+at an app's navigation boundary; neither is an obvious default for a reusable
+routing, networking or analytics package.
+
+The wide conformances on `Optional`, `ForEach` and SwiftUI's container types
+are safest while `AppRoute` remains an internal protocol. Turning the example
+into a public API deserves a separate design pass.
+
+The same routing DSL can be assembled in several ways. The implementation
+determines the deployment floor:
+
+| Approach | Result block | Minimum deployment | Best fit |
+| --- | --- | --- | --- |
+| stock `@ContentBuilder` | `TupleContent` | iOS 27 for multiple non-`View` values | least integration code |
+| extended `@ContentBuilder` | `TupleAppRoute` | iOS 17 with Xcode 27 | same spelling on a lower target |
+| custom `@resultBuilder` | domain-owned types | depends on implementation | no SwiftUI dependency or custom grammar |
+
+A custom `@resultBuilder` removes the SwiftUI dependency by returning
+domain-owned containers. The tradeoff is more infrastructure: the DSL needs
+its own tuple, conditional and empty types, along with build methods such as
+`buildArray`. This is useful when the dependency boundary or grammar matters
+more than keeping the `@ContentBuilder` spelling.
+
+## Conclusion
+
+Use `ContentBuilder` when the domain naturally fits SwiftUI's grammar: static
+siblings, conditions and identified dynamic content. For app-level routing on
+iOS 27, conforming SwiftUI's containers is enough; a specialized `buildBlock`
+can preserve the same DSL down to iOS 17.
+
+Own the builder when the domain needs ordinary loops, availability inside the
+block or a framework-level abstraction. `ContentBuilder` is a useful shortcut,
+but ownership still defines the boundary.
+
+The complete router is available in the
+[ContentBuilderExample](https://github.com/artemnovichkov/ContentBuilderExample)
+repository.
+
+Thanks for reading 🙏
