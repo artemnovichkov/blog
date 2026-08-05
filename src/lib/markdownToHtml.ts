@@ -3,7 +3,6 @@ import rehypePrettyCode from "rehype-pretty-code"
 import rehypeSlug from "rehype-slug"
 import remarkGfm from "remark-gfm"
 import AdBlock from "../app/_components/ad-block"
-import AudioPlayer from "../app/_components/audio-player"
 import Callout from "../app/_components/callout"
 import CodeBlock from "../app/_components/code-block"
 import { FileTree } from "../app/_components/filetree"
@@ -32,7 +31,6 @@ export default async function markdownToHtml(markdown: string) {
       Tweet: SafeTweet,
       Callout,
       FileTree,
-      AudioPlayer,
       pre: CodeBlock,
       img: PostImage,
       AdBlock,
