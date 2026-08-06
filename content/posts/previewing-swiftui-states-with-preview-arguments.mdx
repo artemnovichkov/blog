@@ -12,12 +12,12 @@ categories:
 Most SwiftUI views have more than one meaningful state: empty and populated
 content, loading, errors, permissions, and edge cases. Those states form a
 small visual inventory that we want to review together, but the usual choices
-were either a stack of views inside one preview or several nearly identical
+are either a stack of views inside one preview or several nearly identical
 `#Preview` declarations.
 
-Xcode 27 introduces `#Preview(arguments:)`. Pass it a collection of fixtures
-and Xcode turns every argument into an independently selectable variant inside
-one preview group:
+Xcode 27 introduces `#Preview(arguments:)`. Pass it a collection of values and
+Xcode turns every argument into an independently selectable variant inside one
+preview group:
 
 ```swift
 @available(iOS 26.0, *)
@@ -26,9 +26,8 @@ one preview group:
 }
 ```
 
-The collection becomes the single source of truth for the component's state
-catalog. Canvas renders the arguments in a grid and lets you open one variant
-on its own when you need a closer look.
+Canvas renders the arguments in a grid and lets you open one variant on its
+own when you need a closer look.
 
 <Callout type="info" emoji="ℹ️">
   `#Preview(arguments:)` requires Xcode 27 and is available on iOS 26, macOS
@@ -37,9 +36,8 @@ on its own when you need a closer look.
 
 ## Model the view states
 
-The example uses a small download card. Keeping the state separate from the
-view makes the component easy to use in the app and gives previews a natural
-input.
+The example uses a small download card. Its state lives in a separate
+`DownloadItem` value, so a preview only needs to supply one argument.
 
 ```swift
 enum DownloadState {
@@ -66,10 +64,9 @@ Here is the card in its waiting state:
 
 ![Download card in the waiting state](/images/previewing-swiftui-states-with-preview-arguments/download-card-waiting.png)
 
-The card layout is not important here, so its implementation is omitted. What
-matters is that an item completely describes the input needed to render one
-version of the card. The complete implementation is available in the example
-project linked at the end of the article.
+The card layout is not important here, so its implementation is omitted. The
+complete implementation is available in the example project linked at the end
+of the article.
 
 ## Build a preview item catalog
 
@@ -110,7 +107,7 @@ extension DownloadItem {
 
 ## Declare one preview per state
 
-The most direct approach was a separate `#Preview` declaration for every
+The most direct approach is a separate `#Preview` declaration for every
 state:
 
 ```swift
@@ -144,7 +141,7 @@ means adding another declaration and keeping its name and value in sync.
 
 ## Put every state in one preview
 
-To see everything at once, it was common to put the fixtures in a `VStack`:
+To see everything at once, put the items in a `VStack`:
 
 ```swift
 #Preview("All download states", traits: .sizeThatFitsLayout) {
@@ -159,8 +156,8 @@ To see everything at once, it was common to put the fixtures in a `VStack`:
 ```
 
 This is useful for a quick visual comparison, but Canvas still sees one
-preview. The individual cards are not preview variants: they are subviews of a
-single vertical layout. That makes it harder to open one state on its own or
+preview. The individual cards are subviews of a single vertical layout, not
+preview variants. That makes it harder to open one state on its own or
 to use the Canvas grid as an inventory of component states.
 
 ![A VStack and ForEach render every state inside one preview](/images/previewing-swiftui-states-with-preview-arguments/vstack-foreach.png)
@@ -217,8 +214,8 @@ extension DownloadItem: CustomStringConvertible {
 }
 ```
 
-This is why `Downloading 42%` is more useful than just `Downloading`: labels
-should be short, stable, and unique within the group.
+Two variants both labeled `Downloading` would be indistinguishable in the
+grid, so labels should be short, stable, and unique within the group.
 
 Click a variant in the grid and Xcode opens that item on its own. You can
 inspect it at a comfortable size without losing the context of the state that
@@ -227,15 +224,12 @@ Interactive mode.
 
 ![The Completed argument opened as an individual preview in Xcode](/images/previewing-swiftui-states-with-preview-arguments/interactive-preview.png)
 
-`arguments:` gives Xcode the variants themselves, so Canvas can present and
-open them independently.
-
 ## Use arguments for states, not environments
 
-Use arguments for one finite axis of meaningful input states: loading, empty,
-populated, failed, or a few carefully chosen edge cases. A long file name, a
-large value, or a localized error can be useful fixtures when they reveal
-layout problems.
+Use arguments for one finite axis of meaningful input states, the same list
+the card started with plus a few carefully chosen edge cases. A long file
+name, a large value, or a localized error earns a slot when it reveals a
+layout problem.
 
 Keep environment concerns separate. Color schemes, Dynamic Type sizes,
 locales, devices, and orientations are better expressed with preview traits or
@@ -288,26 +282,17 @@ nonisolated struct $s23PreviewArgumentsExample0023DownloadCardswift_elFCffMX145_
 ```
 
 The source-location metadata and generated type name are implementation
-details. The important part is `if #available(iOS 26.0, *)`. The outer
-availability belongs to the preview registry; it does **not** make
-`arguments:` available on iOS 17–25. The annotation on `#Preview` lets an
-application with a lower deployment target compile cleanly.
+details. The `@available(iOS 17.0, ...)` on the registry does **not** make
+`arguments:` available on iOS 17–25; the inner `if #available(iOS 26.0, *)`
+throws `PreviewUnavailable()` there instead. The annotation on `#Preview` lets
+an application with a lower deployment target compile cleanly.
 
-## Build a first-class state catalog
-
-`#Preview(arguments:)` turns a deterministic collection of fixtures into a
-first-class state catalog in Canvas. One array defines the variants, each
-argument remains independently selectable, and adding a state no longer
-requires another preview declaration.
-
-Give variants clear names and keep each group focused on one dimension. Use
-separate preview groups or traits for environment concerns before the catalog
-becomes a matrix.
+## Example project
 
 You can explore the complete implementation in the
 [PreviewArgumentsExample](https://github.com/artemnovichkov/PreviewArgumentsExample)
 project.
 
-For an example of applying the same fixture mindset to intermediate generated
+For an example of applying the same mindset to intermediate generated
 content, see [Working with partially generated content in Xcode
 previews](/blog/working-with-partially-generated-content-in-xcode-previews).
