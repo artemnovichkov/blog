@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import AdBlock from "@/app/_components/ad-block"
 import PostActions from "@/app/_components/post-actions"
 import PostHeader from "@/app/_components/post-header"
+import PostImageZoom from "@/app/_components/post-image-zoom"
 import PostTableOfContents from "@/app/_components/post-table-of-contents"
 import ReadNext from "@/app/_components/read-next"
 import {
@@ -52,6 +53,8 @@ export default async function BlogPost(props: Params) {
           >
             {content}
           </div>
+          {/* Keyed by slug so navigating between posts remounts and re-marks images. */}
+          <PostImageZoom key={post.slug} />
         </div>
       </article>
       <div className="mx-auto w-full max-w-2xl">
