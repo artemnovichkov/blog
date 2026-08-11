@@ -33,8 +33,16 @@ cycle again with Xcode not running.
 
 ## Wiring the server into an agent
 
-The MCP server itself is a stdio bridge. In Claude Code, `.mcp.json` at the
-repository root is enough:
+The MCP server itself is a stdio bridge. In Claude Code, one command registers
+it:
+
+```bash
+claude mcp add --transport stdio xcode -- xcrun mcpbridge
+```
+
+Everything after `--` is the command the bridge runs, so the flags belong to
+`claude` rather than to `xcrun`. If you'd rather commit the configuration with
+the project, the equivalent `.mcp.json` at the repository root is:
 
 ```json
 {
