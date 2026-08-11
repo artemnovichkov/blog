@@ -1,0 +1,518 @@
+---
+title: Building iOS Apps with the Headless Xcode MCP Server
+description: Xcode 27 beta 5 runs its MCP server without the Xcode UI and exports Apple's agent skills to your repo
+cover: /images/building-ios-apps-with-headless-xcode-mcp/cover.png
+date: '2026-08-11'
+categories:
+  - xcode
+  - mcp
+  - ai
+  - claude
+  - swiftui
+---
+
+Xcode has shipped an MCP server for a while now: point a coding agent at
+`xcrun mcpbridge` and it can create files, build, render previews, and drive
+the simulator through the running Xcode instance. The catch was in that last
+part — *running*. Quit Xcode and the tools went dark.
+
+Xcode 27 beta 5 adds a new launcher, `xcrun mcp-server`, that runs the tool
+service headless. It comes with a real permission model, and separately, Xcode
+now exports Apple's own agent skills to disk so you can commit them next to
+your code.
+
+This post walks through both by building a small reading list app end to end:
+scaffolding the project, adding screens and navigation, checking previews
+across states, and verifying the logic on a simulator — then doing the whole
+cycle again with Xcode not running.
+
+<Callout type="info" emoji="ℹ️">
+  Everything here was run on Xcode 27.0 beta 5 (build `27A5237l`) with Claude
+  Code as the MCP client. This is beta software and the CLI surface may change.
+</Callout>
+
+## Wiring the server into an agent
+
+The MCP server itself is a stdio bridge. In Claude Code, `.mcp.json` at the
+repository root is enough:
+
+```json
+{
+  "mcpServers": {
+    "xcode": {
+      "type": "stdio",
+      "command": "xcrun",
+      "args": ["mcpbridge"]
+    }
+  }
+}
+```
+
+By default the bridge connects to whichever Xcode `xcode-select` points at. Two
+environment variables override that: `MCP_XCODE_PID` pins a specific Xcode
+process, and `MCP_XCODE_SESSION_ID` identifies a tool session.
+
+## Turning on headless mode
+
+Headless mode is off until you enable it, and every command that changes
+permissions needs `sudo`:
+
+```bash
+sudo xcrun mcp-server enable
+```
+
+That is the whole setup. `xcrun mcp-server status` reports what the server
+currently allows and, if it is running, which workspaces it is serving:
+
+```
+Permission: enabled
+Permitted agents:
+  1B162114-2FCD-4FD0-9537-667626CCD0CC: signed Q6L2SF6YDW com.anthropic.claude-code
+  692E32E9-87A3-49C2-B537-4F8D53C869C2: signed 2DC432GLL2 codex
+Permitted folders:
+  10FD8B3C-903A-44BB-95F6-89A40D87CF92: /Users/artemnovichkov/Developer
+mcp-server: running
+Open workspaces:
+  - ReadingListExample — /Users/artemnovichkov/Developer/ReadingListExample/ReadingListExample.xcodeproj (scheme: ReadingListExample)
+```
+
+Two things are being authorized here, and they are independent. An **agent** is
+identified by its code signature — the team identifier and bundle id in the
+listing above. A **folder** grant lets the headless server open workspaces
+anywhere beneath a directory:
+
+```bash
+sudo xcrun mcp-server allow-folder ~/Developer --always
+```
+
+When an unknown agent connects, it shows up in `status` as a pending request
+with an id, and you approve it by that id:
+
+```bash
+sudo xcrun mcp-server approve <id> --always
+sudo xcrun mcp-server approve <id> --for-24-hours
+```
+
+<Callout type="warning" emoji="⚠️">
+  `--always` only works for signed agents and folders. An unsigned binary —
+  anything invoked through a shell wrapper, a Homebrew script, a Python
+  launcher — can only ever be granted `--for-24-hours`, and it is identified by
+  path plus a content hash rather than by signature. Expect to re-approve those
+  daily.
+</Callout>
+
+There is also `sudo xcrun mcp-server enable --unsafe-always-allow-all-agents`,
+which skips per-agent approval entirely. The flag name is the documentation:
+it means any process on the machine that can reach the service gets to build
+and run code through your Xcode. Use `deny <id>` to revoke a single grant and
+`clear-permissions` to drop all of them.
+
+The rest of the commands are unprivileged: `start` launches the server (a no-op
+if it is already up), `open <path>` launches it if needed and opens
+workspaces, `stop` terminates it.
+
+## Scaffolding the project
+
+With the server wired up, the first prompt is just a description of what you
+want:
+
+> Create a new multiplatform SwiftUI app called ReadingListExample in
+> ~/Developer, no storage, Swift Testing, and open it.
+
+The agent discovers what the templates actually offer instead of guessing at
+identifiers. `XcodeListTemplates` with `kind: "project"` returns each template
+along with its option schema — for the standard App template that is
+`storageType`, `hostInCloudKit`, and `testingSystem`. Then `XcodeNewProject`
+instantiates it:
+
+```json
+{
+  "templateIdentifier": "com.apple.dt.unit.multiPlatform.app",
+  "productName": "ReadingListExample",
+  "destinationPath": "/Users/artemnovichkov/Developer",
+  "organizationIdentifier": "com.artemnovichkov",
+  "options": { "storageType": "None", "testingSystem": "Swift Testing" }
+}
+```
+
+`XcodeOpenWorkspace` then returns a `workspaceIdentifier` such as
+`workspace-GH9NfefFRc`. Every subsequent tool call carries it, which is how one
+agent session keeps several projects straight.
+
+<Callout type="warning" emoji="⚠️">
+  `XcodeWrite`, `XcodeRead`, and friends take *project organization* paths, not
+  filesystem paths, and the project root group is the first component. Writing
+  to `ReadingListExample/Book.swift` put the file next to the `.xcodeproj`, not
+  in the app's source folder — the correct path was
+  `ReadingListExample/ReadingListExample/Book.swift`. `XcodeLS` is the quickest
+  way to see the real shape before writing.
+</Callout>
+
+## Screens and navigation
+
+The app is deliberately small: a list of books grouped into *Currently Reading*
+and *Finished*, a detail screen, and a sheet for adding a book. The state lives
+in an `@Observable` store so previews can be handed a specific state:
+
+```swift
+@MainActor
+@Observable
+final class ReadingListStore {
+
+    enum State: Equatable {
+        case loading
+        case loaded([Book])
+        case failed(String)
+    }
+
+    private(set) var state: State
+
+    init(state: State = .loading, autoLoads: Bool = true) { ... }
+}
+```
+
+The view switches on that state and uses `NavigationStack` with a
+`navigationDestination(for: Book.self)`:
+
+```swift
+NavigationStack {
+    content
+        .navigationTitle("Reading List")
+        .navigationDestination(for: Book.self) { book in
+            BookDetailView(book: book) { finished in
+                store.finish(finished)
+            }
+        }
+        .sheet(isPresented: $isAddingBook) {
+            AddBookView { book in
+                store.add(book)
+            }
+        }
+}
+```
+
+`BuildProject` closes the loop after each change. The first build failed with
+`Call to main actor-isolated initializer 'init(state:)' in a synchronous
+nonisolated context` — a default argument of `= .init()` on the view's
+initializer, which Swift evaluates outside the main actor no matter what you
+annotate the initializer with. Dropping the default and passing the store
+explicitly from the `App` fixed it. Build errors come back as structured
+`errors` entries with file and line, so this loop is fast; `GetBuildLog` is
+there for the cases where the summary isn't enough.
+
+## Checking previews across states
+
+This is where the MCP server earns its keep. `RenderPreview` builds and renders
+a preview and hands back a PNG, so the agent can look at states without anyone
+opening the Canvas.
+
+The four states go in a single `#Preview(arguments:)`, which
+[renders each argument as its own selectable variant](/blog/previewing-swiftui-states-with-preview-arguments):
+
+```swift
+extension ReadingListStore {
+
+    static var previewStores: [ReadingListStore] {
+        [
+            .init(state: .loading, autoLoads: false),
+            .init(state: .loaded([]), autoLoads: false),
+            .init(state: .loaded(Book.samples), autoLoads: false),
+            .init(state: .failed("The shelf is offline. Check your connection."),
+                  autoLoads: false)
+        ]
+    }
+}
+
+#Preview("Reading list states", arguments: ReadingListStore.previewStores) { store in
+    BookListView(store: store)
+}
+```
+
+The `autoLoads: false` matters. The view's `.task` calls `loadIfNeeded()`, so
+without it the loading variant would race itself into the loaded state and the
+snapshot would be non-deterministic.
+
+A `RenderPreview` call reports the variants it found in
+`supportedCanvasControlOverrides`, and you select one with `groupItemIndex`:
+
+```json
+{
+  "sourceFilePath": "ReadingListExample/ReadingListExample/BookListView.swift",
+  "workspaceIdentifier": "workspace-GH9NfefFRc",
+  "previewCanvasControlOverrides": { "groupItemIndex": 2 }
+}
+```
+
+Out of the box those variants come back labelled
+`ReadingListExample.ReadingListStore` four times over, which is useless for picking
+an index. Conforming the argument type to `CustomStringConvertible` fixes the
+listing:
+
+```swift
+extension ReadingListStore: CustomStringConvertible {
+
+    var description: String {
+        switch state {
+        case .loading: "Loading"
+        case .loaded(let books): books.isEmpty ? "Empty" : "Loaded"
+        case .failed: "Failed"
+        }
+    }
+}
+```
+
+```json
+"groupItems": [
+  { "index": 0, "title": "Loading" },
+  { "index": 1, "title": "Empty" },
+  { "index": 2, "title": "Loaded" },
+  { "index": 3, "title": "Failed" }
+]
+```
+
+That is worth doing regardless of agents — the same labels show up in the
+Canvas variant picker. Here are the four renders:
+
+![Loading state](/images/building-ios-apps-with-headless-xcode-mcp/preview-loading.png)
+
+![Empty state](/images/building-ios-apps-with-headless-xcode-mcp/preview-empty.png)
+
+![Loaded state](/images/building-ios-apps-with-headless-xcode-mcp/preview-loaded.png)
+
+![Failure state](/images/building-ios-apps-with-headless-xcode-mcp/preview-failed.png)
+
+`RenderPreview` also accepts `previewVariantOverrides` and
+`previewLocalizationOverride`, so the same call can render dark appearance, an
+accessibility Dynamic Type size, or a specific locale.
+
+## Running on the simulator and verifying logic
+
+Previews prove a view renders. They don't prove that finishing a book actually
+moves it between sections. That needs the device interaction tools, which have
+their own session lifecycle:
+
+```
+DeviceInteractionStartWorkspaceSession
+  → DeviceInteractionInstallAndRun
+    → DeviceInteractionSynthesize   (repeat)
+  → DeviceInteractionEndSession
+```
+
+Starting the session boots the simulator, so it is worth kicking off early
+while the agent is still writing code. `DeviceInteractionInstallAndRun` builds,
+installs, and launches. It also takes `commandLineArguments` and
+`environmentVariables` — both accept an `$(inherited)` token — which is a much
+better way to launch into a specific state than editing the scheme, since
+nothing persists after the run.
+
+`DeviceInteractionSynthesize` does the interacting. Called with no command it
+just captures the current state: a screenshot plus a UI hierarchy dump with
+precomputed hit points.
+
+```
+Button, {{16.0, 208.3}, {370.0, 92.3}}, label: 'The Pragmatic Programmer, Andrew Hunt, David Thomas', value: 34%, hitPoint: {201.0, 254.5}
+```
+
+Those hit points are the coordinates to tap — never estimate them from the
+screenshot. Commands are terse: `t x y` taps, `d x y` double taps,
+`t x1 y1 f x2 y2` swipes, `w 0.3` waits, and `sender keyboard kbd <text>` types
+(it has to be last, since everything after `kbd ` is taken verbatim). They
+chain in one call:
+
+```
+t 201 198.3 w 0.3 sender keyboard kbd Designing Data-Intensive Applications
+```
+
+So the whole check is: tap the book, tap *Mark as Finished*, capture, and read
+the hierarchy back.
+
+![Book detail screen](/images/building-ios-apps-with-headless-xcode-mcp/simulator-detail.png)
+
+![Adding a book](/images/building-ios-apps-with-headless-xcode-mcp/simulator-add-book.png)
+
+The hierarchy after the tap shows *The Pragmatic Programmer* under **Finished**
+and only *Thinking, Fast and Slow* left under **Currently Reading**:
+
+![List after finishing a book](/images/building-ios-apps-with-headless-xcode-mcp/simulator-after-finish.png)
+
+UI state is one signal; the log is the other. The store emits an `OSLog` line
+on every mutation, and `GetConsoleOutput` filters the session's output with a
+regex:
+
+```
+2026-08-11 17:01:04.529501+0500 [ReadingList] Finished The Pragmatic Programmer, currently reading: 1
+2026-08-11 17:02:14.091375+0500 [ReadingList] Added Designing Data-Intensive Applications
+```
+
+That is the assertion. The UI moved the row *and* the model agrees on the
+count. Then `DeviceInteractionEndSession` — an open session holds a booted
+simulator and a debug connection, so leaving it open is expensive.
+
+## Doing it all without Xcode
+
+Now the part that is new. Quit Xcode entirely, then ask the server what it
+thinks:
+
+```
+$ xcrun mcp-server status
+mcp-server: running
+Open workspaces:
+  - ReadingListExample — /Users/artemnovichkov/Developer/ReadingListExample/ReadingListExample.xcodeproj (scheme: ReadingListExample)
+```
+
+No Xcode process, same workspaces, same `workspace-GH9NfefFRc` identifier from
+before the quit. Re-running the cycle — `BuildProject`, `RenderPreview` on the
+loaded variant, `DeviceInteractionInstallAndRun`, taps, `GetConsoleOutput` —
+produces the same results it did with the UI open:
+
+![Verified headless](/images/building-ios-apps-with-headless-xcode-mcp/headless-after-finish.png)
+
+This is what the `workspaceIdentifier` parameter that appears on most of these
+tools is for. With the UI running there is an implicit "current" workspace and
+you can often omit it. Headless there is no such thing, so passing it becomes
+the norm.
+
+<Callout type="warning" emoji="⚠️">
+  The `workspaceIdentifier` parameter is documented as accepting an absolute
+  path as well as an identifier, but passing the exact `.xcodeproj` path
+  reported by `status` was rejected with `Unknown workspace identifier`. Call
+  `XcodeListWorkspaces` and use the `workspace-…` identifier it returns.
+</Callout>
+
+## Adding Xcode's skills to the repo
+
+MCP tools are verbs — build this, render that. They say nothing about *when* to
+reach for them or what good SwiftUI looks like. That is what skills are for,
+and Xcode 27 now hands you Apple's:
+
+```bash
+xcrun agent skills export --output-dir ~/Developer/ReadingListExample/.claude/skills
+```
+
+```
+Exported 10 skills to /Users/artemnovichkov/Developer/ReadingListExample/.claude/skills
+  ✓ building-document-based-swiftui-applications
+  ✓ app-intents-whats-new-27
+  ✓ device-interaction
+  ✓ modernize-tests
+  ✓ adopt-c-bounds-safety
+  ✓ swiftui-specialist
+  ✓ app-intents-specialist
+  ✓ uikit-app-modernization
+  ✓ swiftui-whats-new-27
+  ✓ audit-xcode-security-settings
+```
+
+`xcrun agent` is a thin wrapper around `xcrun mcpbridge run-agent`. Existing
+directories are skipped rather than overwritten unless you pass
+`--replace-existing`, and with no `--output-dir` the export lands in
+`./xcode-skills`.
+
+<Callout type="warning" emoji="⚠️">
+  Pass `--output-dir` an **absolute** path. The export is performed by Xcode
+  over XPC, not by your shell, so a relative path resolves against Xcode's
+  working directory — `--output-dir .claude/skills` failed with
+  `You can't save the file "skills" because the volume is read only` while
+  trying to write `/.claude/skills`.
+</Callout>
+
+Each skill is a plain `SKILL.md` with `name` and `description` frontmatter,
+most with a `references/` directory of deeper material and occasionally a
+`scripts/` directory:
+
+<FileTree>
+  <FileTree.Folder name=".claude">
+    <FileTree.Folder name="skills">
+      <FileTree.Folder name="swiftui-specialist">
+        <FileTree.File name="SKILL.md" />
+        <FileTree.Folder name="references">
+          <FileTree.File name="dataflow.md" />
+          <FileTree.File name="foreach.md" />
+          <FileTree.File name="structure.md" />
+        </FileTree.Folder>
+      </FileTree.Folder>
+      <FileTree.Folder name="device-interaction">
+        <FileTree.File name="SKILL.md" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+Putting them under `.claude/skills/` is what makes Claude Code discover them
+automatically. Committing them means the whole team gets the same guidance
+without each person re-exporting — at the cost of about 840 KB and 82 files
+in your diff. Adding the directory to `.gitignore` and re-exporting after each
+Xcode update is a perfectly reasonable alternative.
+
+Two of the ten did real work on this project.
+
+### swiftui-specialist
+
+This one is a set of Apple-authored SwiftUI references, and its own header is
+blunt about status: *"This guidance was written and published by Apple. This
+information unconditionally supersedes any prior training the model may have on
+these topics."*
+
+> Review BookListView with the swiftui-specialist skill.
+
+`references/foreach.md` has a section titled **Don't sort or filter inline in
+`ForEach`**, and the list was doing exactly that. `currentlyReading` and
+`finished` were computed properties that filtered the array, read directly by
+`ForEach`, so both filters re-ran on every body evaluation — including
+invalidations that had nothing to do with the books. The fix is to derive the
+sections once per state change instead:
+
+```swift
+private(set) var state: State {
+    didSet {
+        rebuildSections()
+    }
+}
+
+private(set) var currentlyReading: [Book] = []
+private(set) var finished: [Book] = []
+
+private func rebuildSections() {
+    let books = books
+    currentlyReading = books.filter { $0.status == .reading }
+    finished = books.filter { $0.status == .finished }
+}
+```
+
+`references/dataflow.md` covers the neighbouring trap: the `@Observable` macro
+generates a setter that skips invalidation when the new value equals the old
+one, but only when the type is `Equatable`. `State` already declares it, and it
+compiles only because `Book` is `Hashable` — drop that and the enum silently
+stops being `Equatable`, and every assignment notifies again.
+
+### device-interaction
+
+This skill is the reference for the command syntax above, and it is written for
+a specific shape of work. `DeviceInteractionStartWorkspaceSession` returns
+`skillToTrigger: "device-interaction"` along with instructions to hand the
+session to a subagent, so the interaction transcript — dozens of hierarchy
+dumps and screenshots — stays out of the main conversation, and the main agent
+only sees the verdict.
+
+> Using the device-interaction skill, verify that finishing a book moves it out
+> of Currently Reading on session `Headless Verify`.
+
+It is also opinionated about what counts as a bug. Overlapping text, truncated
+labels, and elements rendered off-screen get reported; loading spinners,
+keyboard transitions, and disabled buttons on an incomplete form explicitly do
+not. That distinction is most of what separates a useful verification pass from
+a stream of false positives.
+
+One rough edge: the skill refers to the tool as `DeviceEventSynthesize`
+throughout, while the tool the server actually exposes is
+`DeviceInteractionSynthesize`.
+
+## Example project
+
+The complete app, including the exported skills under `.claude/skills/`, is in
+the [ReadingListExample](https://github.com/artemnovichkov/ReadingListExample)
+project.
+
+If you're interested in how the preview states in this post work, see
+[Preview Multiple SwiftUI View States with
+`#Preview(arguments:)`](/blog/previewing-swiftui-states-with-preview-arguments).
