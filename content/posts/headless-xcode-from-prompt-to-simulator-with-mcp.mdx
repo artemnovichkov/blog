@@ -251,10 +251,10 @@ With the setup complete, describe the project:
 > subfolder, no storage, Swift Testing.
 
 The agent discovers what the templates actually offer instead of guessing at
-identifiers. `XcodeListTemplates` with `kind: "project"` returns each template
-along with its option schema — for the standard App template that is
-`storageType`, `hostInCloudKit`, and `testingSystem`. Then `XcodeNewProject`
-instantiates it:
+identifiers. The `XcodeListTemplates` tool with `kind: "project"` returns each
+template along with its option schema — for the standard App template that is
+`storageType`, `hostInCloudKit`, and `testingSystem`. Then the
+`XcodeNewProject` tool instantiates it:
 
 ```json
 {
@@ -270,9 +270,9 @@ calls to a one-line summary; ⌃ + O shows the parameters and response.
 
 `destinationPath` is the **parent** directory. Asking for a subfolder keeps
 `.mcp.json` and the skills at the repository root while Xcode creates
-`<productName>/` beneath it. `XcodeNewProject` writes the project to disk;
-`XcodeOpenWorkspace` then opens the generated `.xcodeproj` and returns the
-workspace identifier used by subsequent tools.
+`<productName>/` beneath it. The `XcodeNewProject` tool writes the project to
+disk; the `XcodeOpenWorkspace` tool then opens the generated `.xcodeproj` and
+returns the workspace identifier used by subsequent tools.
 
 ## Generating the app with Apple's SwiftUI skill
 
@@ -315,7 +315,7 @@ Claude loaded `swiftui-specialist` and its data-flow and structure references
 before editing. The generated store caches both sections and recomputes them
 after mutations, while rows and sections remain separate views.
 
-`BuildProject` then verifies the generated project:
+The `BuildProject` tool then verifies the generated project:
 
 ```json
 {
@@ -327,8 +327,8 @@ after mutations, while rows and sections remain separate views.
 
 ## Rendering previews without a Canvas
 
-`RenderPreview` keeps visual verification inside the agent's workflow. It
-builds a preview and returns the rendered PNG without opening the Canvas.
+The `RenderPreview` tool keeps visual verification inside the agent's workflow.
+It builds a preview and returns the rendered PNG without opening the Canvas.
 
 > Combine the previews in `ReadingListView.swift` into one `#Preview(arguments:)`
 > with all four states — loading, empty, loaded, failed — and give each a
@@ -345,8 +345,9 @@ one variant per case:
 ```
 
 Then the agent renders each variant, opens the resulting PNGs, and checks their
-contents. `RenderPreview` returns file paths, so it is important to ask the
-agent to inspect the images rather than only confirm that rendering succeeded.
+contents. The `RenderPreview` tool returns file paths, so it is important to ask
+the agent to inspect the images rather than only confirm that rendering
+succeeded.
 
 Comparing four separate PNGs is cumbersome, so ask Claude to publish them as a
 single HTML artifact:
@@ -448,8 +449,8 @@ and its debug connection.
 Headless mode removes Xcode's visual debugging UI, not the debugger itself. You
 lose the Canvas with its live selection, the view debugger, the breakpoint
 gutter, and Organizer. Breakpoints still work through LLDB, but they are not
-visible in an editor. `RenderPreview` gives you a PNG per variant instead of an
-interactive Canvas.
+visible in an editor. The `RenderPreview` tool gives you a PNG per variant
+instead of an interactive Canvas.
 
 Builds, previews, tests, simulator runs, and console output remain available
 through tools. That covers most of an agent's build loop without a window

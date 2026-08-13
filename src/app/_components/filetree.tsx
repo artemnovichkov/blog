@@ -27,7 +27,7 @@ const iconByType = {
 const iconClassNameByType = {
   common: "h-4 w-4",
   markdown: "h-4 w-5",
-  swift: "h-4 w-4 text-orange-600 dark:text-orange-400",
+  swift: "h-4 w-4 text-[#F05138]",
 }
 
 const inferredIconType = (name: string): FileIconType => {
