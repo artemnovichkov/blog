@@ -167,6 +167,9 @@ export default function PostImageZoom() {
       viewport.clientWidth * viewportFill,
       (viewport.clientHeight * viewportFill * width) / height
     )
+    const exceedsViewport =
+      width > viewport.clientWidth * viewportFill ||
+      height > viewport.clientHeight * viewportFill
 
     if (sourceRef.current) sourceRef.current.style.visibility = ""
     sourceRef.current = image
@@ -178,7 +181,7 @@ export default function PostImageZoom() {
       // Fitting into the viewport is only worth it when it actually magnifies
       // the image. Tall screenshots on desktop and wide ones on phones gain
       // nothing that way, so those are shown at natural size and scrolled.
-      scrollable: containedWidth < rect.width * minZoomGain,
+      scrollable: exceedsViewport && containedWidth < rect.width * minZoomGain,
     })
   }, [])
 

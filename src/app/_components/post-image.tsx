@@ -23,7 +23,7 @@ export default function PostImage({
 
   return (
     <Image
-      className="rounded"
+      className="mx-auto block rounded"
       src={src}
       alt={alt ?? ""}
       width={width}

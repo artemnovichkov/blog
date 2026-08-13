@@ -41,6 +41,17 @@
   margin-bottom: 0;
 }
 
+.callout span[data-rehype-pretty-code-figure] {
+  background-color: transparent !important;
+}
+
+.callout :where(code):not(:where(pre code)) {
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  border-radius: 0.25rem;
+  background-color: transparent !important;
+}
+
 .ad-block p {
   margin-top: 0;
   margin-bottom: 0;
@@ -332,6 +343,12 @@ code[data-line-numbers] > [data-line]::before {
   background-color: transparent !important;
 }
 
+.prose
+  [data-rehype-pretty-code-figure]:has([data-rehype-pretty-code-title])
+  pre {
+  margin-top: 0;
+}
+
 /* Remove backticks from inline code */
 .prose :where(code):not(:where([class~="not-prose"] *))::before,
 .prose :where(code):not(:where([class~="not-prose"] *))::after {
@@ -348,8 +365,18 @@ code[data-line-numbers] > [data-line]::before {
   padding: 0.25rem;
 }
 
-.prose h2[id] {
-  scroll-margin-top: 6rem;
+.prose :where(h2[id], h3[id]) {
+  scroll-margin-top: 7rem;
+}
+
+.prose .menu-bar-states {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.prose .menu-bar-states figcaption {
+  font-style: italic;
 }
 
 /* Dark mode typography colors */
