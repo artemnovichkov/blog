@@ -1,0 +1,535 @@
+---
+title: 'Headless Xcode: From Prompt to Simulator with MCP'
+description: Use Xcode 27's headless MCP server and Apple's agent skills to build, preview, and verify an iOS app
+cover: /images/headless-xcode-from-prompt-to-simulator-with-mcp/cover.png
+date: '2026-08-11'
+categories:
+  - xcode
+  - mcp
+  - ai
+  - claude
+  - swiftui
+---
+
+Xcode's MCP server lets a coding agent create files, build, render previews,
+and drive the simulator. Until now, those tools disappeared when you quit
+Xcode.
+
+Xcode 27 beta 5 adds `xcrun mcp-server`, which exposes the same tools without
+opening the Xcode UI. Combined with Apple's exportable agent skills, it lets an
+external agent create a project, build it, render previews, and verify
+interactions in the simulator. I'll use Claude Code to do exactly that with a
+small reading list app.
+
+<Callout type="info" emoji="ℹ️">
+  Everything here was run on Xcode 27.0 beta 5 (build 27A5237l) with Claude
+  Code as the MCP client. You need that Xcode build, Claude Code, and an
+  administrator account to enable the service. This is beta software and the
+  CLI surface may change.
+</Callout>
+
+Quit Xcode. We're getting started.
+
+## Starting the server without the Xcode UI
+
+Headless mode is off until you turn it on, and every command that changes
+permissions needs `sudo`:
+
+```console
+$ sudo xcrun mcp-server enable
+mcp-server: enabled (unsafeAlwaysAllowAllAgents: false)
+$ xcrun mcp-server start
+```
+
+`enable` flips the switch; `start` launches the service and is a no-op if it is
+already up. `unsafeAlwaysAllowAllAgents` is the one thing `enable` lets you
+change, and `false` — the default — means every agent gets approved
+individually. More on that later.
+
+`xcrun mcp-server status` reports where things stand:
+
+```console
+$ xcrun mcp-server status
+Permission: enabled
+mcp-server: running
+Open workspaces: none
+```
+
+## Wiring the project: MCP server and Apple's skills
+
+Two things have to be in place before an agent is any use here, and both belong
+in the project repo rather than in your machine's global config: the server
+registration, which is how the agent reaches Xcode at all, and Apple's skills,
+which are how it knows what to do once it gets there.
+
+### Registering the MCP server in the repo
+
+The MCP server itself is a stdio bridge. Pinning `DEVELOPER_DIR` in the
+registration keeps the beta scoped to the agent and leaves the stable Xcode
+selected for day-to-day work:
+
+```console
+$ claude mcp add --scope project \
+    -e DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+    xcode -- xcrun mcpbridge
+```
+
+Everything after `--` is the command the bridge runs, so the flags belong to
+`claude` rather than to `xcrun`. `--scope project` writes a `.mcp.json` at the
+repository root. The registration travels with the repository, but every
+developer still approves it locally. The resulting file is small enough to
+hand-edit later:
+
+```json title=".mcp.json"
+{
+  "mcpServers": {
+    "xcode": {
+      "type": "stdio",
+      "command": "xcrun",
+      "args": ["mcpbridge"],
+      "env": {
+        "DEVELOPER_DIR": "/Applications/Xcode-beta.app/Contents/Developer"
+      }
+    }
+  }
+}
+```
+
+Point `DEVELOPER_DIR` at wherever the beta actually lives. You can omit the
+variable entirely to use the Xcode selected by `xcode-select`. When set,
+`DEVELOPER_DIR` takes precedence without changing the selection for other
+terminals.
+
+### Exporting Apple's skills into the repo
+
+Tools are verbs: build this, render that. Skills tell the agent when to use
+them and how Apple expects SwiftUI code to be structured. One command copies
+Apple's skills next to `.mcp.json`:
+
+```console
+$ xcrun agent skills export --output-dir ~/Developer/ReadingListExample/.claude/skills
+Launching Xcode...
+Exported 10 skills to /Users/artemnovichkov/Developer/ReadingListExample/.claude/skills
+  ✓ device-interaction
+  ✓ swiftui-specialist
+  ✓ swiftui-whats-new-27
+  …
+```
+
+Xcode launches and shows its window while exporting the skills — its only
+on-screen appearance in this entire headless workflow. The skills live inside
+Xcode rather than the CLI, which is why the command prints `Launching Xcode...`.
+Existing skills are skipped rather than overwritten, so pass
+`--replace-existing` when you re-export after an update.
+
+<Callout type="warning" emoji="⚠️">
+  Pass `--output-dir` an **absolute** path. The export is performed by Xcode
+  over XPC (Apple's system for communication between processes), not by your
+  shell, so a relative path may resolve outside your project and fail.
+</Callout>
+
+Each skill is a plain `SKILL.md` with `name` and `description` frontmatter,
+most with a `references/` directory of deeper material and occasionally a
+`scripts/` directory:
+
+<FileTree>
+  <FileTree.Folder name=".claude">
+    <FileTree.Folder name="skills">
+      <FileTree.Folder name="swiftui-specialist">
+        <FileTree.File name="SKILL.md" />
+        <FileTree.Folder name="references">
+          <FileTree.File name="dataflow.md" />
+          <FileTree.File name="foreach.md" />
+          <FileTree.File name="structure.md" />
+        </FileTree.Folder>
+      </FileTree.Folder>
+      <FileTree.Folder name="device-interaction">
+        <FileTree.File name="SKILL.md" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+Putting them under `.claude/skills/` is what makes Claude Code discover them
+automatically, and discovery is relative to the directory the agent was started
+in — so the agent has to be started in the project, the same place the server
+registration lives.
+
+## Understanding the two permission gates
+
+After you start an agent, its first request to the MCP server waits while the
+headless service authorizes two things independently.
+
+The first gate is the **agent** itself. This prompt appears:
+
+![Agent permission prompt](/images/headless-xcode-from-prompt-to-simulator-with-mcp/permission-agent.png)
+
+The prompt comes from the headless service, not from Claude Code. The grant is
+keyed to the code signature rather than the app name, which is why the dialog
+says *agents from Anthropic PBC*. Approving it gives the agent every tool the
+server exposes: *build, test, and modify your code*, as the dialog says.
+
+An Xcode icon appears in the menu bar as the only visible trace of the setup.
+Click it to open the Background Activity window:
+
+![Xcode Background Activity menu bar item](/images/headless-xcode-from-prompt-to-simulator-with-mcp/connected-agents.png)
+
+It lists approved agents, their current activity, and any open workspaces.
+`Quit` shuts down the service, just like `xcrun mcp-server stop`.
+
+A **folder** grant is the second gate, and it gets its own prompt the moment the
+agent tries to open or create something:
+
+![Folder permission prompt](/images/headless-xcode-from-prompt-to-simulator-with-mcp/permission-folder.png)
+
+The phrase *Any Xcode project inside this folder* matters. The grant is
+recursive and does not expire unless you pick *Allow for 24 Hours*.
+
+`status` shows both gates now:
+
+```console
+$ xcrun mcp-server status
+Permission: enabled
+Permitted agents:
+  A843056C-42FA-4C26-9EB3-84A7251FF7F1: signed Q6L2SF6YDW com.anthropic.claude-code
+Permitted folders:
+  026F9649-91E7-48B4-B9F4-947E91ACEB37: /Users/artemnovichkov/Developer/ReadingListExample
+mcp-server: running
+Open workspaces: none
+```
+
+Both grants carry an id, and that id is how you revoke them later.
+
+### Skipping the prompts
+
+One unsafe flag skips both prompts:
+
+```bash
+sudo xcrun mcp-server enable --unsafe-always-allow-all-agents
+```
+
+The Xcode item in the menu bar normally collapses to a hammer with no
+background. When an agent connects, it briefly expands into a colored badge:
+blue for individual approvals and red for unsafe mode. The red badge is a
+security warning, not an error.
+
+While Xcode is handling an agent request, the hammer changes into rotating
+arrows — for example, while building and launching the app on a simulator. The
+color still reflects the permission mode; the animation is the activity
+indicator.
+
+<figure className="menu-bar-states">
+  <img
+    src="/images/headless-xcode-from-prompt-to-simulator-with-mcp/menu-bar-activity-states.png"
+    alt="Four Xcode menu bar states: a collapsed hammer, a blue badge for individual approvals, a red badge for unsafe mode, and rotating arrows for an active request in unsafe mode"
+    width="384"
+    height="68"
+  />
+  <figcaption>
+    From left: collapsed, individual approvals, unsafe mode, and an active
+    request in unsafe mode.
+  </figcaption>
+</figure>
+
+The flag is named after agents, but it bypasses the folder gate too. It trusts
+every process on the machine with every Xcode project it can reach, leaving no
+individual grant in `status` to revoke. Disable and re-enable the service
+without the flag to return to individual prompts. To remove any stored grants,
+run:
+
+```bash
+sudo xcrun mcp-server clear-permissions
+```
+
+The next connection asks for approval again.
+
+## Creating the project from a prompt
+
+With the setup complete, describe the project:
+
+> Create a new multiplatform SwiftUI app called ReadingListExample in a
+> subfolder, no storage, Swift Testing.
+
+The agent discovers what the templates actually offer instead of guessing at
+identifiers. The `XcodeListTemplates` tool with `kind: "project"` returns each
+template along with its option schema — for the standard App template that is
+`storageType`, `hostInCloudKit`, and `testingSystem`. Then the
+`XcodeNewProject` tool instantiates it:
+
+```json
+{
+  "templateIdentifier": "com.apple.dt.unit.multiPlatform.app",
+  "productName": "ReadingListExample",
+  "destinationPath": "/Users/artemnovichkov/Developer/ReadingListExample",
+  "options": { "storageType": "None", "testingSystem": "Swift Testing" }
+}
+```
+
+That JSON is the tool call, not something you write. Claude Code collapses tool
+calls to a one-line summary; ⌃ + O shows the parameters and response.
+
+`destinationPath` is the **parent** directory. Asking for a subfolder keeps
+`.mcp.json` and the skills at the repository root while Xcode creates
+`<productName>/` beneath it. The `XcodeNewProject` tool writes the project to
+disk; the `XcodeOpenWorkspace` tool then opens the generated `.xcodeproj` and
+returns the workspace identifier used by subsequent tools.
+
+## Generating the app with Apple's SwiftUI skill
+
+The app is deliberately small: a list of books grouped into *Currently Reading*
+and *Finished*, a detail screen, and a sheet for adding a book.
+
+> Build the reading list screen. A `Book` model with title, author, page count,
+> current page and a reading/finished status. An `@Observable` store that holds
+> a loading/loaded/failed state and exposes the two sections. A `List` grouped
+> into Currently Reading and Finished, pushing to a detail screen with a "Mark
+> as Finished" button, plus a sheet for adding a book. Log every mutation with
+> `OSLog` under the `ReadingList` category.
+
+Logging each mutation lets the simulator run verify the underlying state
+changes, not only the visible UI.
+
+The generated project keeps the model, store, views, and logging extension in
+separate files:
+
+<FileTree>
+  <FileTree.Folder name="ReadingListExample">
+    <FileTree.File name="ReadingListExample.xcodeproj" />
+    <FileTree.Folder name="ReadingListExample">
+      <FileTree.File name="ReadingListExampleApp.swift" />
+      <FileTree.File name="Book.swift" />
+      <FileTree.File name="ReadingListStore.swift" />
+      <FileTree.File name="ReadingListView.swift" />
+      <FileTree.File name="BookRows.swift" />
+      <FileTree.File name="BookDetailView.swift" />
+      <FileTree.File name="AddBookView.swift" />
+      <FileTree.File name="Logger+ReadingList.swift" />
+      <FileTree.File name="Assets.xcassets" />
+    </FileTree.Folder>
+    <FileTree.Folder name="ReadingListExampleTests" />
+    <FileTree.Folder name="ReadingListExampleUITests" />
+  </FileTree.Folder>
+</FileTree>
+
+Claude loaded `swiftui-specialist` and its data-flow and structure references
+before editing. The generated store caches both sections and recomputes them
+after mutations, while rows and sections remain separate views.
+
+The `BuildProject` tool then verifies the generated project:
+
+```json
+{
+  "buildResult": "The project built successfully.",
+  "elapsedTime": 1.037,
+  "errors": []
+}
+```
+
+## Rendering previews without a Canvas
+
+The `RenderPreview` tool keeps visual verification inside the agent's workflow.
+It builds a preview and returns the rendered PNG without opening the Canvas.
+
+> Combine the previews in `ReadingListView.swift` into one `#Preview(arguments:)`
+> with all four states — loading, empty, loaded, failed — and give each a
+> readable name. Then render every variant and look at the PNGs.
+
+The four states end up in a single
+[`#Preview(arguments:)`](/blog/previewing-swiftui-states-with-preview-arguments),
+one variant per case:
+
+```swift
+#Preview("Reading List", arguments: ReadingListPreviewState.allCases) { previewState in
+    ReadingListPreview(previewState: previewState)
+}
+```
+
+Then the agent renders each variant, opens the resulting PNGs, and checks their
+contents. The `RenderPreview` tool returns file paths, so it is important to ask
+the agent to inspect the images rather than only confirm that rendering
+succeeded.
+
+Comparing four separate PNGs is cumbersome, so ask Claude to publish them as a
+single HTML artifact:
+
+> Publish the renders as an artifact, one card per state.
+
+An artifact is a standalone HTML page that Claude generates from the rendered
+files. Here it embeds each PNG in a labeled card, arranges the four states in a
+grid, and adds context such as the device, OS version, and appearance. The page
+can then be opened and shared as a single result instead of passing around four
+temporary files.
+
+![Preview states published as an artifact](/images/headless-xcode-from-prompt-to-simulator-with-mcp/artifact-preview-states.png)
+
+Side by side, they reveal details a single snapshot hides: spacing that drifts
+between states, a title that sits differently, or a message that wraps.
+
+## Verifying a full app flow on the simulator
+
+Previews show individual screens and states, but they don't cover navigation,
+text input, or how changes propagate across the app. Running the app on a
+simulator lets the agent verify these interactions as one continuous flow.
+
+The prompt is the sentence you'd say to a colleague — no coordinates, no tool
+names, no mention of a simulator being booted:
+
+> Run the app on the iPhone 17 Pro simulator and check that finishing a book
+> moves it out of Currently Reading. Then add a book and confirm it shows up.
+
+The agent opens an interaction session, boots a simulator through MCP, then
+builds, installs, and launches the app. This keeps verification in the same
+workflow as code generation without requiring manual interaction with the
+Simulator UI.
+
+Every capture returns a PNG and the accessibility hierarchy, including each
+element's label, frame, and a precomputed point to tap. The agent uses this data
+to find controls and interact with them instead of guessing coordinates. These
+tools rely on the app's accessibility metadata, so clear labels benefit both
+automation and VoiceOver users.
+
+Here is the PNG returned for one capture:
+
+![Reading list captured with its accessibility hierarchy](/images/headless-xcode-from-prompt-to-simulator-with-mcp/accessibility-capture.png)
+
+The matching accessibility hierarchy included entries like these:
+
+```text
+Button
+  frame: {{346.0, 66.0}, {36.0, 36.0}}
+  label: "Add Book"
+  hitPoint: {364.0, 84.0}
+
+Button
+  frame: {{16.0, 208.3}, {370.0, 112.7}}
+  label: "The Swift Programming Language, Apple, Page 213 of 640"
+  value: 33%
+  hitPoint: {201.0, 264.7}
+```
+
+The output is reformatted here for readability. The frame is written as
+`{{x, y}, {width, height}}`, while `label` and `value` describe what is on
+screen. `hitPoint` gives the agent a reliable coordinate for the next action:
+the second entry becomes `t 201.0 264.7`.
+
+Interactions are a small command language, chained into one call — tap, wait,
+type, swipe, press a hardware button:
+
+```text
+t 113.8 384.2 w 0.5 t 38 84
+t 201 198.3 w 0.4 sender keyboard kbd The Design of Everyday Things
+```
+
+Here `t x y` taps, `w` waits, and `sender keyboard kbd` types everything that
+follows. Swipe and hardware-button commands can be chained in the same call.
+The `device-interaction` skill documents this syntax and helps the agent turn
+the accessibility output into reliable actions.
+
+Using this loop, the agent can open a book, mark it as finished, return to the
+list, open the add-book sheet, enter the details, and submit the form. A final
+capture shows the result of the complete flow:
+
+![Reading list after the verification run](/images/headless-xcode-from-prompt-to-simulator-with-mcp/simulator-final.png)
+
+The screenshot confirms the visible result, while `OSLog` confirms the
+underlying state changes:
+
+```text
+[ReadingList] Loaded 4 books
+[ReadingList] Marked book 5CB30AD5-71D0-4A2A-8395-C557340904AA 'Thinking in Systems' as finished
+[ReadingList] Added book D01C2C79-5ECB-45EE-B8E7-...
+```
+
+Together, the UI capture and logs provide stronger evidence than a successful
+build or preview alone. Closing the interaction session releases the simulator
+and its debug connection.
+
+## What headless costs you
+
+Headless mode removes Xcode's visual debugging UI, not the debugger itself. You
+lose the Canvas with its live selection, the view debugger, the breakpoint
+gutter, and Organizer. Breakpoints still work through LLDB, but they are not
+visible in an editor. The `RenderPreview` tool gives you a PNG per variant
+instead of an interactive Canvas.
+
+Builds, previews, tests, simulator runs, and console output remain available
+through tools. That covers most of an agent's build loop without a window
+stealing focus every time it renders something. You can still open the same
+project in Xcode whenever you need its visual tools.
+
+## Optional: inspecting the stored permissions
+
+You don't need the implementation details below to use the server. They are
+useful when auditing or scripting the setup, but the location and schema are
+undocumented beta internals and may change.
+
+The headless setting and folder grants are reflected in a JSON file inside
+Xcode's group container:
+
+```text
+~/Library/Group Containers/group.com.apple.dt.Xcode.SecureSettingsContainer/CodingAssistant/HeadlessPermissions/mcp-server.json
+```
+
+The file is one line on disk, formatted here for readability:
+
+```jsonc
+{
+  "enabled": true,
+  "folderPermissions": [
+    {
+      "id": "026F9649-91E7-48B4-B9F4-947E91ACEB37",
+      "subtreeRoot": "/Users/artemnovichkov/Developer/ReadingListExample"
+    }
+  ],
+  "version": 1
+}
+```
+
+Read it, but don't edit it: the service rewrites the file on every change. For
+scripts, `status --format json` is the better source because it also reports
+runtime state and the signed agent trust object:
+
+```jsonc
+{
+  "openWorkspaces" : [],
+  "permission" : {
+    "enabled" : true,
+    "permittedAgents" : [
+      {
+        "id" : "A843056C-42FA-4C26-9EB3-84A7251FF7F1",
+        "trust" : {
+          "signed" : {
+            "signingIdentifier" : "com.anthropic.claude-code",
+            "teamIdentifier" : "Q6L2SF6YDW"
+          }
+        }
+      }
+    ],
+    "permittedFolders" : [
+      {
+        "id" : "026F9649-91E7-48B4-B9F4-947E91ACEB37",
+        "subtreeRoot" : "/Users/artemnovichkov/Developer/ReadingListExample"
+      }
+    ],
+    "unsafeAlwaysAllowAllAgents" : false
+  },
+  "running" : true
+}
+```
+
+The JSON format makes the unsafe-mode flag and agent trust data easier to
+inspect from scripts. A provisioning script can use them to verify the expected
+team identifier before a build.
+
+## Conclusion
+
+After the initial setup, Claude created the project, generated the app with
+Apple's skills, rendered four preview states, and verified a complete flow on
+the simulator without keeping the Xcode UI open.
+
+The complete app, including the exported skills under `.claude/skills/`, is in
+the private
+[ReadingListExample](https://github.com/artemnovichkov/ReadingListExample)
+repository. My
+[Xcode Tools documentation](https://github.com/artemnovichkov/xcode-tools-docs)
+covers the individual MCP tools in more detail.

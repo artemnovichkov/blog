@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 
 type TableOfContentsItem = {
   id: string
+  level: 2 | 3
   title: string
 }
 
@@ -22,11 +23,14 @@ export default function PostTableOfContents({
 
   useEffect(() => {
     const headings = Array.from(
-      document.querySelectorAll<HTMLHeadingElement>(`${contentSelector} h2[id]`)
+      document.querySelectorAll<HTMLHeadingElement>(
+        `${contentSelector} h2[id], ${contentSelector} h3[id]`
+      )
     )
 
-    const nextItems = headings.map((heading) => ({
+    const nextItems: TableOfContentsItem[] = headings.map((heading) => ({
       id: heading.id,
+      level: heading.tagName === "H3" ? 3 : 2,
       title: heading.textContent?.trim() || heading.id,
     }))
 
@@ -108,13 +112,24 @@ export default function PostTableOfContents({
                   href={`#${item.id}`}
                   onClick={(event) => {
                     event.preventDefault()
-                    document.getElementById(item.id)?.scrollIntoView({
+                    const heading = document.getElementById(item.id)
+
+                    if (!heading) return
+
+                    const top =
+                      heading.getBoundingClientRect().top +
+                      window.scrollY -
+                      activeOffset
+
+                    window.scrollTo({
                       behavior: "smooth",
-                      block: "start",
+                      top,
                     })
                     setActiveId(item.id)
                   }}
-                  className={`block border-l-2 py-1 pl-3 text-sm transition-colors duration-150 ease-out ${
+                  className={`block border-l-2 py-1 transition-colors duration-150 ease-out ${
+                    item.level === 3 ? "pl-6 text-xs" : "pl-3 text-sm"
+                  } ${
                     isActive
                       ? "-ml-px border-accent text-accent"
                       : "-ml-px border-transparent text-zinc-500 hover:text-accent dark:text-gray-400 dark:hover:text-accent"
