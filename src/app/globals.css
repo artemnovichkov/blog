@@ -307,14 +307,20 @@ a.underline:hover,
 /* rehype-pretty-code theme */
 code[data-theme*=" "],
 code[data-theme*=" "] span {
-  color: var(--shiki-light);
+  color: var(--shiki-light, #24292e);
 }
 
 .dark {
   code[data-theme*=" "],
   code[data-theme*=" "] span {
-    color: var(--shiki-dark);
+    color: var(--shiki-dark, #e1e4e8);
   }
+}
+
+.copyable-code-block [data-line]::after {
+  display: inline-block;
+  width: 3rem;
+  content: "";
 }
 
 /* line numbers */

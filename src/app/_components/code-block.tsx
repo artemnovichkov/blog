@@ -20,11 +20,11 @@ export default function CodeBlock({ children, ...props }: CodeBlockProps) {
   }
 
   return (
-    <div className="relative">
+    <div className="copyable-code-block relative">
       <button
         type="button"
         onClick={handleCopy}
-        className="absolute top-3 right-3 flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-white px-1 py-0.5 text-sm shadow hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+        className="absolute top-3 right-3 flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-white px-1 py-0.5 text-gray-700 text-sm shadow hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:ring-1 dark:ring-white/10 dark:hover:bg-gray-600"
       >
         {copied ? <GoCheck /> : <GoCopy />}
       </button>

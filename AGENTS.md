@@ -16,7 +16,10 @@ Static assets are in `public/`, including images, audio, videos, icons, and
 ## Build, Test, and Development Commands
 
 - `npm run dev`: starts the local Next.js development server.
-- `npm run build`: creates a production build and validates route generation.
+- `npm run build -- --webpack`: creates a production build and validates route
+  generation. Use this webpack variant for agent-run validation because the
+  default Next.js 16.3.0 Turbopack build hangs at the compilation step in the
+  Codex environment.
 - `npm start`: serves the production build after `npm run build`.
 - `npm run lint`: runs Biome checks across the configured files.
 - `npm run lint:fix`: applies safe Biome lint fixes.
@@ -24,7 +27,10 @@ Static assets are in `public/`, including images, audio, videos, icons, and
 - `npm run optimize-images`: runs `scripts/optimize-images.sh` for image assets.
 
 There is no dedicated test command currently. Use `npm run lint` and
-`npm run build` before submitting changes.
+`npm run build -- --webpack` before submitting changes. Do not run a production
+build alongside `npm run dev`. When Codex starts a Next.js process, stop it and
+confirm that no child `next dev` or `next-build` process remains before starting
+another build.
 
 ## Coding Style & Naming Conventions
 
@@ -70,8 +76,8 @@ Recent commits use short imperative or descriptive messages, for example
 or dependency changes directly.
 
 Pull requests should include a concise summary, validation steps
-(`npm run lint`, `npm run build`), linked issues when relevant, and screenshots
-for visual changes to pages, components, or MDX rendering.
+(`npm run lint`, `npm run build -- --webpack`), linked issues when relevant, and
+screenshots for visual changes to pages, components, or MDX rendering.
 
 ## Security & Configuration Tips
 
