@@ -33,6 +33,8 @@ export default async function markdownToHtml(markdown: string) {
       FileTree,
       pre: CodeBlock,
       img: PostImage,
+      // Authored inside a post body, so it defaults to the "inline" slot; the
+      // fixed placement under the post header passes its own.
       AdBlock,
     },
   })

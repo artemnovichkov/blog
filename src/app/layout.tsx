@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Script from "next/script"
 import { buildMetadata } from "@/lib/metadata"
+import AnalyticsProvider from "./_components/analytics-provider"
 import AppearanceAnimation from "./_components/appearance-animation"
 import Footer from "./_components/footer"
 import Header from "./_components/header"
@@ -55,6 +56,7 @@ export default function RootLayout({
         </main>
         <Footer />
         <WebMcpTools />
+        <AnalyticsProvider />
         <Analytics />
         <SpeedInsights />
       </body>

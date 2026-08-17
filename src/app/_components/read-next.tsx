@@ -33,6 +33,7 @@ export default function ReadNext({ posts }: { posts: ReadNextPost[] }) {
                 showReadingTime={false}
                 priority={false}
                 imageSizes="(max-width: 640px) 100vw, 320px"
+                surface={`read_next_${relation}`}
               />
             </div>
           )

@@ -3,6 +3,7 @@
 import type React from "react"
 import { useRef, useState } from "react"
 import { GoCheck, GoCopy } from "react-icons/go"
+import { currentPostSlug, track } from "@/lib/analytics"
 
 interface CodeBlockProps extends React.HTMLAttributes<HTMLPreElement> {
   children?: React.ReactNode
@@ -17,6 +18,15 @@ export default function CodeBlock({ children, ...props }: CodeBlockProps) {
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
+
+    // Copies per view are the clearest signal that a post is used as a
+    // reference rather than read once.
+    track("code_copy", {
+      slug: currentPostSlug(),
+      language: preRef.current?.dataset.language || "unknown",
+      line_count: text ? text.split("\n").length : 0,
+      char_count: text.length,
+    })
   }
 
   return (

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { currentPostSlug, track } from "@/lib/analytics"
 
 type TableOfContentsItem = {
   id: string
@@ -103,7 +104,7 @@ export default function PostTableOfContents({
           On this page
         </p>
         <ol className="space-y-2 border-zinc-300 border-l dark:border-gray-700">
-          {items.map((item) => {
+          {items.map((item, index) => {
             const isActive = item.id === activeId
 
             return (
@@ -115,6 +116,16 @@ export default function PostTableOfContents({
                     const heading = document.getElementById(item.id)
 
                     if (!heading) return
+
+                    // Jumps mean the post is being skimmed for one section;
+                    // a section that attracts many is worth its own post.
+                    track("toc_click", {
+                      slug: currentPostSlug(),
+                      heading_id: item.id,
+                      heading_index: index,
+                      depth: item.level,
+                      total_headings: items.length,
+                    })
 
                     const top =
                       heading.getBoundingClientRect().top +

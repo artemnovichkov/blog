@@ -17,6 +17,9 @@ export default function PostActions({ post }: { post: Post }) {
         target="_blank"
         rel="noopener noreferrer"
         className="underline"
+        data-analytics-event="share_click"
+        data-analytics-prop-slug={post.slug}
+        data-analytics-prop-target="x"
       >
         {"Share on X"}
       </a>
@@ -26,6 +29,8 @@ export default function PostActions({ post }: { post: Post }) {
         target="_blank"
         rel="noopener noreferrer"
         className="underline"
+        data-analytics-event="github_edit_click"
+        data-analytics-prop-slug={post.slug}
       >
         {"Found a typo? Edit this post on GitHub"}
       </a>

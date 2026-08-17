@@ -12,6 +12,10 @@ type PostPreviewProps = {
   showReadingTime?: boolean
   priority?: boolean
   imageSizes?: string
+  /** Where this card is rendered, so click-through can be compared per surface. */
+  surface?: string
+  /** Zero-based slot in its list, to see how far down the list gets read. */
+  position?: number
 }
 
 export default function PostPreview({
@@ -21,6 +25,8 @@ export default function PostPreview({
   showReadingTime = true,
   priority = true,
   imageSizes = "(max-width: 768px) 100vw, 50vw",
+  surface = "unknown",
+  position,
 }: PostPreviewProps) {
   const isCompact = variant === "compact"
 
@@ -29,6 +35,10 @@ export default function PostPreview({
       <Link
         className="group mb-2 flex w-full flex-col gap-2 no-underline"
         href={`/blog/${encodeURIComponent(post.slug)}`}
+        data-analytics-event="post_preview_click"
+        data-analytics-prop-slug={post.slug}
+        data-analytics-prop-surface={surface}
+        data-analytics-prop-position={position}
       >
         <div className="w-full overflow-hidden rounded">
           <Image
@@ -58,7 +68,7 @@ export default function PostPreview({
         </p>
       </Link>
       {showCategories && post.categories && (
-        <CategoryList categories={post.categories} />
+        <CategoryList categories={post.categories} surface="post_preview" />
       )}
       <div
         className={`mt-2 font-normal text-zinc-500 dark:text-gray-400 ${

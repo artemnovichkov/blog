@@ -25,7 +25,7 @@ export default async function CategoryPage(props: Params) {
             {posts.length} post{posts.length === 1 ? "" : "s"} found in this
             category:
           </p>
-          <PostList posts={posts} />
+          <PostList posts={posts} surface="category" />
         </div>
       </section>
     </div>

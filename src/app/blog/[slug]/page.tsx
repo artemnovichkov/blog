@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import readingTime from "reading-time"
 import AdBlock from "@/app/_components/ad-block"
 import PostActions from "@/app/_components/post-actions"
+import PostAnalytics from "@/app/_components/post-analytics"
 import PostHeader from "@/app/_components/post-header"
 import PostImageZoom from "@/app/_components/post-image-zoom"
 import PostTableOfContents from "@/app/_components/post-table-of-contents"
@@ -30,6 +32,10 @@ export default async function BlogPost(props: Params) {
     readNextPosts.push({ relation: "previous", post: previousPost })
   if (nextPost) readNextPosts.push({ relation: "next", post: nextPost })
 
+  // Completion rate is only comparable across posts once it is normalised by
+  // length, so the size of the post travels with every read-depth event.
+  const stats = readingTime(post.content || "")
+
   return (
     <div>
       <JsonLd data={buildBlogPostingJsonLd(post)} />
@@ -43,6 +49,7 @@ export default async function BlogPost(props: Params) {
             description={sponsorshipConfig.description}
             url={sponsorshipConfig.url}
             isVisible={sponsorshipConfig.isVisible}
+            slot="post_header"
           />
         </div>
         <div className="-translate-x-1/2 relative left-1/2 w-screen px-4 sm:px-0">
@@ -55,6 +62,14 @@ export default async function BlogPost(props: Params) {
           </div>
           {/* Keyed by slug so navigating between posts remounts and re-marks images. */}
           <PostImageZoom key={post.slug} />
+          <PostAnalytics
+            key={`analytics-${post.slug}`}
+            slug={post.slug}
+            categories={post.categories ?? []}
+            readingTimeMinutes={Math.round(stats.minutes * 10) / 10}
+            wordCount={stats.words}
+            publishedAt={post.date}
+          />
         </div>
       </article>
       <div className="mx-auto w-full max-w-2xl">

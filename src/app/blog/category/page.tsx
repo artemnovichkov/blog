@@ -10,7 +10,7 @@ export default function Categories() {
         Categories
       </p>
       {categories.length > 0 ? (
-        <CategoryList categories={categories} />
+        <CategoryList categories={categories} surface="category_index" />
       ) : (
         <p className="text-zinc-500 dark:text-gray-400">No categories found.</p>
       )}

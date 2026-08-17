@@ -3,6 +3,7 @@
 import type React from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { FiX } from "react-icons/fi"
+import { currentPostSlug, track } from "@/lib/analytics"
 
 const contentSelector = "[data-post-content]"
 const openDuration = 320
@@ -170,6 +171,16 @@ export default function PostImageZoom() {
     const exceedsViewport =
       width > viewport.clientWidth * viewportFill ||
       height > viewport.clientHeight * viewportFill
+
+    // A zoom means the image is unreadable inline: worth shipping it larger or
+    // redrawing it as a diagram.
+    track("image_zoom", {
+      slug: currentPostSlug(),
+      src: image.getAttribute("src") || image.currentSrc || "",
+      alt: image.alt,
+      natural_width: width,
+      scrollable: exceedsViewport,
+    })
 
     if (sourceRef.current) sourceRef.current.style.visibility = ""
     sourceRef.current = image
