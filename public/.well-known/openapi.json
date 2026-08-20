@@ -48,6 +48,59 @@
           }
         }
       }
+    },
+    "/blog/{slug}.md": {
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" },
+          "description": "Blog post slug"
+        }
+      ],
+      "get": {
+        "summary": "Get blog post as markdown",
+        "description": "Same content as GET /blog/{slug} with Accept: text/markdown, at a URL that needs no headers.",
+        "operationId": "getPostMarkdown",
+        "responses": {
+          "200": {
+            "description": "Blog post as markdown",
+            "content": {
+              "text/markdown": {
+                "schema": { "type": "string" }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found"
+          }
+        }
+      }
+    },
+    "/llms.txt": {
+      "get": {
+        "summary": "Index of every post for LLMs",
+        "operationId": "getLlmsTxt",
+        "responses": {
+          "200": {
+            "description": "Post index",
+            "content": { "text/plain": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    },
+    "/llms-full.txt": {
+      "get": {
+        "summary": "Full text of every post",
+        "operationId": "getLlmsFullTxt",
+        "responses": {
+          "200": {
+            "description": "All posts concatenated",
+            "content": { "text/plain": { "schema": { "type": "string" } } }
+          }
+        }
+      }
     }
   }
 }

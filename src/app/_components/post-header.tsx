@@ -2,6 +2,7 @@ import Image from "next/image"
 import readingTime from "reading-time"
 import type { Post } from "@/interfaces/post"
 import CategoryList from "./category-list"
+import CopyPageMenu from "./copy-page-menu"
 import PostDate from "./post-date"
 import ViewCounter from "./view-counter"
 
@@ -19,6 +20,9 @@ export default function PostHeader({ post }: { post: Post }) {
           <span>•</span>
           <ViewCounter slug={post.slug} />
         </span>
+      </div>
+      <div className="flex w-full justify-end">
+        <CopyPageMenu slug={post.slug} />
       </div>
       <Image
         className="rounded"

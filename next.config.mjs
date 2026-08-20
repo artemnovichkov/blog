@@ -43,6 +43,7 @@ const nextConfig = {
             value: [
               '</feed.xml>; rel="alternate"; type="application/rss+xml"; title="Artem Novichkov Blog"',
               '</sitemap.xml>; rel="sitemap"; type="application/xml"',
+              '</llms.txt>; rel="alternate"; type="text/plain"; title="Post index for LLMs"',
               '</.well-known/api-catalog>; rel="api-catalog"',
               '</.well-known/oauth-protected-resource>; rel="oauth-protected-resource"',
             ].join(", "),

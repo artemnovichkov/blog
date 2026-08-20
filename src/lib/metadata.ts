@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
+import { siteUrl as SITE_URL } from "@/lib/const"
 
-const SITE_URL = "https://artemnovichkov.com"
 const DEFAULT_IMAGE = `${SITE_URL}/images/banner.png`
 const TWITTER_HANDLE = "@iosartem"
 const TWITTER_ID = "3081906297"
