@@ -1,4 +1,5 @@
 import type { Post } from "@/interfaces/post"
+import { getPostModifiedDate } from "@/lib/api"
 import { about, name } from "@/lib/const"
 
 const SITE_URL = "https://artemnovichkov.com"
@@ -23,6 +24,7 @@ export function buildBlogPostingJsonLd(post: Post) {
     description: post.description,
     image: `${SITE_URL}${post.cover}`,
     datePublished: new Date(post.date).toISOString(),
+    dateModified: new Date(getPostModifiedDate(post)).toISOString(),
     url,
     mainEntityOfPage: {
       "@type": "WebPage",

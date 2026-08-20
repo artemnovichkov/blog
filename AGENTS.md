@@ -57,6 +57,14 @@ categories:
 ---
 ```
 
+`updated` is optional. Add it when a post is meaningfully revised, and it
+becomes the post's `dateModified` in JSON-LD, Open Graph, and the sitemap;
+without it those fall back to `date`. Skip it for typo fixes.
+
+```yaml
+updated: '2026-08-18'
+```
+
 `categories` is a YAML list (not a comma-separated string). The cover image
 and any inline images live in `public/images/<slug>/`, matching the post's
 slug/filename. Code examples commonly target Swift/iOS development; preserve

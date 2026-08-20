@@ -8,7 +8,12 @@ import PostHeader from "@/app/_components/post-header"
 import PostImageZoom from "@/app/_components/post-image-zoom"
 import PostTableOfContents from "@/app/_components/post-table-of-contents"
 import ReadNext from "@/app/_components/read-next"
-import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/lib/api"
+import {
+  getAllPosts,
+  getPostBySlug,
+  getPostModifiedDate,
+  getRelatedPosts,
+} from "@/lib/api"
 import { name } from "@/lib/const"
 import { buildBlogPostingJsonLd, JsonLd } from "@/lib/json-ld"
 import markdownToHtml from "@/lib/markdownToHtml"
@@ -86,6 +91,10 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
     path: `/blog/${post.slug}`,
     siteName: name,
     images: [post.cover],
+    article: {
+      publishedTime: new Date(post.date).toISOString(),
+      modifiedTime: new Date(getPostModifiedDate(post)).toISOString(),
+    },
   })
 }
 

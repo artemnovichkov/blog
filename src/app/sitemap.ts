@@ -1,10 +1,17 @@
 import type { MetadataRoute } from "next"
-import { getAllCategories, getAllPosts } from "@/lib/api"
+import {
+  getAllPosts,
+  getIndexableCategories,
+  getPostModifiedDate,
+} from "@/lib/api"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://artemnovichkov.com"
   const posts = getAllPosts()
-  const categories = getAllCategories()
+  // Thin categories are deliberately absent: they are noindex, and asking
+  // Google to crawl them anyway spends the site's crawl budget on listings
+  // that will never be indexed.
+  const categories = getIndexableCategories()
 
   const staticEntries = [
     {
@@ -27,7 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const postEntries = posts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: post.date,
+    lastModified: getPostModifiedDate(post),
     priority: 0.7,
   }))
 

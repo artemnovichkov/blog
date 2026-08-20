@@ -50,6 +50,33 @@ export function getAllCategories(): string[] {
   return Array.from(getCategoryCounts().keys()).sort()
 }
 
+/**
+ * Below this a category page lists so few posts that it is a near-duplicate of
+ * the post it points at. Nineteen of the thirty-five categories hold a single
+ * post, so indexing them all buries the posts under thin listings.
+ */
+export const minIndexableCategoryPosts = 3
+
+export function getCategoryPostCount(category: string): number {
+  return getCategoryCounts().get(category) ?? 0
+}
+
+/** Categories with enough posts to deserve an indexable listing of their own. */
+export function getIndexableCategories(): string[] {
+  return getAllCategories().filter(
+    (category) => getCategoryPostCount(category) >= minIndexableCategoryPosts
+  )
+}
+
+/**
+ * The day a post last said something new. Falls back to the publish date, so a
+ * post that was never revised reports the two as equal rather than claiming a
+ * freshness it does not have.
+ */
+export function getPostModifiedDate(post: Post): string {
+  return post.updated ?? post.date
+}
+
 export type RelatedPost = {
   post: Post
   /** False for the recency backfill, so analytics can tell the two apart. */

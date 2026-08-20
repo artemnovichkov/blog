@@ -1,7 +1,11 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import PostList from "@/app/_components/post-list"
-import { getAllPosts } from "@/lib/api"
+import {
+  getAllPosts,
+  getCategoryPostCount,
+  minIndexableCategoryPosts,
+} from "@/lib/api"
 import { categoryTitleMap, name as siteName } from "@/lib/const"
 import { buildMetadata } from "@/lib/metadata"
 
@@ -57,14 +61,24 @@ export async function generateStaticParams() {
 
 export async function generateMetadata(props: Params): Promise<Metadata> {
   const params = await props.params
-  const { name } = params
+  // Lowercased like the page itself, so the canonical and the count lookup
+  // both match the category the page actually renders.
+  const name = params.name.toLowerCase()
   const title = `${siteName} | Category: ${categoryTitleMap[name] || name}`
   const description = `Posts in "${categoryTitleMap[name] || name}" category`
-  return buildMetadata({
+  const metadata = buildMetadata({
     title,
     description,
     path: `/blog/category/${name}`,
     siteName,
     twitterCard: "summary",
   })
+
+  // A one-post category adds nothing a search result for the post itself would
+  // not already say. Still followed, so the post keeps the internal link.
+  if (getCategoryPostCount(name) < minIndexableCategoryPosts) {
+    return { ...metadata, robots: { index: false, follow: true } }
+  }
+
+  return metadata
 }

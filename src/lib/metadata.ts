@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { name as AUTHOR } from "@/lib/const"
 
 const SITE_URL = "https://artemnovichkov.com"
 const DEFAULT_IMAGE = `${SITE_URL}/images/banner.png`
@@ -14,6 +15,14 @@ type BuildMetadataOptions = {
   siteName?: string
   images?: string[]
   twitterCard?: "summary" | "summary_large_image"
+  /**
+   * Set on posts. Without it Open Graph types every page as a generic website,
+   * so a post carries no publish or revision date off-site.
+   */
+  article?: {
+    publishedTime: string
+    modifiedTime: string
+  }
 }
 
 /**
@@ -27,8 +36,23 @@ export function buildMetadata({
   siteName = title,
   images = [DEFAULT_IMAGE],
   twitterCard = "summary_large_image",
+  article,
 }: BuildMetadataOptions): Metadata {
   const url = `${SITE_URL}${path}`
+  const shared = { title, description, url, siteName, images }
+
+  // Built as one object per branch rather than a spread: the `type` field
+  // discriminates Next's OpenGraph union, and a conditional spread widens it
+  // back to a plain string, which no longer matches either variant.
+  const openGraph: Metadata["openGraph"] = article
+    ? {
+        ...shared,
+        type: "article",
+        publishedTime: article.publishedTime,
+        modifiedTime: article.modifiedTime,
+        authors: [AUTHOR],
+      }
+    : shared
 
   return {
     title,
@@ -36,13 +60,7 @@ export function buildMetadata({
     alternates: {
       canonical: url,
     },
-    openGraph: {
-      title,
-      description,
-      url,
-      siteName,
-      images,
-    },
+    openGraph,
     twitter: {
       card: twitterCard,
       title,
