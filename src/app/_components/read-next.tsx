@@ -1,43 +1,31 @@
-import { FiArrowLeft, FiArrowRight } from "react-icons/fi"
-import type { Post } from "@/interfaces/post"
+import type { RelatedPost } from "@/lib/api"
 import PostPreview from "./post-preview"
 
-type ReadNextPost = {
-  relation: "previous" | "next"
-  post: Post
-}
+// Three cards inside the article's max-w-2xl column, so each one is roughly a
+// third of 672px once the grid reaches its widest breakpoint.
+const imageSizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 224px"
 
-export default function ReadNext({ posts }: { posts: ReadNextPost[] }) {
+export default function ReadNext({ posts }: { posts: RelatedPost[] }) {
   return (
     <div className="mt-8 border-gray-200 border-t pt-8 dark:border-gray-800">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        {posts.map(({ relation, post }) => {
-          const isNext = relation === "next"
-          const Icon = isNext ? FiArrowRight : FiArrowLeft
-
-          return (
-            <div key={post.slug} className="flex flex-col gap-3">
-              <div
-                className={
-                  isNext
-                    ? "flex justify-end text-gray-500 dark:text-gray-500"
-                    : "flex justify-start text-gray-500 dark:text-gray-500"
-                }
-              >
-                <Icon className="h-5 w-5" />
-              </div>
-              <PostPreview
-                post={post}
-                variant="compact"
-                showCategories={false}
-                showReadingTime={false}
-                priority={false}
-                imageSizes="(max-width: 640px) 100vw, 320px"
-                surface={`read_next_${relation}`}
-              />
-            </div>
-          )
-        })}
+      <h2 className="mb-4 font-bold text-2xl text-zinc-800 tracking-tight dark:text-gray-100">
+        {"Read next"}
+      </h2>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map(({ post, isRelated }, index) => (
+          <PostPreview
+            key={post.slug}
+            post={post}
+            variant="compact"
+            showCategories={false}
+            priority={false}
+            imageSizes={imageSizes}
+            // Split so the topical picks and the recency backfill can be
+            // compared against each other in PostHog.
+            surface={isRelated ? "read_next" : "read_next_recent"}
+            position={index}
+          />
+        ))}
       </div>
     </div>
   )

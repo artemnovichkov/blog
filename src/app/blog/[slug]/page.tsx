@@ -8,12 +8,7 @@ import PostHeader from "@/app/_components/post-header"
 import PostImageZoom from "@/app/_components/post-image-zoom"
 import PostTableOfContents from "@/app/_components/post-table-of-contents"
 import ReadNext from "@/app/_components/read-next"
-import {
-  getAllPosts,
-  getNextPost,
-  getPostBySlug,
-  getPreviousPost,
-} from "@/lib/api"
+import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/lib/api"
 import { name } from "@/lib/const"
 import { buildBlogPostingJsonLd, JsonLd } from "@/lib/json-ld"
 import markdownToHtml from "@/lib/markdownToHtml"
@@ -25,12 +20,7 @@ export default async function BlogPost(props: Params) {
   const post = getPostBySlug(params.slug)
   if (!post) notFound()
   const content = await markdownToHtml(post.content || "")
-  const previousPost = getPreviousPost(params.slug)
-  const nextPost = getNextPost(params.slug)
-  const readNextPosts: Parameters<typeof ReadNext>[0]["posts"] = []
-  if (previousPost)
-    readNextPosts.push({ relation: "previous", post: previousPost })
-  if (nextPost) readNextPosts.push({ relation: "next", post: nextPost })
+  const readNextPosts = getRelatedPosts(params.slug, 3)
 
   // Completion rate is only comparable across posts once it is normalised by
   // length, so the size of the post travels with every read-depth event.
