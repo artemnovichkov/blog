@@ -30,7 +30,11 @@ export default function PostHeader({ post }: { post: Post }) {
       />
       {post.categories && (
         <div className="flex w-full justify-start">
-          <CategoryList categories={post.categories} surface="post_header" />
+          <CategoryList
+            categories={post.categories}
+            surface="post_header"
+            prefetch
+          />
         </div>
       )}
     </div>

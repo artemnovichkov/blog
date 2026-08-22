@@ -1,44 +1,48 @@
 "use client"
 
 import type React from "react"
-import { useEffect } from "react"
-import useSWR from "swr"
-
-interface ViewData {
-  total: number
-}
+import { useEffect, useRef, useState } from "react"
 
 interface ViewCounterProps {
   slug: string
 }
 
-const fetcher = async (url: string): Promise<ViewData> => {
-  const res = await fetch(url)
-  if (!res.ok) {
-    throw new Error(`Failed to fetch views: ${res.status}`)
-  }
-  return res.json()
-}
-
 export default function ViewCounter({
   slug,
 }: ViewCounterProps): React.ReactElement {
-  const { data } = useSWR<ViewData>(`/api/views/${slug}`, fetcher)
-  const views = Number(data?.total)
-  const formattedViews = views > 0 ? views.toLocaleString() : "0"
+  const [total, setTotal] = useState<number | null>(null)
+  // One registration per slug: React's development double-invoke of effects
+  // would otherwise count the same visit twice, and a ref survives it.
+  const registered = useRef<string | null>(null)
 
   useEffect(() => {
-    const registerView = () =>
-      fetch(`/api/views/${slug}`, {
-        method: "POST",
+    if (registered.current === slug) return
+    registered.current = slug
+
+    let cancelled = false
+
+    // The increment response carries the new total, so the counter needs a
+    // single round trip instead of a separate read.
+    fetch(`/api/views/${slug}`, { method: "POST" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { total?: number } | null) => {
+        if (cancelled || typeof data?.total !== "number") return
+        setTotal(data.total)
+      })
+      .catch(() => {
+        // A failed count must never break the article: the skeleton stays.
       })
 
-    registerView()
+    return () => {
+      cancelled = true
+    }
   }, [slug])
+
+  const formattedViews = total && total > 0 ? total.toLocaleString() : "0"
 
   return (
     <span className="view-counter" aria-live="polite">
-      {data ? (
+      {total !== null ? (
         <span className="view-counter-value" key={formattedViews}>
           {formattedViews}
         </span>

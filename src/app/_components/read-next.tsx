@@ -24,6 +24,9 @@ export default function ReadNext({ posts }: { posts: RelatedPost[] }) {
             // compared against each other in PostHog.
             surface={isRelated ? "read_next" : "read_next_recent"}
             position={index}
+            // Only three cards and the reader has finished the article, so the
+            // prefetch is likely to be used.
+            prefetch
           />
         ))}
       </div>

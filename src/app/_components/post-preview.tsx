@@ -16,6 +16,12 @@ type PostPreviewProps = {
   surface?: string
   /** Zero-based slot in its list, to see how far down the list gets read. */
   position?: number
+  /**
+   * Off by default: a fully scrolled list prefetches the full RSC payload of
+   * every card, and readers open one of them. Surfaces with few cards and high
+   * click-through opt back in.
+   */
+  prefetch?: boolean
 }
 
 export default function PostPreview({
@@ -27,6 +33,7 @@ export default function PostPreview({
   imageSizes = "(max-width: 768px) 100vw, 50vw",
   surface = "unknown",
   position,
+  prefetch = false,
 }: PostPreviewProps) {
   const isCompact = variant === "compact"
 
@@ -35,6 +42,7 @@ export default function PostPreview({
       <Link
         className="group mb-2 flex w-full flex-col gap-2 no-underline"
         href={`/blog/${encodeURIComponent(post.slug)}`}
+        prefetch={prefetch}
         data-analytics-event="post_preview_click"
         data-analytics-prop-slug={post.slug}
         data-analytics-prop-surface={surface}
