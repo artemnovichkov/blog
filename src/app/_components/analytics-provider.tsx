@@ -67,7 +67,7 @@ export default function AnalyticsProvider() {
           autocapture: true,
           capture_pageview: "history_change",
           capture_pageleave: true,
-          enable_heatmaps: true,
+          capture_heatmaps: true,
           // Anonymous readers never get a person profile: cheaper against the
           // free-tier quota and less data retained.
           person_profiles: "identified_only",
