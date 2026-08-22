@@ -4,9 +4,12 @@ import { categoryTitleMap } from "@/lib/const"
 export default function CategoryList({
   categories,
   surface = "unknown",
+  prefetch = false,
 }: {
   categories: string[]
   surface?: string
+  /** See PostPreview: off by default, opted into where the pill count is low. */
+  prefetch?: boolean
 }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -14,6 +17,7 @@ export default function CategoryList({
         <Link
           key={category}
           href={`/blog/category/${encodeURIComponent(category)}`}
+          prefetch={prefetch}
           data-analytics-event="category_click"
           data-analytics-prop-category={category}
           data-analytics-prop-surface={surface}
