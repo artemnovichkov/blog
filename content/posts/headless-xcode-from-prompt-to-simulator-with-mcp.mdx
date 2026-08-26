@@ -3,6 +3,7 @@ title: 'Headless Xcode: From Prompt to Simulator with MCP'
 description: Use Xcode 27's headless MCP server and Apple's agent skills to build, preview, and verify an iOS app
 cover: /images/headless-xcode-from-prompt-to-simulator-with-mcp/cover.png
 date: '2026-08-13'
+updated: '2026-08-26'
 categories:
   - xcode
   - mcp
@@ -22,7 +23,7 @@ interactions in the simulator. I'll use Claude Code to do exactly that with a
 small reading list app.
 
 <Callout type="info" emoji="ℹ️">
-  Everything here was run on Xcode 27.0 beta 5 (build 27A5237l) with Claude
+  Everything here was run on Xcode 27.0 beta 6 (build 27A5252f) with Claude
   Code as the MCP client. You need that Xcode build, Claude Code, and an
   administrator account to enable the service. This is beta software and the
   CLI surface may change.
@@ -155,83 +156,71 @@ automatically, and discovery is relative to the directory the agent was started
 in — so the agent has to be started in the project, the same place the server
 registration lives.
 
-## Understanding the two permission gates
+## Understanding the permission prompt
 
-After you start an agent, its first request to the MCP server waits while the
-headless service authorizes two things independently.
+The first time an agent uses the server, it has to be approved. The approval is
+tied to opening a project: every other tool is refused until the agent calls
+`XcodeOpenWorkspace` or `XcodeNewProject`. That call blocks, and this prompt
+appears:
 
-The first gate is the **agent** itself. This prompt appears:
+![Permission prompt](/images/headless-xcode-from-prompt-to-simulator-with-mcp/permission-prompt.png)
 
-![Agent permission prompt](/images/headless-xcode-from-prompt-to-simulator-with-mcp/permission-agent.png)
-
-The prompt comes from the headless service, not from Claude Code. The grant is
-keyed to the code signature rather than the app name, which is why the dialog
-says *agents from Anthropic PBC*. Approving it gives the agent every tool the
-server exposes: *build, test, and modify your code*, as the dialog says.
+The prompt comes from the headless service, not from Claude Code. Approving it
+lets the agent use Xcode Tools on anything under the path it names — the
+directory containing the project, recursively. *Always Allow* keeps the
+approval, *Allow for 24 Hours* expires it.
 
 An Xcode icon appears in the menu bar as the only visible trace of the setup.
-Click it to open the Background Activity window:
+Click it to open the Xcode Service window:
 
-![Xcode Background Activity menu bar item](/images/headless-xcode-from-prompt-to-simulator-with-mcp/connected-agents.png)
+![Xcode Service menu bar item](/images/headless-xcode-from-prompt-to-simulator-with-mcp/xcode-service.png)
 
-It lists approved agents, their current activity, and any open workspaces.
-`Quit` shuts down the service, just like `xcrun mcp-server stop`.
+It lists the connected workspaces and what the agents are currently doing.
+`Session Logs…` reveals `~/Library/Logs/Xcode/XcodeService/` in Finder, the
+same activity log that `xcrun mcp-server show-logs` dumps to a file. `Quit`
+shuts the service down, just like `xcrun mcp-server stop`.
 
-A **folder** grant is the second gate, and it gets its own prompt the moment the
-agent tries to open or create something:
-
-![Folder permission prompt](/images/headless-xcode-from-prompt-to-simulator-with-mcp/permission-folder.png)
-
-The phrase *Any Xcode project inside this folder* matters. The grant is
-recursive and does not expire unless you pick *Allow for 24 Hours*.
-
-`status` shows both gates now:
+`status` records it as a signed agent and a permitted folder:
 
 ```console
 $ xcrun mcp-server status
 Permission: enabled
 Permitted agents:
-  A843056C-42FA-4C26-9EB3-84A7251FF7F1: signed Q6L2SF6YDW com.anthropic.claude-code
+  8EC174ED-B917-4104-8358-688464424F0B: signed Q6L2SF6YDW com.anthropic.claude-code
 Permitted folders:
-  026F9649-91E7-48B4-B9F4-947E91ACEB37: /Users/artemnovichkov/Developer/ReadingListExample
+  472C100D-96D4-44FE-81D3-FA27F11E2433: /Users/artemnovichkov/Developer/ReadingListExample/ReadingListExample
 mcp-server: running
-Open workspaces: none
+Open workspaces:
+  - ReadingListExample — /Users/artemnovichkov/Developer/ReadingListExample/ReadingListExample/ReadingListExample.xcodeproj (scheme: ReadingListExample)
 ```
-
-Both grants carry an id, and that id is how you revoke them later.
 
 ### Skipping the prompts
 
-One unsafe flag skips both prompts:
+One unsafe flag skips the prompt entirely:
 
 ```bash
 sudo xcrun mcp-server enable --unsafe-always-allow-all-agents
 ```
 
-The Xcode item in the menu bar normally collapses to a hammer with no
-background. When an agent connects, it briefly expands into a colored badge:
-blue for individual approvals and red for unsafe mode. The red badge is a
-security warning, not an error.
-
-While Xcode is handling an agent request, the hammer changes into rotating
-arrows — for example, while building and launching the app on a simulator. The
-color still reflects the permission mode; the animation is the activity
-indicator.
+The permission mode is visible in the menu bar. The Xcode item is a plain
+hammer with no background while no agent holds a session, and gains a colored
+badge once one does: blue for individual approvals, yellow for unsafe mode. The
+yellow badge is a security warning, not an error. The badge is static — it
+marks the mode, not the activity.
 
 <figure className="menu-bar-states">
   <img
-    src="/images/headless-xcode-from-prompt-to-simulator-with-mcp/menu-bar-activity-states.png"
-    alt="Four Xcode menu bar states: a collapsed hammer, a blue badge for individual approvals, a red badge for unsafe mode, and rotating arrows for an active request in unsafe mode"
-    width="384"
-    height="68"
+    src="/images/headless-xcode-from-prompt-to-simulator-with-mcp/menu-bar-states.png"
+    alt="Three Xcode menu bar states: a plain hammer with no agent connected, a blue badge for individual approvals, and a yellow badge for unsafe mode"
+    width="246"
+    height="60"
   />
   <figcaption>
-    From left: collapsed, individual approvals, unsafe mode, and an active
-    request in unsafe mode.
+    From left: no agent connected, individual approvals, and unsafe mode.
   </figcaption>
 </figure>
 
-The flag is named after agents, but it bypasses the folder gate too. It trusts
+The flag is named after agents, but it covers the folder grant too. It trusts
 every process on the machine with every Xcode project it can reach, leaving no
 individual grant in `status` to revoke. Disable and re-enable the service
 without the flag to return to individual prompts. To remove any stored grants,
@@ -463,8 +452,8 @@ You don't need the implementation details below to use the server. They are
 useful when auditing or scripting the setup, but the location and schema are
 undocumented beta internals and may change.
 
-The headless setting and folder grants are reflected in a JSON file inside
-Xcode's group container:
+The headless setting and both kinds of grant are reflected in a JSON file
+inside Xcode's group container:
 
 ```text
 ~/Library/Group Containers/group.com.apple.dt.Xcode.SecureSettingsContainer/CodingAssistant/HeadlessPermissions/mcp-server.json
@@ -474,11 +463,22 @@ The file is one line on disk, formatted here for readability:
 
 ```jsonc
 {
+  "agentPermissions": [
+    {
+      "id": "8EC174ED-B917-4104-8358-688464424F0B",
+      "trust": {
+        "signed": {
+          "signingIdentifier": "com.anthropic.claude-code",
+          "teamIdentifier": "Q6L2SF6YDW"
+        }
+      }
+    }
+  ],
   "enabled": true,
   "folderPermissions": [
     {
-      "id": "026F9649-91E7-48B4-B9F4-947E91ACEB37",
-      "subtreeRoot": "/Users/artemnovichkov/Developer/ReadingListExample"
+      "id": "472C100D-96D4-44FE-81D3-FA27F11E2433",
+      "subtreeRoot": "/Users/artemnovichkov/Developer/ReadingListExample/ReadingListExample"
     }
   ],
   "version": 1
@@ -487,16 +487,22 @@ The file is one line on disk, formatted here for readability:
 
 Read it, but don't edit it: the service rewrites the file on every change. For
 scripts, `status --format json` is the better source because it also reports
-runtime state and the signed agent trust object:
+runtime state:
 
 ```jsonc
 {
-  "openWorkspaces" : [],
+  "openWorkspaces" : [
+    {
+      "activeSchemeName" : "ReadingListExample",
+      "displayName" : "ReadingListExample",
+      "path" : "/Users/artemnovichkov/Developer/ReadingListExample/ReadingListExample/ReadingListExample.xcodeproj"
+    }
+  ],
   "permission" : {
     "enabled" : true,
     "permittedAgents" : [
       {
-        "id" : "A843056C-42FA-4C26-9EB3-84A7251FF7F1",
+        "id" : "8EC174ED-B917-4104-8358-688464424F0B",
         "trust" : {
           "signed" : {
             "signingIdentifier" : "com.anthropic.claude-code",
@@ -507,8 +513,8 @@ runtime state and the signed agent trust object:
     ],
     "permittedFolders" : [
       {
-        "id" : "026F9649-91E7-48B4-B9F4-947E91ACEB37",
-        "subtreeRoot" : "/Users/artemnovichkov/Developer/ReadingListExample"
+        "id" : "472C100D-96D4-44FE-81D3-FA27F11E2433",
+        "subtreeRoot" : "/Users/artemnovichkov/Developer/ReadingListExample/ReadingListExample"
       }
     ],
     "unsafeAlwaysAllowAllAgents" : false
@@ -517,9 +523,10 @@ runtime state and the signed agent trust object:
 }
 ```
 
-The JSON format makes the unsafe-mode flag and agent trust data easier to
-inspect from scripts. A provisioning script can use them to verify the expected
-team identifier before a build.
+The JSON format makes the unsafe-mode flag, the agent trust data, and the
+active scheme of each open workspace easier to inspect from scripts. A
+provisioning script can use them to verify the expected team identifier before
+a build.
 
 ## Conclusion
 
