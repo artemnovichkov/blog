@@ -25,6 +25,18 @@ const ageInDays = (publishedAt: string): number => {
   return Math.max(0, Math.floor((Date.now() - published) / dayInMs))
 }
 
+/** Groups the read_end reports that belong to the same read. */
+const readIdentifier = (): string => {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
+    return crypto.randomUUID()
+  }
+
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+}
+
 /**
  * Read-depth and in-content link tracking for a single post. Mounted once per
  * post page and keyed by slug, so navigating between posts restarts the timers.
@@ -72,6 +84,10 @@ export default function PostAnalytics({
     }
 
     const startedAt = Date.now()
+    // One read can be reported more than once: the reader tabs away, the read
+    // is reported, then they come back and finish it. Every report carries the
+    // same read_id so analytics can collapse them into a single read.
+    const readId = readIdentifier()
     const reached = new Set<number>()
     let maxScrollPct = 0
     // Only time with the tab actually visible counts, otherwise a forgotten
@@ -79,6 +95,8 @@ export default function PostAnalytics({
     let activeMs = 0
     let activeSince = document.visibilityState === "visible" ? Date.now() : 0
     let ended = false
+    let reportIndex = 0
+    let lastReport = ""
     let frame = 0
 
     const activeSeconds = () => {
@@ -123,17 +141,34 @@ export default function PostAnalytics({
       if (ended) return
       ended = true
 
-      track("post_read_end", {
-        ...base,
+      const report = {
         max_scroll_pct: Math.round(maxScrollPct),
         active_seconds: activeSeconds(),
         reached_end: reached.has(90),
+      }
+
+      // A tab flicked away and straight back adds nothing to the read, so it
+      // should not add a row either.
+      const signature = `${report.max_scroll_pct}:${report.active_seconds}:${report.reached_end}`
+      if (signature === lastReport) return
+      lastReport = signature
+
+      track("post_read_end", {
+        ...base,
+        ...report,
+        read_id: readId,
+        report_index: reportIndex,
       })
+      reportIndex += 1
     }
 
     const onVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         activeSince = Date.now()
+        // The reader came back, so the read is not over. Re-arming lets the
+        // deeper scroll that follows be reported instead of being frozen at
+        // whatever had been read when they first switched away.
+        ended = false
         return
       }
 
