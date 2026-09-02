@@ -17,6 +17,13 @@ import { siteUrl } from "@/lib/const"
 
 const PUBLISHER = "artemnovichkov.com"
 
+/**
+ * ARD itself requires only `entries` (Appendix D, ArdManifest). `specVersion`
+ * is a transport-defined member the schema permits and ignores; scanners built
+ * on the specification do demand it, so it is stated rather than omitted.
+ */
+const SPEC_VERSION = "0.91"
+
 type ArdEntry = {
   identifier: string
   displayName: string
@@ -28,7 +35,10 @@ type ArdEntry = {
   updatedAt?: string
 }
 
-export function getArdCatalog(): { entries: ArdEntry[] } {
+export function getArdCatalog(): {
+  specVersion: string
+  entries: ArdEntry[]
+} {
   // The archive's newest revision: the catalog is only as fresh as the content
   // behind it, and a build timestamp would churn the file on every deploy.
   const updatedAt = getAllPosts().map(getPostModifiedDate).sort().at(-1)
@@ -82,5 +92,5 @@ export function getArdCatalog(): { entries: ArdEntry[] } {
     },
   ]
 
-  return { entries }
+  return { specVersion: SPEC_VERSION, entries }
 }
