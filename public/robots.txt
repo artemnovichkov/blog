@@ -6,5 +6,8 @@ Content-Signal: ai-train=yes, search=yes, ai-input=yes
 # Host
 Host: https://artemnovichkov.com
 
+# Agent catalog
+Agentmap: https://artemnovichkov.com/.well-known/ard.json
+
 # Sitemaps
 Sitemap: https://artemnovichkov.com/sitemap.xml

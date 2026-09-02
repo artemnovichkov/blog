@@ -36,6 +36,38 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/*
+          Duplicates the `Link` response header from next.config.mjs. Agents
+          fetch pages through tools that never surface response headers, so the
+          header alone left every discovery surface unreachable.
+        */}
+        <link href="/llms.txt" rel="alternate" type="text/plain" />
+        {/*
+          ARD is discoverable under two names: `ard` per the specification and
+          `ai-catalog` per Google's announcement, which the scanners follow.
+        */}
+        <link href="/.well-known/ard.json" rel="ard" type="application/json" />
+        <link
+          href="/.well-known/ai-catalog.json"
+          rel="ai-catalog"
+          type="application/json"
+        />
+        <link
+          href="/.well-known/api-catalog"
+          rel="api-catalog"
+          type="application/linkset+json"
+        />
+        <link
+          href="/.well-known/openapi.json"
+          rel="service-desc"
+          type="application/openapi+json"
+        />
+        <link
+          href="/feed.xml"
+          rel="alternate"
+          title="Artem Novichkov Blog"
+          type="application/rss+xml"
+        />
         {/* biome-ignore lint/correctness/useUniqueElementIds: next/script requires a stable id for inline scripts. */}
         <Script id="theme-init" strategy="beforeInteractive">
           {`

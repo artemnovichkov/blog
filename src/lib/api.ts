@@ -77,6 +77,18 @@ export function getPostModifiedDate(post: Post): string {
   return post.updated ?? post.date
 }
 
+/**
+ * The Markdown an agent gets for a post, shared by the Markdown route and the
+ * MCP `get_post` tool so the two never drift apart.
+ */
+export function getPostMarkdown(post: Post): string {
+  return (
+    [`# ${post.title}`, ``, post.description, ``, `_${post.date}_`, ``].join(
+      "\n"
+    ) + post.content
+  )
+}
+
 export type RelatedPost = {
   post: Post
   /** False for the recency backfill, so analytics can tell the two apart. */
