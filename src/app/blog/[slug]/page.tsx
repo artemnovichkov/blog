@@ -95,6 +95,11 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
       publishedTime: new Date(post.date).toISOString(),
       modifiedTime: new Date(getPostModifiedDate(post)).toISOString(),
     },
+    // Slack and X show these next to the link preview.
+    labels: [
+      { label: "Written by", value: name },
+      { label: "Reading time", value: readingTime(post.content || "").text },
+    ],
   })
 }
 

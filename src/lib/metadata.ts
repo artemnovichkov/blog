@@ -23,6 +23,16 @@ type BuildMetadataOptions = {
     publishedTime: string
     modifiedTime: string
   }
+  /**
+   * Slack and X render these as a key/value row under the preview. Both
+   * platforms read at most two pairs, hence the fixed-length tuple.
+   */
+  labels?: [LabeledValue] | [LabeledValue, LabeledValue]
+}
+
+type LabeledValue = {
+  label: string
+  value: string
 }
 
 /**
@@ -37,6 +47,7 @@ export function buildMetadata({
   images = [DEFAULT_IMAGE],
   twitterCard = "summary_large_image",
   article,
+  labels,
 }: BuildMetadataOptions): Metadata {
   const url = `${SITE_URL}${path}`
   const shared = { title, description, url, siteName, images }
@@ -57,6 +68,15 @@ export function buildMetadata({
   return {
     title,
     description,
+    other: labels && {
+      ...Object.fromEntries(
+        labels.flatMap(({ label, value }, index) => [
+          [`twitter:label${index + 1}`, label],
+          [`twitter:data${index + 1}`, value],
+        ])
+      ),
+    },
+
     alternates: {
       canonical: url,
     },
