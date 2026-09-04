@@ -27,6 +27,10 @@ export async function GET(): Promise<Response> {
   return new Response(feed.xml({ indent: true }), {
     headers: {
       "Content-Type": "application/atom+xml; charset=utf-8",
+      // Feed readers poll far more often than posts ship, and every
+      // unconditional poll is a billable Vercel edge request. An hour of
+      // freshness is well inside the publishing cadence.
+      "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
     },
   })
 }

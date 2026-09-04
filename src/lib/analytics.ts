@@ -7,7 +7,14 @@ import type { PostHog } from "posthog-js"
  */
 
 export const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY
-export const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || "/ingest"
+/**
+ * Events go straight to PostHog rather than through a first-party /ingest
+ * rewrite: proxying made every event a billable Vercel edge request, and the
+ * blog sits on the Hobby plan. The cost is that content blockers now drop some
+ * events.
+ */
+export const posthogHost =
+  process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com"
 
 /**
  * Local development shares the single production PostHog project, so dev

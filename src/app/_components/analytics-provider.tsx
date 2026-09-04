@@ -58,9 +58,6 @@ export default function AnalyticsProvider() {
 
         posthog.init(posthogKey as string, {
           api_host: posthogHost,
-          // Without this the SDK asks the PostHog API where to send data,
-          // which defeats the /ingest rewrite.
-          ui_host: "https://us.posthog.com",
           defaults: "2025-05-24",
           // Autocapture plus heatmaps answer "where do people click" without
           // any bespoke instrumentation; named events only add properties.
@@ -77,8 +74,7 @@ export default function AnalyticsProvider() {
           // Recording rate is deliberately not set here: client-side sampling
           // would decide per page load and split one visit across several
           // partial recordings. Set it once in PostHog under Session replay ->
-          // Sampling (15% is the intended rate) so whole sessions are sampled
-          // and the /ingest rewrite stays within the Hobby plan budget.
+          // Sampling (15% is the intended rate) so whole sessions are sampled.
         })
 
         setAnalyticsClient(posthog)
