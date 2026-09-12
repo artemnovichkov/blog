@@ -115,7 +115,7 @@ them and how Apple expects SwiftUI code to be structured. One command copies
 Apple's skills next to `.mcp.json`:
 
 ```console
-$ xcrun agent skills export --output-dir ~/Developer/ReadingListExample/.claude/skills
+$ xcrun agent skills export --output-dir "$PWD/.claude/skills"
 Launching Xcode...
 Exported 10 skills to /Users/artemnovichkov/Developer/ReadingListExample/.claude/skills
   ✓ adopt-c-bounds-safety
@@ -133,7 +133,8 @@ workflow. Existing skills are skipped rather than overwritten, so pass
 <Callout type="warning" emoji="⚠️">
   Pass `--output-dir` an **absolute** path. The export is performed by Xcode
   over XPC (Apple's system for communication between processes), not by your
-  shell, so a relative path may resolve outside your project and fail.
+  shell, so a relative path resolves against `/` instead of your project and
+  fails with a read-only volume error — hence the `$PWD` above.
 </Callout>
 
 Each skill is a plain `SKILL.md` with `name` and `description` frontmatter,
