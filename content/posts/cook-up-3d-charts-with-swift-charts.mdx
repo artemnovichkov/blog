@@ -3,6 +3,7 @@ title: Cook up 3D charts with Swift Charts
 description: Learn how to use Chart3D from iOS 26.0
 cover: /images/cook-up-3d-charts-with-swift-charts/cover.png
 date: '2025-06-12'
+updated: '2026-09-14'
 categories:
   - swiftui
   - swift-charts
@@ -97,7 +98,7 @@ At the moment, `Chart3D` supports 3 types of marks:
 - RuleMark;
 - RectangleMark.
 
-We'll use `PointMark` that will represent a single point in 3D space. Since iOS 26.0 beta, we can use a new initializer with three values:
+We'll use `PointMark` that will represent a single point in 3D space. Since iOS 26.0, we can use a new initializer with three values:
 
 ```swift
 Chart3D(irisData) { iris in
@@ -120,7 +121,7 @@ We can customize scale of the chart by modifier for every axis:
 ```swift
 .chartXScale(domain: 1...8, range: -1.5...1.5)
 .chartYScale(domain: 0...3, range: -0.5...0.5)
-// New in iOS 26.0 beta
+// New in iOS 26.0
 .chartZScale(domain: 4...8, range: -0.5...0.5)
 ```
 
@@ -134,11 +135,11 @@ private let zLabel = "Sepal Length (cm)"
 Chart3D(irisData) { ... }
 .chartXAxisLabel(xLabel)
 .chartYAxisLabel(yLabel)
-// New in iOS 26.0 beta
+// New in iOS 26.0
 .chartZAxisLabel(zLabel)
 ```
 
-The interesting thing here is that we can't set string literals directly, the labels won't be displayed. It looks like a bug for me, but I found this workaround in Code section of related WWDC session. I'll check it in next betas and update this post if needed.
+The interesting thing here is that we can't set string literals directly, the labels won't be displayed. It looks like a bug for me, but I found this workaround in Code section of related WWDC session.
 
 ![Axis](/images/cook-up-3d-charts-with-swift-charts/axis.png)
 

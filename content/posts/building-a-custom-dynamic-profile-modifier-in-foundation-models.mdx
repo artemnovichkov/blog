@@ -3,6 +3,7 @@ title: Building a custom DynamicProfileModifier in Foundation Models
 description: Build a reusable economy mode modifier that switches a session on device, caps responses, and trims history
 cover: /images/building-a-custom-dynamic-profile-modifier-in-foundation-models/cover.png
 date: '2026-07-17'
+updated: '2026-09-14'
 categories:
   - foundation-models
   - ai
@@ -18,10 +19,10 @@ We'll build a practical one: an **economy mode** that switches a profile to the 
 
 ## Requirements
 
-- Xcode 27 beta and an iOS/iPadOS/macOS 27 beta.
+- Xcode 27 and iOS/iPadOS/macOS 27.
 - A remote `LanguageModel` if you want to run the model-switching branch. You can use Private Cloud Compute, Claude, OpenAI, or your own provider.
 
-Private Cloud Compute requires a managed entitlement. Anthropic, OpenAI, and other commercial providers require their own credentials and network connection. The APIs in this post are beta, so check availability and test again with the final SDK and operating system before shipping.
+Private Cloud Compute requires a managed entitlement. Anthropic, OpenAI, and other commercial providers require their own credentials and network connection.
 
 ## Understanding dynamic profiles
 

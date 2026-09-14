@@ -3,6 +3,7 @@ title: Using Claude with Apple Foundation Models
 description: Bringing frontier models to LanguageModelSession with model selection and BYOK
 cover: /images/using-claude-with-apple-foundation-models/cover.png
 date: '2026-06-12'
+updated: '2026-09-14'
 categories:
   - foundation-models
   - ai
@@ -16,8 +17,8 @@ In this post, we'll build GiftGenie — a small app that generates gift ideas �
 
 ## Requirements
 
-- Xcode 27 beta;
-- iOS 27 beta (macOS, visionOS, and watchOS 27 are supported as well);
+- Xcode 27;
+- iOS 27 (macOS, visionOS, and watchOS 27 are supported as well);
 - A Claude API key from [Claude Console](https://platform.claude.com).
 
 Requests go directly from the app to the Claude API — Apple is not in the request path and doesn't see prompts or responses. Usage is billed to your Anthropic account at standard API pricing.
@@ -252,7 +253,7 @@ Foundation Models is becoming a universal interface for language models on Apple
 
 If you like this approach but can't require iOS 27, check out [AnyLanguageModel](https://github.com/huggingface/AnyLanguageModel) from Hugging Face — a drop-in replacement for the Foundation Models framework that works back to iOS 17 and supports many backends behind the same session API: MLX, llama.cpp, Ollama, Core ML, and remote providers like Anthropic, OpenAI, and Gemini.
 
-I created [GiftGenieExample](https://github.com/artemnovichkov/GiftGenieExample) with all the code from this post, so you can run it in Xcode right away. Note that both the OS 27 betas and the package are in beta, so APIs may change before general availability. Happy gifting!
+I created [GiftGenieExample](https://github.com/artemnovichkov/GiftGenieExample) with all the code from this post, so you can run it in Xcode right away. Happy gifting!
 
 ## Resources
 
