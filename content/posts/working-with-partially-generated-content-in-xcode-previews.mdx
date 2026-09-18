@@ -13,7 +13,7 @@ categories:
 With the introduction of the Foundation Models framework, Apple provides tools to integrate AI-generated content directly into SwiftUI apps. One particularly useful feature is guided generation of Swift data structures. In this post, we'll explore techniques for working with partially generated content in Xcode previews.
 
 <Callout type="info" emoji="️ℹ️">
-  Code examples are tested in Xcode 26.0 (17A324).
+  Code examples are tested in Xcode 27.0.
 </Callout>
 
 ## Generating content
@@ -156,27 +156,13 @@ Additionally, we can create a `CatProfile` from raw JSON fragments:
     VStack(spacing: 8) {
         ForEach(jsons, id: \.self) { json in
             let content = try! GeneratedContent(json: json)
-            CatProfileView(catProfile: try! .init(content))
+            CatProfileView(catProfile: try! CatProfile.PartiallyGenerated(content))
         }
     }
 }
 ```
 
 Note that the JSON may be invalid; `GeneratedContent` will still attempt to parse it and return `PartiallyGenerated` value with whatever fields are present.
-
-Initially, I tried to use the generated content's type directly:
-
-```swift
-CatProfileView(catProfile: try! CatProfile.PartiallyGenerated(content))
-```
-
-But I got an error related to the type mismatch:
-
-<Callout type="error" emoji="️🚫">
-  Cannot convert value of type 'CatProfile.PartiallyGenerated' (aka 'CatProfile') to expected argument type 'CatProfile.PartiallyGenerated'
-</Callout>
-
-I'm not yet sure why this fails — if you have ideas, please let me know.
 
 Let's check the preview:
 
