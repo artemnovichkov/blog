@@ -3,6 +3,7 @@ title: Task Names in Swift Concurrency
 description: Name Swift tasks for clearer debugging and profiling
 cover: /images/task-names-in-swift-concurrency/cover.png
 date: '2026-05-30'
+updated: '2026-09-18'
 categories:
   - swift-concurrency
 ---
@@ -11,7 +12,7 @@ When a crash happens deep inside concurrent code, the first question is always: 
 
 ## Naming tasks
 
-The name parameter is optional on most explicit task creation APIs, so adoption is purely additive. The examples below all build on the same scenario: loading a user's data.
+The name parameter is optional on most explicit task creation APIs, so you can add names without touching existing code. The examples below all build on the same scenario: loading a user's data.
 
 Let's start with unstructured tasks:
 
@@ -45,9 +46,9 @@ Task(name: "Load user \(userID)") {
 }
 ```
 
-The same `name` parameter is also available on `addTaskUnlessCancelled`, and on all throwing and discarding task group variants.
+The same `name` parameter is also available on `addTaskUnlessCancelled`, on all throwing and discarding task group variants, and on immediate tasks: `Task.immediate`, `Task.immediateDetached`, and `addImmediateTask`.
 
-A few rules: names are set at creation only — there is no setter — and the parameter is optional everywhere, so unnamed tasks remain the default.
+Names are set at creation only, and there is no setter. The parameter is optional everywhere, so unnamed tasks remain the default.
 
 ## SwiftUI task modifier
 
@@ -82,8 +83,6 @@ This is useful when you want every view task to be identifiable without hand-wri
 
 The SwiftUI overloads keep the existing `.task` behaviour on older operating systems, but the `name`, `file`, and `line` arguments are ignored before Apple platforms 26.4. The task still starts, cancels, and restarts as usual; it just does not receive your custom or generated name.
 
-Once a task has a name, you can read that name from inside the task body.
-
 ## Reading the name at runtime
 
 A static property gives you the current task's name from inside the task body:
@@ -104,11 +103,7 @@ group.addTask(name: "Load profile \(userID)") {
 }
 ```
 
-<Callout type="warning" emoji="⚠️">
-  At the time of writing, Swift 6.4 is not yet bundled with Xcode. To try the Swift 6.4 instance APIs today, download a development snapshot from [swift.org/install](https://www.swift.org/install) and select it as the active toolchain in Xcode settings.
-</Callout>
-
-Starting in Swift 6.4, the instance property lets you read the name off a task reference after creation:
+Starting in Swift 6.4, the instance property lets you read the name off a task reference after creation. It requires iOS 27, macOS 27, or a matching OS version on other Apple platforms:
 
 ```swift
 let task = Task(name: "Load profile \(userID)") {
@@ -125,7 +120,7 @@ withUnsafeCurrentTask { task in
 }
 ```
 
-Custom `TaskExecutor` implementations can use `job.unsafeCurrentTask?.name` to log which named task they are about to run — useful when you want executor-level tracing without adding instrumentation inside every closure.
+Custom `TaskExecutor` implementations can use `job.unsafeCurrentTask?.name` to log which named task they are about to run. This gives you executor-level tracing without adding instrumentation inside every closure.
 
 ## Debugging with LLDB
 
@@ -148,9 +143,33 @@ Task(name: "Load profile \(userID)") {
 }
 ```
 
-The name appears right after `current_task =`. With a task group, `language swift task info` has a limitation — it only traverses the parent task's runtime children linked list, and task group children are linked there one at a time. In current LLDB output, you may only see one group child, even if several are running concurrently.
+The name appears right after `current_task =`. For the whole hierarchy, use `language swift task tree`. It prints every discovered task with its name, state, and a short backtrace. The `--max-frames` option limits the backtrace length:
 
-To see all named children at once, use Xcode's Variables View panel instead. Set a breakpoint on `await group.waitForAll()` — in this example, the child tasks are long-running enough to inspect while the parent is waiting. Expand the `group` variable in the bottom panel:
+```
+(lldb) language swift task tree --max-frames 1
+├╴ Task 1, addr = 0x100595880 [awaiting Task 2] [suspended]
+│    frame #0: Task<>.value.getter
+└╴ Task 2 ('Load profile 42'), addr = 0x100596f10 [running]
+     frame #0: closure #1 in  + 36 at main.swift:4:27
+```
+
+Unnamed tasks show only their id, and `[awaiting Task 2]` tells you which task is blocked on which. `language swift task list` prints the same tasks as a flat list.
+
+With a task group, `language swift task info` has a limitation. It only traverses the parent task's runtime children linked list, and task group children are linked there one at a time. In current LLDB output, you may only see one group child, even if several are running concurrently. `language swift task tree` has the same gap:
+
+```
+(lldb) language swift task tree --max-frames 1
+├╴ Task 1, addr = 0x1006598a0 [awaiting Task 2] [suspended]
+│    frame #0: Task<>.value.getter
+└╴ Task 2 ('Load user 42'), addr = 0x10065b150 [suspended]
+   │ frame #0: TaskGroup.next(isolation:)
+   └╴ Task 3 ('Load profile 42'), addr = 0x10065ba30 [suspended]
+        frame #0: specialized static Task<>._sleep<A>(until:tolerance:clock:)
+```
+
+LLDB currently discovers tasks by walking threads and the links between tasks, so suspended group children can be missed.
+
+To see all named children at once, use Xcode's Variables View panel instead. Set a breakpoint on `await group.waitForAll()`. In this example, the child tasks are long-running enough to inspect while the parent is waiting. Expand the `group` variable in the bottom panel:
 
 ![Xcode Variables View panel showing all three named task group children](/images/task-names-in-swift-concurrency/lldb-xcode-panel.png)
 
@@ -158,7 +177,7 @@ You can also hover over the `group` variable in the code and click the eye icon 
 
 ![Quick Look popup for the group variable showing named task group children](/images/task-names-in-swift-concurrency/lldb-variables.png)
 
-Cancellation is also reflected in the flags. Set a breakpoint inside a child's cancellation catch block to catch the moment after `task.cancel()` propagates:
+The flags also show cancellation. Set a breakpoint inside a child's cancellation catch block to catch the moment after `task.cancel()` propagates:
 
 ```swift
 let task = Task(name: "Load user \(userID)") {
@@ -195,7 +214,7 @@ When the breakpoint hits inside `"Load profile 42"`, `language swift task info` 
 
 ## The async let limitation
 
-`async let` tasks cannot be named — there is no place in the syntax to attach a string. The limitation is visible in the debugger. Take this variant of the loading example:
+`async let` tasks cannot be named because the syntax has no place to attach a string. You can see this in the debugger. Take this variant of the loading example:
 
 ```swift
 let task = Task(name: "Load user \(userID)") {
@@ -242,16 +261,17 @@ The Swift Concurrency template in Xcode Instruments displays named tasks as sepa
 
 ## Availability
 
-Task naming is split between Swift language support and framework or runtime support. The core task creation APIs and `Task.name` are available with Swift 6.2, but SwiftUI task names depend on the operating system because the modifier is implemented by SwiftUI.
+Task naming is split between Swift language support and framework or runtime support. The core task creation APIs compile with Swift 6.2 for any deployment target, but reading names and SwiftUI task names depend on the operating system.
 
 | API | Minimum |
 |-----|---------|
 | `Task(name:)`, `Task.detached(name:)`, `addTask(name:)`, `addTaskUnlessCancelled(name:)` | Swift 6.2 |
-| `Task.name` (static, reads current task) | Swift 6.2 |
+| `Task.immediate(name:)`, `Task.immediateDetached(name:)`, `addImmediateTask(name:)` | Swift 6.2, Apple platforms 26 |
+| `Task.name` (static, reads current task) | Swift 6.2, Apple platforms 26 |
 | `.task(name:)`, `.task(id:name:)` (SwiftUI) | Apple platforms 26.4 for task names; older `.task` behaviour is unchanged |
-| `task.name` (instance), `UnsafeCurrentTask.name` | Swift 6.4 |
+| `task.name` (instance), `UnsafeCurrentTask.name` | Swift 6.4, Apple platforms 27 |
 
-The static `Task.name` property landed with the main proposal, so it is the portable way to read the current task's name from inside task code. The instance `task.name` property was added later as an amendment after the original proposal accidentally omitted it, so it requires Swift 6.4.
+The static `Task.name` property landed with the main proposal, so it is the portable way to read the current task's name from inside task code. The instance `task.name` property was added later as an amendment after the original proposal accidentally omitted it, so it requires Swift 6.4 and Apple platforms 27.
 
 ## Naming guidance
 
