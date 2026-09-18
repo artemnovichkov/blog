@@ -103,10 +103,10 @@ hand-edit later:
 }
 ```
 
-The bridge connects to the Xcode selected by `xcode-select`. If you keep a beta
-alongside a stable install, add `DEVELOPER_DIR` to `env`, pointing at
-`/Applications/Xcode-beta.app/Contents/Developer`. It takes precedence for the
-agent without changing the selection for other terminals.
+The bridge connects to the Xcode selected by `xcode-select`. If you keep
+several Xcode installs, add `DEVELOPER_DIR` to `env`, pointing at the one you
+need, for example `/Applications/Xcode-27.app/Contents/Developer`. It takes
+precedence for the agent without changing the selection for other terminals.
 
 ### Exporting Apple's skills into the repo
 

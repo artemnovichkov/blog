@@ -10,7 +10,7 @@ categories:
   - llm
 ---
 
-iOS 26.4 introduces token usage tracking for Apple's Foundation Models framework. The on-device model has a context window of 4096 tokens, so understanding how many tokens your instructions, prompts, and tools consume is essential for building reliable features. In this post, we'll explore APIs for measuring token usage at every level — from individual instructions to full conversation transcripts.
+iOS 26.4 introduces token usage tracking for Apple's Foundation Models framework. The on-device model in iOS 26 has a context window of 4096 tokens, and newer model versions may differ, so reading the actual size at runtime and understanding how many tokens your instructions, prompts, and tools consume is essential for building reliable features. In this post, we'll explore APIs for measuring token usage at every level — from individual instructions to full conversation transcripts.
 
 ## Context Size
 
@@ -19,7 +19,7 @@ Before measuring token usage, you need to know the total context size available.
 ```swift
 let model = SystemLanguageModel.default
 let contextSize = try await model.contextSize
-print("Context size", contextSize) // "Context size 4096"
+print("Context size", contextSize) // "Context size 4096" on iOS 26
 ```
 
 The `contextSize` property is marked with `@backDeployed(before: iOS 26.4, macOS 26.4, visionOS 26.4)`, so it's available on earlier OS versions as well. Note that the call can throw an error if the model is unavailable or Apple Intelligence is disabled on the device.
