@@ -92,11 +92,13 @@ struct ContentView: View {
 }
 ```
 
-At the moment, `Chart3D` supports 3 types of marks:
+`Chart3D` supports 3 types of marks:
 
 - PointMark;
 - RuleMark;
 - RectangleMark.
+
+It also supports `SurfacePlot` for rendering mathematical surfaces defined by a function of two variables.
 
 We'll use `PointMark` that will represent a single point in 3D space. Since iOS 26.0, we can use a new initializer with three values:
 
