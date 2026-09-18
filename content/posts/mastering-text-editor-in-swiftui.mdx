@@ -196,10 +196,12 @@ Here is a workaround with [Introspect](https://github.com/siteline/swiftui-intro
 
 ```swift
 TextEditor(text: $text, selection: $textSelection)
-  .introspect(.textEditor, on: .iOS(.v18)) { textView in
+  .introspect(.textEditor, on: .iOS(.v18, .v26, .v27)) { textView in
       textView.isEditable = false
   }
 ```
+
+Introspect calls the closure only on listed OS versions, so add new versions as they come out. As of iOS 27, SwiftUI still has no built-in read-only mode for `TextEditor`.
 
 ## Apple Intelligence and Writing Tools
 
