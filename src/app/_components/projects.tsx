@@ -1,15 +1,19 @@
 import { SiXcode } from "react-icons/si"
-import { projects } from "@/lib/const"
+import type { Project } from "@/lib/const"
 
-export default function Projects() {
+type Props = {
+  title: string
+  subtitle: string
+  projects: Project[]
+}
+
+export default function Projects({ title, subtitle, projects }: Props) {
   return (
     <div>
       <p className="mb-2 font-bold text-3xl text-zinc-800 tracking-tight dark:text-gray-100">
-        Current Projects
+        {title}
       </p>
-      <p className="mb-4 text-zinc-500 dark:text-gray-400">
-        Projects I&apos;m currently working on:
-      </p>
+      <p className="mb-4 text-zinc-500 dark:text-gray-400">{subtitle}</p>
       <ul className="flex flex-col gap-3">
         {projects.map((project) => (
           <li key={project.name}>

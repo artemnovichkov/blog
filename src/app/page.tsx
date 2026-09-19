@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { iphoneDuoProjects, projects } from "@/lib/const"
 import { buildHomeJsonLd, JsonLd } from "@/lib/json-ld"
 import Projects from "./_components/projects"
 
@@ -68,7 +69,18 @@ export default function Home() {
           PS 5.
         </p>
       </div>
-      <Projects />
+      <div className="flex flex-col gap-12">
+        <Projects
+          title="Current Projects"
+          subtitle="Projects I'm currently working on:"
+          projects={projects}
+        />
+        <Projects
+          title="iPhone Duo"
+          subtitle="Apps and tools for the foldable iPhone:"
+          projects={iphoneDuoProjects}
+        />
+      </div>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { projects } from "@/lib/const"
+import { iphoneDuoProjects, type Project, projects } from "@/lib/const"
 import { markdownResponse } from "@/lib/markdown-response"
 
 const bio = `# Artem Novichkov
@@ -13,7 +13,7 @@ I write blog posts mostly about SwiftUI and occasionally share knowledge through
 
 In my free time, I enjoy flying FPV drones and editing the videos I capture. I also like playing video games on my Nintendo Switch 2 and PS 5.`
 
-function projectsMarkdown() {
+function projectsMarkdown(title: string, projects: Project[]) {
   const items = projects
     .map((project) => {
       const cta = project.cta
@@ -22,10 +22,10 @@ function projectsMarkdown() {
       return `- ${project.emoji ? `${project.emoji} ` : ""}[${project.name}](${project.url}) — ${project.description}${cta}`
     })
     .join("\n")
-  return `## Current Projects\n\n${items}\n`
+  return `## ${title}\n\n${items}\n`
 }
 
-const body = `${bio}\n\n${projectsMarkdown()}`
+const body = `${bio}\n\n${projectsMarkdown("Current Projects", projects)}\n${projectsMarkdown("iPhone Duo", iphoneDuoProjects)}`
 
 export async function GET(request: Request) {
   return markdownResponse(request, body)

@@ -64,6 +64,45 @@ export const projects: Project[] = [
   },
 ]
 
+export const iphoneDuoProjects: Project[] = [
+  {
+    emoji: "📐",
+    name: "iPhone-Duo-by-Examples",
+    url: "https://github.com/artemnovichkov/iPhone-Duo-by-Examples",
+    description: "SwiftUI examples for iPhone Duo APIs in iOS 27.1",
+  },
+  {
+    emoji: "🎚️",
+    name: "hinge",
+    url: "https://github.com/artemnovichkov/hinge",
+    description: "Control iPhone Duo Simulator hinge angle from CLI",
+  },
+  {
+    emoji: "🪗",
+    name: "Accorduon",
+    url: "https://github.com/artemnovichkov/Accorduon",
+    description: "Accordion where the hinge is the bellows",
+  },
+  {
+    emoji: "🧸",
+    name: "ClawKit",
+    url: "https://github.com/artemnovichkov/ClawKit",
+    description: "Clay claw machine split across the fold",
+  },
+  {
+    emoji: "🦢",
+    name: "Duogami",
+    url: "https://github.com/artemnovichkov/Duogami",
+    description: "Origami workshop: fold paper by folding the phone",
+  },
+  {
+    emoji: "⏳",
+    name: "SandValley",
+    url: "https://github.com/artemnovichkov/SandValley",
+    description: "Sand that slides into the fold",
+  },
+]
+
 export const categoryTitleMap: Record<string, string> = {
   ai: "AI",
   avkit: "AVKit",
