@@ -125,6 +125,7 @@ export const categoryTitleMap: Record<string, string> = {
   naturallanguage: "Natural Language",
   "result-builders": "Result builders",
   security: "Security",
+  "sf-symbols": "SF Symbols",
   shazamkit: "ShazamKit",
   swift: "Swift",
   "swift-charts": "Swift Charts",
