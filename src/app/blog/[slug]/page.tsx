@@ -36,7 +36,7 @@ export default async function BlogPost(props: Params) {
       <JsonLd data={buildBlogPostingJsonLd(post)} />
       <article>
         <div className="mx-auto w-full max-w-2xl">
-          <div className="mt-4">
+          <div className="mt-4 mb-6">
             <PostHeader post={post} />
           </div>
           <AdBlock
