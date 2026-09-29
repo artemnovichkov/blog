@@ -325,3 +325,65 @@
 .duo-device[data-flat] :is(.duo-slab, .duo-face-back, .duo-shade) {
   display: none;
 }
+
+/*
+ * Themes scene (themes-scene.tsx): the device stays pinned while its looks
+ * cross-fade, scrubbed by the section's own pass through the screen. Only
+ * opacity moves, so reduced motion keeps it as is.
+ */
+
+.themes-scene,
+.themes-fallback {
+  display: none;
+}
+
+@supports not (animation-timeline: view()) {
+  .themes-fallback {
+    display: block;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .themes-scene {
+    display: block;
+    view-timeline-name: --themes;
+  }
+
+  .themes-next {
+    animation: promo-fade linear both;
+    animation-timeline: --themes;
+  }
+
+  .themes-name {
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --themes;
+    animation-range: contain 0% contain 100%;
+  }
+}
+
+.themes-sticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  padding-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+}
+
+/* One shadow for the stack, so it stays even while looks overlap. */
+.themes-stage {
+  position: relative;
+  width: min(100%, 880px, (100dvh - 22rem) * 2.04);
+  filter: drop-shadow(0 20px 25px rgb(0 0 0 / 0.15));
+}
+
+.themes-look {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}

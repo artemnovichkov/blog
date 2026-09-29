@@ -36,6 +36,11 @@ export type AppSection = {
   /** Shown as is, and as the fallback when the section plays a scene. */
   images: AppImage[]
   /**
+   * Looks of the same screenshot, framed alike, that take turns on one
+   * pinned device as the page scrolls.
+   */
+  themes?: { name: string; image: AppImage }[]
+  /**
    * A foldable that unfolds as the page scrolls: the inner screen split at
    * the hinge, and the outer screen on the back of the left half.
    */
@@ -146,6 +151,35 @@ export const apps: App[] = [
             alt: "Neon theme: magenta and cyan points on a dark grid",
             width: 1200,
             height: 587,
+          },
+        ],
+        themes: [
+          {
+            name: "Classic",
+            image: {
+              src: "/apps/nardy/theme-classic.webp",
+              alt: "Classic theme: walnut board with ivory and ebony checkers",
+              width: 1200,
+              height: 587,
+            },
+          },
+          {
+            name: "Yerevan",
+            image: {
+              src: "/apps/nardy/theme-yerevan.webp",
+              alt: "Yerevan theme: apricot and pomegranate board with red dice",
+              width: 1200,
+              height: 587,
+            },
+          },
+          {
+            name: "Neon",
+            image: {
+              src: "/apps/nardy/theme-neon.webp",
+              alt: "Neon theme: magenta and cyan points on a dark grid",
+              width: 1200,
+              height: 587,
+            },
           },
         ],
       },
