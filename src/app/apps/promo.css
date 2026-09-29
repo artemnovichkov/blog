@@ -98,3 +98,230 @@
     animation: none;
   }
 }
+
+/*
+ * Duo unfold, driven from script (duo-unfold.tsx). The stage holds both inner
+ * halves side by side; the left one is a flap hinged at the middle with the
+ * outer screen on its back. Each half is a stack of silhouettes, so it has an
+ * edge when it turns. Closed, the flap lies over the right half and the
+ * device slides a quarter left to stay centered.
+ */
+
+.duo-fallback {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .duo-scene {
+    display: none;
+  }
+
+  .duo-fallback {
+    display: block;
+  }
+}
+
+.duo-scene {
+  height: 300vh;
+}
+
+.duo-sticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  padding-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+}
+
+.duo-stage {
+  --duo-w: min(100vw - 2rem, 720px, (100dvh - 20rem) * 1.376);
+  /* A half of iPhone Duo is about 4.5 mm thick against 150 mm open. */
+  --duo-t: calc(var(--duo-w) * 0.022);
+  width: var(--duo-w);
+  aspect-ratio: 1600 / 1163;
+  position: relative;
+  perspective: calc(var(--duo-w) * 2.2);
+}
+
+.duo-device {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: 75% 50%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.duo-half {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.duo-right {
+  left: 50%;
+}
+
+/* Screens fold inward, so the hinge runs along the screen side. */
+.duo-flap {
+  left: 0;
+  transform-origin: 100% 50% calc(var(--duo-t) / 2);
+  will-change: transform;
+}
+
+.duo-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform: translateZ(calc(var(--duo-t) / 2));
+}
+
+.duo-face-back {
+  transform: rotateY(180deg) translateZ(calc(var(--duo-t) / 2));
+}
+
+.duo-face img {
+  width: 100%;
+  height: 100%;
+}
+
+/* Titanium edge: brighter across the middle, where the band catches light. */
+.duo-slab {
+  position: absolute;
+  inset: 0;
+  mask-size: 100% 100%;
+  background: color-mix(in srgb, #1b2230, #5a6679 var(--shine));
+  transform: translateZ(calc(var(--duo-t) * (0.5 - var(--slab))));
+}
+
+/*
+ * iPhone Duo's folding look. A folding screen's picture stays lying where
+ * the screen lay, in a flat layer over the scene with the device's own
+ * transform; script cuts it to the outline the tilted half shows, so the
+ * half reads as a window onto it and the picture stretches away from the
+ * hinge. Past the picture's edge is black. On top, the gradients put blur
+ * and darkness where the device does: sharp at the hinge, softer and darker
+ * toward the outer edge, and along the top and bottom.
+ */
+.duo-proj,
+.duo-proj-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.duo-proj {
+  transform-origin: 75% 50%;
+}
+
+.duo-proj-layer {
+  background: #000;
+  visibility: hidden;
+}
+
+/*
+ * The pictures reach past their half by half its width each side and 30% of
+ * its height top and bottom (see fold.py), where they smear out into black.
+ */
+.duo-fx {
+  position: absolute;
+  top: -30%;
+  width: 100%;
+  height: 160%;
+}
+
+.duo-fx img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Darkness belongs to the screen itself, not the margins around it. */
+.duo-fx-dark {
+  position: absolute;
+  inset: 18.75% 25%;
+}
+
+.duo-fx[data-hinge="right"] {
+  --duo-out: left;
+  left: -25%;
+}
+
+.duo-fx[data-hinge="left"] {
+  --duo-out: right;
+  left: 25%;
+}
+
+.duo-fx-blur1,
+.duo-fx-blur2 {
+  opacity: 0;
+}
+
+.duo-fx[data-hinge="right"] .duo-fx-blur1 {
+  mask-image: linear-gradient(to left, transparent 27.5%, #000 50%);
+}
+
+.duo-fx[data-hinge="right"] .duo-fx-blur2 {
+  mask-image: linear-gradient(to left, transparent 40%, #000 70%);
+}
+
+.duo-fx[data-hinge="left"] .duo-fx-blur1 {
+  mask-image: linear-gradient(to right, transparent 27.5%, #000 50%);
+}
+
+.duo-fx[data-hinge="left"] .duo-fx-blur2 {
+  mask-image: linear-gradient(to right, transparent 40%, #000 70%);
+}
+
+.duo-fx-dark {
+  opacity: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      #000,
+      transparent 18%,
+      transparent 82%,
+      #000
+    ),
+    linear-gradient(
+      to var(--duo-out),
+      transparent 15%,
+      rgb(0 0 0 / 0.7) 55%,
+      #000 85%
+    );
+}
+
+.duo-shade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  mask-size: 100% 100%;
+}
+
+/* At rest open it is a plain picture: no 3D, so screens render sharp. */
+.duo-device[data-flat] {
+  transform: none;
+  transform-style: flat;
+  will-change: auto;
+}
+
+.duo-device[data-flat] .duo-half {
+  transform: none;
+  transform-style: flat;
+  will-change: auto;
+}
+
+.duo-device[data-flat] .duo-face {
+  transform: none;
+}
+
+.duo-device[data-flat] :is(.duo-slab, .duo-face-back, .duo-shade) {
+  display: none;
+}

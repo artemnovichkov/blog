@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import DuoUnfold from "@/app/apps/_components/duo-unfold"
 import StoreButton from "@/app/apps/_components/store-button"
 import { type AppSection, apps, getApp, getAppPageSlugs } from "@/lib/apps"
 import { buildAppJsonLd, JsonLd } from "@/lib/json-ld"
@@ -191,6 +192,16 @@ export default async function AppPromoPage({ params }: Params) {
       {groupSections(app.sections).map((group) =>
         group[0].images.length === 0 ? (
           <Cards key={group[0].title} sections={group} />
+        ) : group[0].unfold ? (
+          <div key={group[0].title}>
+            <DuoUnfold section={group[0]} />
+            <div className="duo-fallback">
+              <Showcase
+                section={group[0]}
+                reversed={showcaseIndex++ % 2 === 1}
+              />
+            </div>
+          </div>
         ) : (
           <Showcase
             key={group[0].title}

@@ -33,7 +33,34 @@ export type AppImage = {
 export type AppSection = {
   title: string
   body: string
+  /** Shown as is, and as the fallback when the section plays a scene. */
   images: AppImage[]
+  /**
+   * A foldable that unfolds as the page scrolls: the inner screen split at
+   * the hinge, and the outer screen on the back of the left half.
+   */
+  unfold?: {
+    left: string
+    right: string
+    back: string
+    /**
+     * Path prefixes of the folding screens' pictures without the frame
+     * (`-screen`, `-blur1`, `-blur2` WebP), for the look iPhone Duo gives a
+     * half while it folds.
+     */
+    leftLayers: string
+    backLayers: string
+    /**
+     * Where each folding screen sits in its half, as fractions of the half:
+     * left, top, right, bottom, then corner radii from top left clockwise,
+     * as fractions of the half's width.
+     */
+    leftScreen: number[]
+    backScreen: number[]
+    width: number
+    height: number
+    alt: string
+  }
 }
 
 export type AppPage = {
@@ -72,6 +99,20 @@ export const apps: App[] = [
             height: 861,
           },
         ],
+        unfold: {
+          left: "/apps/nardy/duo-fold-left.webp",
+          right: "/apps/nardy/duo-fold-right.webp",
+          back: "/apps/nardy/duo-fold-back.webp",
+          leftLayers: "/apps/nardy/duo-fold-left",
+          backLayers: "/apps/nardy/duo-fold-back",
+          leftScreen: [0.0762, 0.0525, 1, 0.9475, 0.1125, 0, 0, 0.1125],
+          backScreen: [
+            0.0262, 0.0473, 0.9325, 0.9544, 0.011, 0.111, 0.11, 0.01,
+          ],
+          width: 800,
+          height: 1163,
+          alt: "iPhone Duo unfolding from the inlaid lid with Mount Ararat into a walnut backgammon board, the fold as the bar",
+        },
       },
       {
         title: "Two games, one board",
