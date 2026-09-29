@@ -23,7 +23,7 @@ export default function StoreButton({ app }: { app: App }) {
   return (
     <a
       href={appStoreUrl(app)}
-      className={`${className} bg-black text-white transition-opacity hover:opacity-80 dark:bg-white dark:text-black`}
+      className={`${className} bg-black text-white transition-[opacity,transform] duration-100 ease-out hover:opacity-80 active:scale-[0.97] dark:bg-white dark:text-black`}
       data-analytics-event="app_store_clicked"
       data-analytics-prop-app={app.slug}
     >

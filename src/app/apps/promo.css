@@ -1,0 +1,100 @@
+/*
+ * Promo page motion, in the spirit of apple.com product pages: the hero
+ * settles in once on load, then sections rise into place as they scroll in,
+ * scrubbed by the scroll itself so they can be reversed at any instant.
+ * Transform and opacity only. Browsers without scroll-driven animations get
+ * the static page; reduced motion keeps the fades and drops the movement.
+ */
+
+.promo {
+  --promo-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Hero: text lines arrive one after another, the device a beat later. */
+
+.promo-enter {
+  animation: promo-enter 700ms var(--promo-ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+.promo-device {
+  animation: promo-device 1000ms var(--promo-ease-out) 180ms both;
+}
+
+@keyframes promo-enter {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+@keyframes promo-device {
+  from {
+    opacity: 0;
+    transform: translateY(2rem) scale(0.96);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  /* The hero device sinks back as the page moves on, a layer behind it. */
+  .promo-parallax {
+    animation: promo-parallax linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 100vh;
+  }
+
+  /* Sections rise in while their top crosses the lower part of the screen. */
+  .promo-reveal {
+    animation: promo-reveal var(--promo-ease-out) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 30%;
+  }
+
+  /* Screenshots also drift in from the side they sit on. */
+  .promo-reveal-start {
+    --promo-from-x: -2rem;
+  }
+
+  .promo-reveal-end {
+    --promo-from-x: 2rem;
+  }
+
+  /* Cards side by side trail one another instead of arriving as a block. */
+  .promo-reveal-late {
+    animation-range: entry 10% cover 40%;
+  }
+}
+
+@keyframes promo-parallax {
+  to {
+    transform: translateY(12%) scale(0.94);
+  }
+}
+
+@keyframes promo-reveal {
+  from {
+    opacity: 0;
+    transform: translate(var(--promo-from-x, 0), 3rem) scale(0.98);
+  }
+}
+
+@keyframes promo-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-enter,
+  .promo-device {
+    animation-name: promo-fade;
+  }
+
+  .promo-reveal {
+    animation-name: promo-fade;
+  }
+
+  .promo-parallax {
+    animation: none;
+  }
+}

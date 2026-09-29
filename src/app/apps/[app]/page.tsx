@@ -66,7 +66,7 @@ function Showcase({
 }) {
   return (
     <section className="grid items-center gap-8 md:grid-cols-2 md:gap-12">
-      <div className={reversed ? "md:order-2" : undefined}>
+      <div className={`promo-reveal ${reversed ? "md:order-2" : ""}`.trim()}>
         <h2 className="font-bold font-serif text-2xl text-zinc-900 tracking-tight sm:text-3xl dark:text-gray-100">
           {section.title}
         </h2>
@@ -83,7 +83,7 @@ function Showcase({
             width={image.width}
             height={image.height}
             sizes="(min-width: 768px) 480px, 100vw"
-            className="h-auto w-full drop-shadow-xl"
+            className={`promo-reveal ${reversed ? "promo-reveal-start" : "promo-reveal-end"} h-auto w-full drop-shadow-xl`}
           />
         ))}
       </div>
@@ -100,10 +100,10 @@ function Cards({ sections }: { sections: AppSection[] }) {
           : "grid gap-6 md:grid-cols-2"
       }
     >
-      {sections.map((section) => (
+      {sections.map((section, index) => (
         <div
           key={section.title}
-          className="rounded-3xl bg-white p-6 shadow-sm sm:p-8 dark:bg-gray-800"
+          className={`promo-reveal ${index % 2 === 1 ? "promo-reveal-late" : ""} rounded-3xl bg-white p-6 shadow-sm sm:p-8 dark:bg-gray-800`}
         >
           <h2 className="font-bold font-serif text-2xl text-zinc-900 tracking-tight dark:text-gray-100">
             {section.title}
@@ -124,7 +124,7 @@ export default async function AppPromoPage({ params }: Params) {
   let showcaseIndex = 0
 
   return (
-    <div className="flex flex-col gap-20 py-10 md:gap-28 md:py-16">
+    <div className="promo flex flex-col gap-20 py-10 md:gap-28 md:py-16">
       <JsonLd data={buildAppJsonLd(app)} />
 
       <section className="grid items-center gap-10 md:grid-cols-[2fr_3fr]">
@@ -135,21 +135,36 @@ export default async function AppPromoPage({ params }: Params) {
             width={96}
             height={96}
             priority
-            className="rounded-[22%] shadow-lg"
+            className="promo-enter rounded-[22%] shadow-lg"
           />
-          <h1 className="mt-6 font-bold font-serif text-5xl text-zinc-900 tracking-tight md:text-6xl dark:text-gray-100">
+          <h1
+            className="promo-enter mt-6 font-bold font-serif text-5xl text-zinc-900 tracking-tight md:text-6xl dark:text-gray-100"
+            style={{ "--i": 1 } as React.CSSProperties}
+          >
             {app.name}
           </h1>
-          <p className="mt-2 font-serif text-xl text-zinc-600 sm:text-2xl dark:text-gray-300">
+          <p
+            className="promo-enter mt-2 font-serif text-xl text-zinc-600 sm:text-2xl dark:text-gray-300"
+            style={{ "--i": 2 } as React.CSSProperties}
+          >
             {app.tagline}
           </p>
-          <p className="mt-6 text-zinc-600 leading-relaxed sm:text-lg dark:text-gray-300">
+          <p
+            className="promo-enter mt-6 text-zinc-600 leading-relaxed sm:text-lg dark:text-gray-300"
+            style={{ "--i": 3 } as React.CSSProperties}
+          >
             {app.description}
           </p>
-          <div className="mt-8">
+          <div
+            className="promo-enter mt-8"
+            style={{ "--i": 4 } as React.CSSProperties}
+          >
             <StoreButton app={app} />
           </div>
-          <ul className="mt-6 flex flex-wrap gap-2">
+          <ul
+            className="promo-enter mt-6 flex flex-wrap gap-2"
+            style={{ "--i": 5 } as React.CSSProperties}
+          >
             {app.facts.map((fact) => (
               <li
                 key={fact}
@@ -160,15 +175,17 @@ export default async function AppPromoPage({ params }: Params) {
             ))}
           </ul>
         </div>
-        <Image
-          src={app.hero.src}
-          alt={app.hero.alt}
-          width={app.hero.width}
-          height={app.hero.height}
-          sizes="(min-width: 768px) 600px, 100vw"
-          priority
-          className="h-auto w-full drop-shadow-2xl"
-        />
+        <div className="promo-parallax">
+          <Image
+            src={app.hero.src}
+            alt={app.hero.alt}
+            width={app.hero.width}
+            height={app.hero.height}
+            sizes="(min-width: 768px) 600px, 100vw"
+            priority
+            className="promo-device h-auto w-full drop-shadow-2xl"
+          />
+        </div>
       </section>
 
       {groupSections(app.sections).map((group) =>
