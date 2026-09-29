@@ -218,6 +218,28 @@
 }
 
 /*
+ * Edge-on, the slices part into lines, so the flap's outer side is a solid
+ * rim: faces along its silhouette (see RIM), each dropped across the
+ * thickness from the screen side, lit like the band.
+ */
+.duo-rim {
+  --duo-unit: calc(var(--duo-w) / 2);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--duo-unit) * var(--length) + 1px);
+  height: var(--duo-t);
+  background: linear-gradient(#1b2230, #5a6679, #1b2230);
+  transform-origin: 0 0;
+  transform: translate3d(
+      calc(var(--duo-unit) * var(--x)),
+      calc(var(--duo-unit) * var(--y)),
+      calc(var(--duo-t) / 2)
+    )
+    rotate(var(--angle)) rotateX(-90deg);
+}
+
+/*
  * iPhone Duo's folding look. A folding screen's picture stays lying where
  * the screen lay, in a flat layer over the scene with the device's own
  * transform; script cuts it to the outline the tilted half shows, so the
@@ -348,7 +370,7 @@
   transform: none;
 }
 
-.duo-device[data-flat] :is(.duo-slab, .duo-face-back, .duo-shade) {
+.duo-device[data-flat] :is(.duo-slab, .duo-rim, .duo-face-back, .duo-shade) {
   display: none;
 }
 

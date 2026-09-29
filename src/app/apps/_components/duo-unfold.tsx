@@ -63,9 +63,39 @@ function pose(p: number) {
   }
 }
 
-type Point = [number, number, number]
-
 const rad = (deg: number) => (deg * Math.PI) / 180
+
+/**
+ * The flap's outer side as it runs round its silhouette in the 800-wide
+ * picture: along the top from the hinge, round the corner, down the long
+ * side and back to the hinge along the bottom. Each step is one face of
+ * the rim, so the flap has a solid edge however it turns.
+ */
+const RIM = (() => {
+  const [left, top, bottom, radius, hinge] = [30, 30, 1132, 125, 800]
+  const arc = (cx: number, cy: number, from: number, to: number) =>
+    Array.from({ length: 7 }, (_, k) => {
+      const a = rad(from + ((to - from) * k) / 6)
+      return [cx + radius * Math.cos(a), cy + radius * Math.sin(a)]
+    })
+  const points = [
+    [hinge, top],
+    ...arc(left + radius, top + radius, 270, 180),
+    ...arc(left + radius, bottom - radius, 180, 90),
+    [hinge, bottom],
+  ]
+  return points.slice(1).map(([x, y], i) => {
+    const [x0, y0] = points[i]
+    return {
+      x: x0 / hinge,
+      y: y0 / hinge,
+      length: Math.hypot(x - x0, y - y0) / hinge,
+      angle: (Math.atan2(y - y0, x - x0) * 180) / Math.PI,
+    }
+  })
+})()
+
+type Point = [number, number, number]
 
 /**
  * Outline of a screen as points in its half, from the fractions in the app
@@ -333,6 +363,21 @@ export default function DuoUnfold({ section }: { section: AppSection }) {
                 style={{ transform: pose(0).flap }}
               >
                 {slabs(unfold.left)}
+                {RIM.map((face, i) => (
+                  <div
+                    // biome-ignore lint/suspicious/noArrayIndexKey: fixed outline
+                    key={i}
+                    className="duo-rim"
+                    style={
+                      {
+                        "--x": face.x,
+                        "--y": face.y,
+                        "--length": face.length,
+                        "--angle": `${face.angle}deg`,
+                      } as React.CSSProperties
+                    }
+                  />
+                ))}
                 <div className="duo-face">
                   <Image src={unfold.left} alt="" {...half} />
                   <div
