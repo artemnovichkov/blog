@@ -203,7 +203,10 @@ export default function DuoUnfold({ section }: { section: AppSection }) {
         const points = outline(screen, width / 2, height).map(([u, v]) =>
           project(u, v, isBack)
         )
-        layer.style.clipPath = `polygon(${points.map(([px, py]) => `${px.toFixed(1)}px ${py.toFixed(1)}px`).join(",")})`
+        // The layer reaches past the stage by a quarter of its width and 30% of
+        // its height each side (see promo.css), so shift into its box.
+        const [ox, oy] = [width * 0.25, height * 0.3]
+        layer.style.clipPath = `polygon(${points.map(([px, py]) => `${(px + ox).toFixed(1)}px ${(py + oy).toFixed(1)}px`).join(",")})`
         layer.style.opacity = String(motion)
         blur1.style.opacity = String(Math.min(1, 2 * fold))
         blur2.style.opacity = String(fold)
@@ -302,45 +305,50 @@ export default function DuoUnfold({ section }: { section: AppSection }) {
           </p>
         </div>
         <div className="duo-stage">
-          <div
-            ref={device}
-            className="duo-device"
-            role="img"
-            aria-label={unfold.alt}
-            style={{ transform: pose(0).device }}
-          >
-            <div className="duo-half duo-right" data-part="right">
-              {slabs(unfold.right)}
-              <div className="duo-face">
-                <Image src={unfold.right} alt="" {...half} />
-                <div
-                  className="duo-shade"
-                  data-part="shade-right"
-                  style={{ maskImage: `url("${unfold.right}")`, opacity: 0.5 }}
-                />
-              </div>
-            </div>
+          <div className="duo-body">
             <div
-              className="duo-half duo-flap"
-              data-part="flap"
-              style={{ transform: pose(0).flap }}
+              ref={device}
+              className="duo-device"
+              role="img"
+              aria-label={unfold.alt}
+              style={{ transform: pose(0).device }}
             >
-              {slabs(unfold.left)}
-              <div className="duo-face">
-                <Image src={unfold.left} alt="" {...half} />
-                <div
-                  className="duo-shade"
-                  data-part="shade-front"
-                  style={{ maskImage: `url("${unfold.left}")`, opacity: 0.6 }}
-                />
+              <div className="duo-half duo-right" data-part="right">
+                {slabs(unfold.right)}
+                <div className="duo-face">
+                  <Image src={unfold.right} alt="" {...half} />
+                  <div
+                    className="duo-shade"
+                    data-part="shade-right"
+                    style={{
+                      maskImage: `url("${unfold.right}")`,
+                      opacity: 0.5,
+                    }}
+                  />
+                </div>
               </div>
-              <div className="duo-face duo-face-back">
-                <Image src={unfold.back} alt="" {...half} />
-                <div
-                  className="duo-shade"
-                  data-part="shade-back"
-                  style={{ maskImage: `url("${unfold.back}")`, opacity: 0 }}
-                />
+              <div
+                className="duo-half duo-flap"
+                data-part="flap"
+                style={{ transform: pose(0).flap }}
+              >
+                {slabs(unfold.left)}
+                <div className="duo-face">
+                  <Image src={unfold.left} alt="" {...half} />
+                  <div
+                    className="duo-shade"
+                    data-part="shade-front"
+                    style={{ maskImage: `url("${unfold.left}")`, opacity: 0.6 }}
+                  />
+                </div>
+                <div className="duo-face duo-face-back">
+                  <Image src={unfold.back} alt="" {...half} />
+                  <div
+                    className="duo-shade"
+                    data-part="shade-back"
+                    style={{ maskImage: `url("${unfold.back}")`, opacity: 0 }}
+                  />
+                </div>
               </div>
             </div>
           </div>
