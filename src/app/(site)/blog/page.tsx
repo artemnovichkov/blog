@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
+import PostList from "@/app/_components/post-list"
 import { getAllPosts } from "@/lib/api"
 import { about, name } from "@/lib/const"
 import { buildMetadata } from "@/lib/metadata"
-import PostList from "../_components/post-list"
 
 const title = `${name} | Blog`
 

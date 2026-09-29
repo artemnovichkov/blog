@@ -1,7 +1,7 @@
 import Image from "next/image"
+import Projects from "@/app/_components/projects"
 import { iphoneDuoProjects, projects } from "@/lib/const"
 import { buildHomeJsonLd, JsonLd } from "@/lib/json-ld"
-import Projects from "./_components/projects"
 
 export default function Home() {
   return (

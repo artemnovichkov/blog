@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import { about, name } from "@/lib/const"
 import markdownToHtml from "@/lib/markdownToHtml"
 import { buildMetadata } from "@/lib/metadata"
+import SiteShell from "./_components/site-shell"
 
 const title = `${name} | Page Not Found`
 
@@ -24,14 +25,16 @@ export default async function NotFound() {
   const highlightedContent = await markdownToHtml(mdxContent)
 
   return (
-    <div className="mt-8 flex flex-col items-start justify-center">
-      <h1 className="mb-4 font-bold text-4xl text-zinc-800 tracking-tight dark:text-gray-100">
-        404 - Page Not Found
-      </h1>
+    <SiteShell>
+      <div className="mt-8 flex flex-col items-start justify-center">
+        <h1 className="mb-4 font-bold text-4xl text-zinc-800 tracking-tight dark:text-gray-100">
+          404 - Page Not Found
+        </h1>
 
-      <div className="prose dark:prose-dark mb-8 w-full max-w-none">
-        {highlightedContent}
+        <div className="prose dark:prose-dark mb-8 w-full max-w-none">
+          {highlightedContent}
+        </div>
       </div>
-    </div>
+    </SiteShell>
   )
 }
