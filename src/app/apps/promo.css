@@ -374,6 +374,18 @@
   gap: 2.5rem;
 }
 
+/*
+ * On a phone the scenes are much shorter than the screen. Pinned at full
+ * height their empty lower half would scroll past as a gap once they finish,
+ * so they pin at their own height and the next section rises up to meet them.
+ */
+@media (max-width: 767px) {
+  .duo-sticky,
+  .themes-sticky {
+    height: auto;
+  }
+}
+
 /* One shadow for the stack, so it stays even while looks overlap. */
 .themes-stage {
   position: relative;
