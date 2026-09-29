@@ -67,10 +67,10 @@ function Showcase({
   return (
     <section className="grid items-center gap-8 md:grid-cols-2 md:gap-12">
       <div className={reversed ? "md:order-2" : undefined}>
-        <h2 className="font-bold font-serif text-3xl text-zinc-900 tracking-tight dark:text-gray-100">
+        <h2 className="font-bold font-serif text-2xl text-zinc-900 tracking-tight sm:text-3xl dark:text-gray-100">
           {section.title}
         </h2>
-        <p className="mt-4 text-lg text-zinc-600 leading-relaxed dark:text-gray-300">
+        <p className="mt-4 text-zinc-600 leading-relaxed sm:text-lg dark:text-gray-300">
           {section.body}
         </p>
       </div>
@@ -103,7 +103,7 @@ function Cards({ sections }: { sections: AppSection[] }) {
       {sections.map((section) => (
         <div
           key={section.title}
-          className="rounded-3xl bg-white p-8 shadow-sm dark:bg-gray-800"
+          className="rounded-3xl bg-white p-6 shadow-sm sm:p-8 dark:bg-gray-800"
         >
           <h2 className="font-bold font-serif text-2xl text-zinc-900 tracking-tight dark:text-gray-100">
             {section.title}
@@ -140,10 +140,10 @@ export default async function AppPromoPage({ params }: Params) {
           <h1 className="mt-6 font-bold font-serif text-5xl text-zinc-900 tracking-tight md:text-6xl dark:text-gray-100">
             {app.name}
           </h1>
-          <p className="mt-2 font-serif text-2xl text-zinc-600 dark:text-gray-300">
+          <p className="mt-2 font-serif text-xl text-zinc-600 sm:text-2xl dark:text-gray-300">
             {app.tagline}
           </p>
-          <p className="mt-6 text-lg text-zinc-600 leading-relaxed dark:text-gray-300">
+          <p className="mt-6 text-zinc-600 leading-relaxed sm:text-lg dark:text-gray-300">
             {app.description}
           </p>
           <div className="mt-8">
@@ -183,12 +183,12 @@ export default async function AppPromoPage({ params }: Params) {
         )
       )}
 
-      <nav className="flex justify-center gap-6 text-zinc-600 dark:text-gray-400">
+      <nav className="flex justify-center gap-2 text-zinc-600 dark:text-gray-400">
         {getAppPageSlugs(app.slug).map((page) => (
           <Link
             key={page}
             href={`/apps/${app.slug}/${page}`}
-            className="transition-colors hover:text-accent"
+            className="px-3 py-2 transition-colors hover:text-accent"
           >
             {pageTitles[page] ?? page}
           </Link>

@@ -7,7 +7,7 @@ import { type App, appStoreUrl } from "@/lib/apps"
  */
 export default function StoreButton({ app }: { app: App }) {
   const className =
-    "inline-flex items-center gap-2 rounded-full px-5 py-3 font-medium"
+    "inline-flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-3 font-medium text-sm sm:text-base"
 
   if (!app.isLive) {
     return (
