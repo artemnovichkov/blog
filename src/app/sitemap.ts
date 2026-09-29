@@ -4,6 +4,7 @@ import {
   getIndexableCategories,
   getPostModifiedDate,
 } from "@/lib/api"
+import { apps, getAllAppPages } from "@/lib/apps"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://artemnovichkov.com"
@@ -43,5 +44,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }))
 
-  return [...staticEntries, ...postEntries, ...categoryEntries]
+  const appEntries = [
+    { url: `${baseUrl}/apps`, priority: 0.7 },
+    ...apps.map((app) => ({
+      url: `${baseUrl}/apps/${app.slug}`,
+      priority: 0.7,
+    })),
+    ...getAllAppPages().map(({ app, page }) => ({
+      url: `${baseUrl}/apps/${app}/${page}`,
+      priority: 0.5,
+    })),
+  ]
+
+  return [...staticEntries, ...postEntries, ...categoryEntries, ...appEntries]
 }
