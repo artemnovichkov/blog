@@ -1,5 +1,6 @@
 import type { Post } from "@/interfaces/post"
 import { getPostModifiedDate } from "@/lib/api"
+import { type App, appStoreUrl } from "@/lib/apps"
 import { about, name } from "@/lib/const"
 
 const SITE_URL = "https://artemnovichkov.com"
@@ -67,4 +68,21 @@ export function JsonLd({ data }: { data: object }) {
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
     />
   )
+}
+
+export function buildAppJsonLd(app: App) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    name: app.name,
+    alternateName: `${app.name}: ${app.tagline}`,
+    description: app.description,
+    url: `${SITE_URL}/apps/${app.slug}`,
+    image: `${SITE_URL}${app.icon}`,
+    operatingSystem: "iOS",
+    applicationCategory: "GameApplication",
+    offers: { "@type": "Offer", price: 0, priceCurrency: "USD" },
+    ...(app.isLive && { installUrl: appStoreUrl(app) }),
+    author,
+  }
 }
