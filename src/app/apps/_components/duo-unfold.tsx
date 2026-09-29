@@ -203,9 +203,9 @@ export default function DuoUnfold({ section }: { section: AppSection }) {
         const points = outline(screen, width / 2, height).map(([u, v]) =>
           project(u, v, isBack)
         )
-        // The layer reaches past the stage by a quarter of its width and 30% of
-        // its height each side (see promo.css), so shift into its box.
-        const [ox, oy] = [width * 0.25, height * 0.3]
+        // The layer reaches past the stage by half its width and its full
+        // height each side (see promo.css), so shift into its box.
+        const [ox, oy] = [width * 0.5, height]
         layer.style.clipPath = `polygon(${points.map(([px, py]) => `${(px + ox).toFixed(1)}px ${(py + oy).toFixed(1)}px`).join(",")})`
         layer.style.opacity = String(motion)
         blur1.style.opacity = String(Math.min(1, 2 * fold))

@@ -238,11 +238,13 @@
 }
 
 /*
- * The layer holds the pictures whole: Safari drops what a clipped layer
- * paints outside its own box, so it reaches as far as they do.
+ * Safari drops what a clipped layer paints outside its own box, so the
+ * layer reaches half the stage's width each side and its full height above
+ * and below: enough for the pictures and for the black a tilted half shows
+ * past them.
  */
 .duo-proj-layer {
-  inset: -30% -25%;
+  inset: -100% -50%;
   background: #000;
   visibility: hidden;
 }
@@ -253,16 +255,18 @@
  */
 .duo-fx {
   position: absolute;
-  top: 0;
-  width: calc(100% / 1.5);
-  height: 100%;
+  top: calc(70% / 3);
+  width: 50%;
+  height: calc(160% / 3);
 }
 
+/* Past the screen's own edge the stretched picture is plain black. */
 .duo-fx img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  clip-path: inset(18.75% 25%);
 }
 
 /* Darkness belongs to the screen itself, not the margins around it. */
@@ -273,12 +277,12 @@
 
 .duo-fx[data-hinge="right"] {
   --duo-out: left;
-  left: 0;
+  left: 12.5%;
 }
 
 .duo-fx[data-hinge="left"] {
   --duo-out: right;
-  left: calc(100% / 3);
+  left: 37.5%;
 }
 
 .duo-fx-blur1,
