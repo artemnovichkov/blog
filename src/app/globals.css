@@ -375,6 +375,33 @@ code[data-line-numbers] > [data-line]::before {
   scroll-margin-top: 7rem;
 }
 
+.prose a.heading-anchor {
+  position: relative;
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+.prose a.heading-anchor::before {
+  content: "#";
+  position: absolute;
+  right: 100%;
+  padding-right: 0.4em;
+  color: var(--color-accent);
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.prose a.heading-anchor:hover,
+.prose a.heading-anchor:focus-visible {
+  color: inherit;
+}
+
+.prose a.heading-anchor:hover::before,
+.prose a.heading-anchor:focus-visible::before {
+  opacity: 1;
+}
+
 .prose .menu-bar-states {
   display: grid;
   justify-items: center;

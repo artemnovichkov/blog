@@ -6,6 +6,7 @@ import AdBlock from "../app/_components/ad-block"
 import Callout from "../app/_components/callout"
 import CodeBlock from "../app/_components/code-block"
 import { FileTree } from "../app/_components/filetree"
+import { H2, H3 } from "../app/_components/heading-anchor"
 import OpenInXcode from "../app/_components/open-in-xcode"
 import PostImage from "../app/_components/post-image"
 import { SafeTweet } from "../app/_components/safe-tweet"
@@ -34,6 +35,8 @@ export default async function markdownToHtml(markdown: string) {
       FileTree,
       OpenInXcode,
       pre: CodeBlock,
+      h2: H2,
+      h3: H3,
       img: PostImage,
       // Authored inside a post body, so it defaults to the "inline" slot; the
       // fixed placement under the post header passes its own.
