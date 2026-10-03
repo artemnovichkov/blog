@@ -1,4 +1,7 @@
+"use client"
+
 import type { ComponentPropsWithoutRef } from "react"
+import { scrollToHeading } from "@/lib/scroll-to-heading"
 
 type HeadingProps = ComponentPropsWithoutRef<"h2">
 
@@ -13,7 +16,19 @@ function anchored(Tag: "h2" | "h3") {
 
     return (
       <Tag id={id} {...props}>
-        <a href={`#${id}`} className="heading-anchor">
+        <a
+          href={`#${id}`}
+          className="heading-anchor"
+          onClick={(event) => {
+            const heading = event.currentTarget.parentElement
+            if (!heading) return
+
+            event.preventDefault()
+            // Keeps the hash shareable without the instant native jump.
+            window.history.pushState(null, "", `#${id}`)
+            scrollToHeading(heading)
+          }}
+        >
           {children}
         </a>
       </Tag>

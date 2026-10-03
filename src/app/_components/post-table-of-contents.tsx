@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { currentPostSlug, track } from "@/lib/analytics"
+import { headingOffset, scrollToHeading } from "@/lib/scroll-to-heading"
 
 type TableOfContentsItem = {
   id: string
@@ -10,7 +11,6 @@ type TableOfContentsItem = {
 }
 
 const contentSelector = "[data-post-content]"
-const activeOffset = 112
 
 type PostTableOfContentsProps = {
   className?: string
@@ -58,7 +58,7 @@ export default function PostTableOfContents({
       let currentId = headings[0].id
 
       for (const heading of headings) {
-        if (heading.getBoundingClientRect().top <= activeOffset) {
+        if (heading.getBoundingClientRect().top <= headingOffset) {
           currentId = heading.id
         } else {
           break
@@ -127,15 +127,7 @@ export default function PostTableOfContents({
                       total_headings: items.length,
                     })
 
-                    const top =
-                      heading.getBoundingClientRect().top +
-                      window.scrollY -
-                      activeOffset
-
-                    window.scrollTo({
-                      behavior: "smooth",
-                      top,
-                    })
+                    scrollToHeading(heading)
                     setActiveId(item.id)
                   }}
                   className={`block border-l-2 py-1 transition-colors duration-150 ease-out ${
