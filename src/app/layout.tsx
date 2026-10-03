@@ -65,7 +65,6 @@ export default function RootLayout({
           title="Artem Novichkov Blog"
           type="application/rss+xml"
         />
-        {/* biome-ignore lint/correctness/useUniqueElementIds: next/script requires a stable id for inline scripts. */}
         <Script id="theme-init" strategy="beforeInteractive">
           {`
           try {

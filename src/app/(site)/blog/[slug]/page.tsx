@@ -47,7 +47,7 @@ export default async function BlogPost(props: Params) {
             slot="post_header"
           />
         </div>
-        <div className="-translate-x-1/2 relative left-1/2 w-screen px-4 sm:px-0">
+        <div className="relative left-1/2 w-screen -translate-x-1/2 px-4 sm:px-0">
           <PostTableOfContents className="absolute top-0 bottom-0 left-[max(1rem,calc(50%-36.5rem))] w-52" />
           <div
             className="prose dark:prose-dark mx-auto w-full max-w-2xl"

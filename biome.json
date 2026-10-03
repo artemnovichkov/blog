@@ -1,9 +1,9 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "correctness": {
         "useExhaustiveDependencies": "warn",
         "useHookAtTopLevel": "error"
@@ -16,7 +16,7 @@
         "noNonNullAssertion": "warn"
       },
       "a11y": {
-        "recommended": true
+        "preset": "recommended"
       },
       "nursery": {
         "useSortedClasses": "warn"
