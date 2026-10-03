@@ -81,11 +81,15 @@ export function getPostModifiedDate(post: Post): string {
  * The Markdown an agent gets for a post, shared by the Markdown route and the
  * MCP `get_post` tool so the two never drift apart.
  */
+// The clone card only works in a browser on a Mac, and the paragraph above it
+// already links the repository.
+const openInXcodePattern = /\n*<OpenInXcode [^>]*\/>\n*/g
+
 export function getPostMarkdown(post: Post): string {
   return (
     [`# ${post.title}`, ``, post.description, ``, `_${post.date}_`, ``].join(
       "\n"
-    ) + post.content
+    ) + post.content.replace(openInXcodePattern, "\n\n")
   )
 }
 

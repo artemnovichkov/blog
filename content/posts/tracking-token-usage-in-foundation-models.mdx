@@ -128,4 +128,6 @@ print(model.formattedPercent(tokenCount: instructionsTokenCount, contextSize: co
 
 Token usage tracking helps you make informed decisions about prompt design — whether to simplify instructions, reduce tool definitions, or split conversations into multiple sessions. I created [TokenUsageExample](https://github.com/artemnovichkov/TokenUsageExample) with all the code from this post, so you can run it in Xcode right away. For more details, see Apple's tech note [TN3193: Managing the on-device foundation model's context window](https://developer.apple.com/documentation/technotes/tn3193-managing-the-on-device-foundation-model-s-context-window).
 
+<OpenInXcode repo="artemnovichkov/TokenUsageExample" />
+
 If you want a visual way to inspect transcripts during development, check out [TranscriptDebugMenu](https://swiftpackageindex.com/artemnovichkov/TranscriptDebugMenu) — a drop-in SwiftUI component that displays the full conversation transcript. I already added token usage information, so you can see how many tokens each message consumes in real time. Happy prompting!

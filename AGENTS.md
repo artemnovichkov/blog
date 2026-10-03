@@ -73,8 +73,13 @@ accurate language tags for syntax highlighting.
 MDX components available in post bodies (registered in
 `src/lib/markdownToHtml.ts`): `<Callout type="info|warning|error" emoji="...">`,
 `<FileTree>` / `<FileTree.File>` / `<FileTree.Folder>`, `<AudioPlayer src="...">`,
-and `<Tweet id="...">`. `<AdBlock>` is injected automatically on post pages from
-`src/lib/sponsorship-config.ts` and doesn't need to be authored inline.
+`<Tweet id="...">`, and `<OpenInXcode repo="owner/name">`. `<AdBlock>` is
+injected automatically on post pages from `src/lib/sponsorship-config.ts` and
+doesn't need to be authored inline.
+
+`<OpenInXcode>` renders a "Clone in Xcode" card (`xcode://clone?repo=...`) on
+macOS only. Place it right after the paragraph that links the post's example
+repository, usually near the end of the post.
 
 ## Commit & Pull Request Guidelines
 
@@ -92,3 +97,13 @@ screenshots for visual changes to pages, components, or MDX rendering.
 Do not commit secrets, credentials, or local environment files. View counting
 uses external services; keep related tokens in deployment or local environment
 configuration rather than source files.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

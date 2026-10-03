@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation"
 import { useEffect, useRef } from "react"
 import { postSlugFromPath, track } from "@/lib/analytics"
+import { primaryButtonClassName } from "./button-styles"
 
 interface AdBlockProps {
   title: string
@@ -99,7 +100,7 @@ const AdBlock = ({
             data-analytics-prop-sponsor={title}
             data-analytics-prop-slot={slot}
             data-analytics-prop-slug={slug}
-            className="mt-2 inline-block w-fit rounded-md bg-accent px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-accent/85"
+            className={`mt-2 inline-block w-fit ${primaryButtonClassName}`}
           >
             Learn More →
           </a>
