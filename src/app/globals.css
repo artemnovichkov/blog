@@ -397,9 +397,15 @@ code[data-line-numbers] > [data-line]::before {
   color: inherit;
 }
 
-.prose a.heading-anchor:hover::before,
 .prose a.heading-anchor:focus-visible::before {
   opacity: 1;
+}
+
+/* Touch devices keep :hover after a tap, which would show a clipped marker. */
+@media (hover: hover) {
+  .prose a.heading-anchor:hover::before {
+    opacity: 1;
+  }
 }
 
 .prose .menu-bar-states {
