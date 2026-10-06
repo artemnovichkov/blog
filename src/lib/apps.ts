@@ -95,11 +95,11 @@ export const apps: App[] = [
     sections: [
       {
         title: "Your foldable is a backgammon board",
-        body: "Hold iPhone Duo half open, like a board on the table: the fold becomes the bar, and a snap of the hinge throws the dice. Close it, and the case closes too, with the inlaid lid on the outside.",
+        body: "Hold iPhone Duo half open, like a board on the table: the fold becomes the bar, and a snap of the hinge throws the dice. Close it, and the game carries on to the outer display.",
         images: [
           {
             src: "/apps/nardy/duo-closed.webp",
-            alt: "Closed iPhone Duo showing the board's inlaid lid with Mount Ararat",
+            alt: "Closed iPhone Duo with the game going on on the outer display",
             width: 1200,
             height: 861,
           },
@@ -116,7 +116,7 @@ export const apps: App[] = [
           ],
           width: 800,
           height: 1163,
-          alt: "iPhone Duo unfolding from the inlaid lid with Mount Ararat into a walnut backgammon board, the fold as the bar",
+          alt: "iPhone Duo unfolding from the game on the outer display into a walnut backgammon board, the fold as the bar",
         },
       },
       {
