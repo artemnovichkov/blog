@@ -91,7 +91,13 @@ export const apps: App[] = [
       width: 1600,
       height: 1162,
     },
-    facts: ["iPhone", "Made for iPhone Duo", "Free, one-time Pro"],
+    facts: [
+      "iPhone",
+      "Made for iPhone Duo",
+      "Free, one-time Pro",
+      "No ads",
+      "6 languages",
+    ],
     sections: [
       {
         title: "Your foldable is a backgammon board",
@@ -138,7 +144,7 @@ export const apps: App[] = [
       },
       {
         title: "Tables for every mood",
-        body: "Walnut, bone and ebony with inlaid rosettes, or Yerevan's apricot and pomegranate, or neon after midnight. Boards, checkers and dice mix freely, and the app icon can match.",
+        body: "Walnut, bone and ebony with inlaid rosettes, deep mahogany, Yerevan's apricot and pomegranate, Card Club felt, or neon after midnight, plus a High Contrast board for easy reading. Boards, checkers and dice mix freely, and the app icon can match.",
         images: [
           {
             src: "/apps/nardy/pro-yerevan.webp",
@@ -164,10 +170,28 @@ export const apps: App[] = [
             },
           },
           {
+            name: "Mahogany",
+            image: {
+              src: "/apps/nardy/theme-mahogany.webp",
+              alt: "Mahogany theme: red mahogany board with gold points and amber checkers",
+              width: 1200,
+              height: 587,
+            },
+          },
+          {
             name: "Yerevan",
             image: {
               src: "/apps/nardy/theme-yerevan.webp",
               alt: "Yerevan theme: apricot and pomegranate board with red dice",
+              width: 1200,
+              height: 587,
+            },
+          },
+          {
+            name: "Card Club",
+            image: {
+              src: "/apps/nardy/theme-card-club.webp",
+              alt: "Card Club theme: green felt board with red casino dice",
               width: 1200,
               height: 587,
             },
@@ -203,7 +227,7 @@ export const apps: App[] = [
       },
       {
         title: "Nardy Pro",
-        body: "One purchase, no subscription: the Hard opponent, unlimited hints, Pro table themes and app icons.",
+        body: "No ads, ever. One purchase, no subscription: the Hard opponent, unlimited hints, and table themes like Mahogany, Yerevan, Card Club and Neon, with app icons to match, gold included.",
         images: [],
       },
     ],

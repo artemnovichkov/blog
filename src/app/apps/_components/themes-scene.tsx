@@ -86,11 +86,11 @@ export default function ThemesScene({ section }: { section: AppSection }) {
             />
           ))}
         </div>
-        <ul className="flex gap-6 font-serif text-lg text-zinc-900 sm:text-xl dark:text-gray-100">
+        <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 font-serif text-lg text-zinc-900 sm:gap-x-6 sm:text-xl dark:text-gray-100">
           {themes.map((theme, index) => (
             <li
               key={theme.name}
-              className="themes-name"
+              className="themes-name whitespace-nowrap"
               style={{ animationName: `themes-name-${index}` }}
             >
               {theme.name}
