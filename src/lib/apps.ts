@@ -232,6 +232,70 @@ export const apps: App[] = [
       },
     ],
   },
+  {
+    slug: "accorduon",
+    name: "Accorduon",
+    tagline: "Foldable Accordion",
+    description:
+      "An accordion for iPhone. On iPhone Duo the hinge is the bellows: fold and unfold to play.",
+    appStoreId: "6816177737",
+    isLive: false,
+    icon: "/apps/accorduon/icon.png",
+    hero: {
+      src: "/apps/accorduon/duo-open.webp",
+      alt: "Accorduon on an unfolded iPhone Duo: bass buttons on the left, piano keys on the right, the bellows on the fold",
+      width: 1600,
+      height: 1163,
+    },
+    facts: [
+      "iPhone",
+      "Made for iPhone Duo",
+      "Free, one-time Pro",
+      "No ads",
+      "7 languages",
+    ],
+    sections: [
+      {
+        title: "Your foldable is an accordion",
+        body: "Hold iPhone Duo open like a book: bass buttons under your left thumb, the keyboard under your right, and the hinge between them is the bellows. Fold and unfold to push air through the reeds. The faster you move, the louder and brighter it plays.",
+        images: [
+          {
+            src: "/apps/accorduon/duo-hands.webp",
+            alt: "Accorduon on an unfolded iPhone Duo, held in two hands",
+            width: 1200,
+            height: 675,
+          },
+        ],
+      },
+      {
+        title: "Open to play, closed to rest",
+        body: "Close it, and the outer display shows your accordion folded shut, gently breathing. No foldable? Drag the bellows with a finger, or turn on Auto Air to keep them full.",
+        images: [
+          {
+            src: "/apps/accorduon/duo-both.webp",
+            alt: "Accorduon on the inner display of an open iPhone Duo and on the outer display of a closed one",
+            width: 1200,
+            height: 675,
+          },
+        ],
+      },
+      {
+        title: "Reeds, not samples",
+        body: "Every note is synthesized as you play: three musette reeds beating against each other, a bassoon reed below, the wooden chamber and the hiss of air. Switch registers like on a real accordion: Master, Clarinet, Bassoon, Bandoneon, Violin and Musette.",
+        images: [],
+      },
+      {
+        title: "Learn a song",
+        body: "Pick a melody and the next key lights up: Ode to Joy, Jingle Bells, Korobeiniki, Amazing Grace and more. Chords wait on the left: F, C, G, Dm, Am and Em.",
+        images: [],
+      },
+      {
+        title: "Accorduon Pro",
+        body: "No ads, ever. One purchase, no subscription: every register, the whole song library, and future Pro features at no extra cost.",
+        images: [],
+      },
+    ],
+  },
 ]
 
 const appsDirectory = join(process.cwd(), "content", "apps")
