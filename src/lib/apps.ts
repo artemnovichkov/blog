@@ -242,10 +242,10 @@ export const apps: App[] = [
     isLive: false,
     icon: "/apps/accorduon/icon.png",
     hero: {
-      src: "/apps/accorduon/duo-open.webp",
-      alt: "Accorduon on an unfolded iPhone Duo: bass buttons on the left, piano keys on the right, the bellows on the fold",
+      src: "/apps/accorduon/duo-folded.webp",
+      alt: "Accorduon on a slightly folded iPhone Duo: piano keys on the left, bass buttons on the right, the bellows on the fold",
       width: 1600,
-      height: 1163,
+      height: 1386,
     },
     facts: [
       "iPhone",
@@ -257,37 +257,51 @@ export const apps: App[] = [
     sections: [
       {
         title: "Your foldable is an accordion",
-        body: "Hold iPhone Duo open like a book: bass buttons under your left thumb, the keyboard under your right, and the hinge between them is the bellows. Fold and unfold to push air through the reeds. The faster you move, the louder and brighter it plays.",
+        body: "Hold iPhone Duo open like a book: the keyboard under your left thumb, bass buttons under your right, and the hinge between them is the bellows. Fold and unfold to push air through the reeds. The faster you move, the louder and brighter it plays.",
         images: [
           {
-            src: "/apps/accorduon/duo-hands.webp",
-            alt: "Accorduon on an unfolded iPhone Duo, held in two hands",
+            src: "/apps/accorduon/duo-open.webp",
+            alt: "Accorduon on an unfolded iPhone Duo, playing Ode to Joy",
             width: 1200,
-            height: 675,
+            height: 872,
           },
         ],
       },
       {
-        title: "Open to play, closed to rest",
-        body: "Close it, and the outer display shows your accordion folded shut, gently breathing. No foldable? Drag the bellows with a finger, or turn on Auto Air to keep them full.",
+        title: "No foldable? Rock to play",
+        body: "On any iPhone, or iPhone Duo folded shut, turn it sideways and rock it like a steering wheel to work the bellows. Or turn on Auto Air to keep them full.",
         images: [
           {
-            src: "/apps/accorduon/duo-both.webp",
-            alt: "Accorduon on the inner display of an open iPhone Duo and on the outer display of a closed one",
+            src: "/apps/accorduon/iphone-rock.webp",
+            alt: "Accorduon on a regular iPhone held sideways and tilted",
             width: 1200,
-            height: 675,
+            height: 671,
           },
         ],
       },
       {
         title: "Reeds, not samples",
-        body: "Every note is synthesized as you play: three musette reeds beating against each other, a bassoon reed below, the wooden chamber and the hiss of air. Switch registers like on a real accordion: Master, Clarinet, Bassoon, Bandoneon, Violin and Musette.",
-        images: [],
+        body: "Every note is synthesized as you play: three musette reeds beating against each other, a bassoon reed below, the wooden chamber and the hiss of air. Flip the register switches like on a real accordion: Master, Clarinet, Bassoon, Bandoneon, Violin and Musette.",
+        images: [
+          {
+            src: "/apps/accorduon/duo-registers.webp",
+            alt: "The six register switches above Accorduon on a slightly folded iPhone Duo, Musette on",
+            width: 1200,
+            height: 1212,
+          },
+        ],
       },
       {
         title: "Learn a song",
-        body: "Pick a melody and the next key lights up: Ode to Joy, Jingle Bells, Korobeiniki, Amazing Grace and more. Chords wait on the left: F, C, G, Dm, Am and Em.",
-        images: [],
+        body: "Pick a melody and the next key lights up: Ode to Joy, Jingle Bells, Korobeiniki, Amazing Grace and more. Chords wait on the right: F, C, G, Dm, Am and Em.",
+        images: [
+          {
+            src: "/apps/accorduon/duo-songs.webp",
+            alt: "Accorduon in dark mode on an unfolded iPhone Duo, the next note of Ode to Joy lit up",
+            width: 1200,
+            height: 872,
+          },
+        ],
       },
       {
         title: "Accorduon Pro",
