@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import readingTime from "reading-time"
 import AdBlock from "@/app/_components/ad-block"
+import IosDailyCta from "@/app/_components/ios-daily-cta"
 import PostActions from "@/app/_components/post-actions"
 import PostAnalytics from "@/app/_components/post-analytics"
 import PostHeader from "@/app/_components/post-header"
@@ -18,7 +19,7 @@ import { name } from "@/lib/const"
 import { buildBlogPostingJsonLd, JsonLd } from "@/lib/json-ld"
 import markdownToHtml from "@/lib/markdownToHtml"
 import { buildMetadata } from "@/lib/metadata"
-import { sponsorshipConfig } from "@/lib/sponsorship-config"
+import { houseAdConfig, sponsorshipConfig } from "@/lib/sponsorship-config"
 
 export default async function BlogPost(props: Params) {
   const params = await props.params
@@ -30,6 +31,7 @@ export default async function BlogPost(props: Params) {
   // Completion rate is only comparable across posts once it is normalised by
   // length, so the size of the post travels with every read-depth event.
   const stats = readingTime(post.content || "")
+  const ad = sponsorshipConfig.isVisible ? sponsorshipConfig : houseAdConfig
 
   return (
     <div>
@@ -40,11 +42,12 @@ export default async function BlogPost(props: Params) {
             <PostHeader post={post} />
           </div>
           <AdBlock
-            title={sponsorshipConfig.title}
-            description={sponsorshipConfig.description}
-            url={sponsorshipConfig.url}
-            isVisible={sponsorshipConfig.isVisible}
+            title={ad.title}
+            description={ad.description}
+            url={ad.url}
+            isVisible={ad.isVisible}
             slot="post_header"
+            isHouse={ad === houseAdConfig}
           />
         </div>
         <div className="relative left-1/2 w-screen -translate-x-1/2 px-4 sm:px-0">
@@ -68,6 +71,7 @@ export default async function BlogPost(props: Params) {
         </div>
       </article>
       <div className="mx-auto w-full max-w-2xl">
+        <IosDailyCta slug={post.slug} />
         <PostActions post={post} />
         {readNextPosts.length > 0 && <ReadNext posts={readNextPosts} />}
       </div>

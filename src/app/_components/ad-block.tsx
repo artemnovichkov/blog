@@ -12,6 +12,8 @@ interface AdBlockProps {
   isVisible?: boolean
   /** Distinguishes the slot under the header from inline placements in MDX. */
   slot?: string
+  /** Self-promotion: no "Sponsored" label, no UTM, no rel="sponsored". */
+  isHouse?: boolean
 }
 
 /** Half the block on screen for a full second. Rendering is not a view. */
@@ -37,6 +39,7 @@ const AdBlock = ({
   url,
   isVisible = true,
   slot = "inline",
+  isHouse = false,
 }: AdBlockProps) => {
   const blockRef = useRef<HTMLDivElement>(null)
   // usePathname rather than window.location: this runs during render, and the
@@ -87,15 +90,19 @@ const AdBlock = ({
       <div className="flex items-start gap-3">
         <span className="text-xl">📢</span>
         <div className="flex flex-col gap-2">
-          <p className="text-gray-600 text-sm dark:text-gray-400">Sponsored</p>
+          <p className="text-gray-600 text-sm dark:text-gray-400">
+            {isHouse ? "From the author" : "Sponsored"}
+          </p>
           <h3 className="font-semibold text-gray-900 dark:text-white">
             {title}
           </h3>
           <p className="text-gray-700 dark:text-gray-300">{description}</p>
           <a
-            href={withUtm(url, slug)}
+            href={isHouse ? url : withUtm(url, slug)}
             target="_blank"
-            rel="noopener noreferrer sponsored"
+            rel={
+              isHouse ? "noopener noreferrer" : "noopener noreferrer sponsored"
+            }
             data-analytics-event="ad_click"
             data-analytics-prop-sponsor={title}
             data-analytics-prop-slot={slot}

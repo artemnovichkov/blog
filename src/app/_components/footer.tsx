@@ -1,5 +1,5 @@
 import type { IconType } from "react-icons"
-import { FaGithub, FaLinkedin } from "react-icons/fa"
+import { FaGithub, FaLinkedin, FaTelegram } from "react-icons/fa"
 import { FaXTwitter } from "react-icons/fa6"
 import {
   iconButtonClassName,
@@ -21,6 +21,11 @@ const socialLinks = [
     href: "https://www.linkedin.com/in/artemnovichkov",
     label: "LinkedIn",
     Icon: FaLinkedin,
+  },
+  {
+    href: "https://t.me/+AZtEJK8TP90yM2Zi",
+    label: "iOS Daily on Telegram",
+    Icon: FaTelegram,
   },
 ]
 
@@ -50,7 +55,7 @@ export default function Footer() {
   return (
     <footer>
       <div className="py-8 text-center">
-        <div className="flex flex-row place-content-center gap-16">
+        <div className="flex flex-row place-content-center gap-8 sm:gap-16">
           {socialLinks.map((item) => (
             <SocialButton key={item.href} {...item} />
           ))}
