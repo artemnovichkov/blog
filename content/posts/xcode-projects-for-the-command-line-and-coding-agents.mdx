@@ -527,6 +527,11 @@ There's no project name in it, so you can paste it into any project. With one
 the agent passes `--project`, or you set `XCODEPROJ_PROJECT` to the project's
 path.
 
+If you'd rather install that context than paste it, I keep it as a skill,
+[xcproj](https://github.com/artemnovichkov/skills/tree/main/skills/xcproj). It
+keeps the agent on these commands instead of editing the project file as text,
+and checks the result with `xcprojformatter` afterwards.
+
 ### What about Xcode's MCP server?
 
 Xcode also gives agents an MCP server through `xcrun mcpbridge`, and some of
