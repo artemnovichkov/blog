@@ -3,6 +3,7 @@ title: Xcode Projects for the Command Line and Coding Agents
 description: Edit Xcode projects from the terminal with xcodeproj, xcprojformatter, and the new JSON format
 cover: /images/xcode-projects-for-the-command-line-and-coding-agents/cover.png
 date: '2026-10-15'
+updated: '2026-10-17'
 categories:
   - xcode
   - developer-tools
@@ -552,9 +553,9 @@ A few things I ran into while testing.
 
 ### Add build phases before synchronized groups
 
-If you include a filesystem-synchronized group before the target has a
-Sources phase, `xcodeproj` puts every file in the folder into the target's
-exclusions:
+Include a synchronized group in a target that has no Sources phase and the
+membership comes out clean. Adding the phase afterwards is what writes the
+exclusions, one entry per file in the folder:
 
 ```json
 {
@@ -606,12 +607,12 @@ xcrun xcodeproj setting set --config Debug ENABLE_TESTABILITY YES
 The last line is needed for projects created with `init`. Projects from
 Xcode's templates already have it.
 
-`xcodeproj` also never touches schemes. If your project has a shared scheme,
-its Test action won't include the new target, and
-`xcodebuild test -scheme Weather` won't run the new tests. `xcodebuild`
-generates a separate `WeatherTests` scheme, so either test with that scheme or
-add the target to the shared one in Xcode. `xcodebuild -list` doesn't show
-the `WeatherTests` scheme, but `-scheme WeatherTests` still works.
+`xcodeproj` also never touches schemes, which is fine with auto-generated
+ones. `xcodebuild` picks up the hosted test target, so both `-scheme Weather`
+and `-scheme WeatherTests` run the new tests. `xcodebuild -list` doesn't show
+the `WeatherTests` scheme, but `-scheme WeatherTests` still works. A shared
+scheme in `xcshareddata/xcschemes` is the exception: its Test action won't
+include `WeatherTests` until you add the target to the scheme in Xcode.
 
 ### Keep xcconfig files out of synchronized groups
 
