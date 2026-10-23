@@ -17,7 +17,7 @@ export default function AppsPage() {
       <h1 className="font-bold font-serif text-5xl text-zinc-900 tracking-tight dark:text-gray-100">
         Apps
       </h1>
-      <p className="mt-4 max-w-xl text-lg text-zinc-600 dark:text-gray-300">
+      <p className="mt-4 max-w-2xl text-pretty text-lg text-zinc-600 dark:text-gray-300">
         Apps and games I make on the side, for iPhone and the fold of iPhone
         Duo.
       </p>
