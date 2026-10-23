@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getAllAppPages, getApp, getAppPage } from "@/lib/apps"
+import { getAllAppPages, getApp, getAppPage, smartAppBanner } from "@/lib/apps"
 import markdownToHtml from "@/lib/markdownToHtml"
 import { buildMetadata } from "@/lib/metadata"
 
@@ -21,12 +21,15 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const page = getAppPage(appSlug, pageSlug)
   if (!app || !page) return {}
 
-  return buildMetadata({
-    title: `${app.name} | ${page.title}`,
-    description: page.description,
-    path: `/apps/${app.slug}/${page.slug}`,
-    images: [`/apps/${app.slug}/og.png`],
-  })
+  return {
+    ...buildMetadata({
+      title: `${app.name} | ${page.title}`,
+      description: page.description,
+      path: `/apps/${app.slug}/${page.slug}`,
+      images: [`/apps/${app.slug}/og.png`],
+    }),
+    other: smartAppBanner(app),
+  }
 }
 
 export default async function AppPage({ params }: Params) {

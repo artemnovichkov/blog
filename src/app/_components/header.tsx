@@ -25,6 +25,12 @@ export default function Header() {
             Blog
           </Link>
           <Link
+            href="/apps"
+            className="shrink-0 px-2 py-2 text-gray-900 transition-colors hover:text-accent sm:px-3 dark:text-gray-100 dark:hover:text-accent"
+          >
+            Apps
+          </Link>
+          <Link
             href="/sponsorship"
             className="min-w-0 px-2 py-2 text-gray-900 transition-colors hover:text-accent sm:px-3 dark:text-gray-100 dark:hover:text-accent"
           >

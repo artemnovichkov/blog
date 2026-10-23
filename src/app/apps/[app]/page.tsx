@@ -5,7 +5,13 @@ import { notFound } from "next/navigation"
 import DuoUnfold from "@/app/apps/_components/duo-unfold"
 import StoreButton from "@/app/apps/_components/store-button"
 import ThemesScene from "@/app/apps/_components/themes-scene"
-import { type AppSection, apps, getApp, getAppPageSlugs } from "@/lib/apps"
+import {
+  type AppSection,
+  apps,
+  getApp,
+  getAppPageSlugs,
+  smartAppBanner,
+} from "@/lib/apps"
 import { buildAppJsonLd, JsonLd } from "@/lib/json-ld"
 import { buildMetadata } from "@/lib/metadata"
 
@@ -23,17 +29,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const app = getApp((await params).app)
   if (!app) return {}
 
-  const metadata = buildMetadata({
-    title: `${app.name}: ${app.tagline}`,
-    description: app.description,
-    path: `/apps/${app.slug}`,
-    images: [`/apps/${app.slug}/og.png`],
-  })
-  // The Smart App Banner only makes sense once there is a store page.
-  if (!app.isLive) return metadata
   return {
-    ...metadata,
-    other: { "apple-itunes-app": `app-id=${app.appStoreId}` },
+    ...buildMetadata({
+      title: `${app.name}: ${app.tagline}`,
+      description: app.description,
+      path: `/apps/${app.slug}`,
+      images: [`/apps/${app.slug}/og.png`],
+    }),
+    other: smartAppBanner(app),
   }
 }
 

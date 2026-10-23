@@ -10,8 +10,9 @@ export type App = {
   /** App Store Connect app ID; the store link is built from it. */
   appStoreId: string
   /**
-   * The store page only exists once the app is out. Until then the link
-   * would 404, so pages show "Coming soon" instead of the badge.
+   * Whether the app is out. An app that is not out has no store page to
+   * send anyone to, so it stays off the site entirely: `apps` leaves it
+   * out and its routes are never generated. Flip it on release.
    */
   isLive: boolean
   /** Square icon; pages round the corners. */
@@ -75,7 +76,11 @@ export type AppPage = {
   content: string
 }
 
-export const apps: App[] = [
+/**
+ * Every app, released or not. Pages read `apps`, which is this list without
+ * the ones still to come: their copy and screenshots live here until then.
+ */
+const catalog: App[] = [
   {
     slug: "nardy",
     name: "Nardy",
@@ -83,7 +88,7 @@ export const apps: App[] = [
     description:
       "Long Narde and classic backgammon for iPhone. Play a friend or a chatty AI, and on iPhone Duo the fold becomes the bar.",
     appStoreId: "6815637296",
-    isLive: false,
+    isLive: true,
     icon: "/apps/nardy/icon.png",
     hero: {
       src: "/apps/nardy/duo-open.webp",
@@ -312,6 +317,8 @@ export const apps: App[] = [
   },
 ]
 
+export const apps: App[] = catalog.filter((app) => app.isLive)
+
 const appsDirectory = join(process.cwd(), "content", "apps")
 
 export function getApp(slug: string): App | undefined {
@@ -320,6 +327,15 @@ export function getApp(slug: string): App | undefined {
 
 export function appStoreUrl(app: App): string {
   return `https://apps.apple.com/app/id${app.appStoreId}`
+}
+
+/**
+ * Safari's Smart App Banner, as `other` metadata. Only makes sense once
+ * there is a store page, so an app still on its way carries no banner.
+ */
+export function smartAppBanner(app: App): Record<string, string> | undefined {
+  if (!app.isLive) return undefined
+  return { "apple-itunes-app": `app-id=${app.appStoreId}` }
 }
 
 /** Support, privacy and similar pages, one MDX file each per app. */
