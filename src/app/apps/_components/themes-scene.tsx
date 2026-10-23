@@ -1,5 +1,6 @@
 import Image from "next/image"
 import type { AppSection } from "@/lib/apps"
+import ThemeNames from "./theme-names"
 
 type Theme = NonNullable<AppSection["themes"]>[number]
 
@@ -86,17 +87,7 @@ export default function ThemesScene({ section }: { section: AppSection }) {
             />
           ))}
         </div>
-        <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 font-serif text-lg text-zinc-900 sm:gap-x-6 sm:text-xl dark:text-gray-100">
-          {themes.map((theme, index) => (
-            <li
-              key={theme.name}
-              className="themes-name whitespace-nowrap"
-              style={{ animationName: `themes-name-${index}` }}
-            >
-              {theme.name}
-            </li>
-          ))}
-        </ul>
+        <ThemeNames names={themes.map((theme) => theme.name)} />
       </div>
     </section>
   )
