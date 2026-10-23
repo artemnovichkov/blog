@@ -9,6 +9,12 @@ type Unfold = NonNullable<AppSection["unfold"]>
 /** Slices that give each half its edge, from the screen side to the back. */
 const SLABS = 6
 
+/**
+ * Side of the box the camera is drawn in before the matrix below maps it
+ * onto the panel. Large enough that the circle stays smooth once scaled.
+ */
+const CAMERA_BOX = 64
+
 /** CSS `ease-in-out`, solved for x the way browsers do. */
 function easeInOut(x: number): number {
   const [x1, y1, x2, y2] = [0.42, 0, 0.58, 1]
@@ -198,6 +204,7 @@ export default function DuoUnfold({ section }: { section: AppSection }) {
       all(["proj", "blur1", "blur2", "dark"].map((name) => `${name}-${side}`))
     const front = fx("front")
     const back = fx("back")
+    const camera = part("camera-back")
     const stage = phone.parentElement
     const overlay = projection.current
     if (!flap || !right || !stage || !overlay || shades.length < 3) return
@@ -251,8 +258,32 @@ export default function DuoUnfold({ section }: { section: AppSection }) {
         blur2.style.opacity = String(fold)
         dark.style.opacity = String(0.9 * fold)
       }
+      /*
+       * The camera is cut into the panel, so it turns with the half rather
+       * than lying flat with the picture: its centre and two half-axes go
+       * through the same projection, and the matrix they make carries the
+       * circle into the ellipse the eye sees. It only has to stand in while
+       * the picture covers the half's own face.
+       */
+      const showCamera = () => {
+        if (!camera || !unfold.backCamera) return
+        const [cu, cv, cr] = unfold.backCamera
+        const on = !next.flat && next.angle > 90 && motion > 0.01
+        camera.style.visibility = on ? "visible" : "hidden"
+        if (!on) return
+        const [u, v, r] = [(cu * width) / 2, cv * height, (cr * width) / 2]
+        const at = project(u, v, true)
+        const alongU = project(u + r, v, true)
+        const alongV = project(u, v + r, true)
+        const [ax, ay] = [alongU[0] - at[0], alongU[1] - at[1]]
+        const [bx, by] = [alongV[0] - at[0], alongV[1] - at[1]]
+        const k = 2 / CAMERA_BOX
+        camera.style.transform = `matrix(${ax * k}, ${ay * k}, ${bx * k}, ${by * k}, ${at[0] - ax - bx}, ${at[1] - ay - by})`
+        camera.style.opacity = String(motion)
+      }
       show(front, unfold.leftScreen, false, next.angle < 90, next.frontFold)
       show(back, unfold.backScreen, true, next.angle > 90, next.backFold)
+      showCamera()
     }
 
     // Progress follows the scroll with a short lag, like a spring with no
@@ -414,6 +445,13 @@ export default function DuoUnfold({ section }: { section: AppSection }) {
           >
             {flatPicture(unfold.leftLayers, "front", "right")}
             {flatPicture(unfold.backLayers, "back", "left")}
+            {unfold.backCamera && (
+              <div
+                className="duo-camera"
+                data-part="camera-back"
+                style={{ width: CAMERA_BOX, height: CAMERA_BOX }}
+              />
+            )}
           </div>
         </div>
       </div>

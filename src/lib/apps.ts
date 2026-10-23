@@ -63,6 +63,12 @@ export type AppSection = {
      */
     leftScreen: number[]
     backScreen: number[]
+    /**
+     * The outer display's camera, which is cut into the panel rather than
+     * drawn on the screen: centre x and radius as fractions of the half's
+     * width, centre y as a fraction of its height.
+     */
+    backCamera?: number[]
     width: number
     height: number
     alt: string
@@ -125,6 +131,7 @@ const catalog: App[] = [
           backScreen: [
             0.0262, 0.0473, 0.9325, 0.9544, 0.011, 0.111, 0.11, 0.01,
           ],
+          backCamera: [0.8381, 0.1118, 0.0338],
           width: 800,
           height: 1163,
           alt: "iPhone Duo unfolding from the game on the outer display into a walnut backgammon board, the fold as the bar",

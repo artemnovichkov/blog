@@ -297,6 +297,22 @@
   inset: 18.75% 25%;
 }
 
+/*
+ * The camera is cut into the panel, not drawn on the screen, so while the
+ * fold moves and the flat picture covers the half's own face, it has to be
+ * drawn over that picture instead. Script turns it with the half (see
+ * showCamera); the box is square and its matrix makes the ellipse.
+ */
+.duo-camera {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #1a1a22 0 33%, #010102 38%);
+  visibility: hidden;
+}
+
 .duo-fx[data-hinge="right"] {
   --duo-out: left;
   left: 12.5%;
