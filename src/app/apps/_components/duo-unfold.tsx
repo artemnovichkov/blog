@@ -66,6 +66,15 @@ function pose(p: number) {
 const rad = (deg: number) => (deg * Math.PI) / 180
 
 /**
+ * Engines are free to differ in the last bits of cos, sin, atan2 and hypot,
+ * and they do: the server's Node and the visitor's browser disagree around
+ * the sixteenth digit. The rim's faces are written into the HTML as inline
+ * custom properties, so that alone would mismatch on hydration. Nine places
+ * are far below anything the eye or the layout can tell apart.
+ */
+const round = (n: number) => +n.toFixed(9)
+
+/**
  * The flap's outer side as it runs round its silhouette in the 800-wide
  * picture: along the top from the hinge, round the corner, down the long
  * side and back to the hinge along the bottom. Each step is one face of
@@ -87,10 +96,10 @@ const RIM = (() => {
   return points.slice(1).map(([x, y], i) => {
     const [x0, y0] = points[i]
     return {
-      x: x0 / hinge,
-      y: y0 / hinge,
-      length: Math.hypot(x - x0, y - y0) / hinge,
-      angle: (Math.atan2(y - y0, x - x0) * 180) / Math.PI,
+      x: round(x0 / hinge),
+      y: round(y0 / hinge),
+      length: round(Math.hypot(x - x0, y - y0) / hinge),
+      angle: round((Math.atan2(y - y0, x - x0) * 180) / Math.PI),
     }
   })
 })()
