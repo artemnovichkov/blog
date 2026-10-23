@@ -17,6 +17,10 @@ export default function AppsPage() {
       <h1 className="font-bold font-serif text-5xl text-zinc-900 tracking-tight dark:text-gray-100">
         Apps
       </h1>
+      <p className="mt-4 max-w-xl text-lg text-zinc-600 dark:text-gray-300">
+        Apps and games I make on the side, for iPhone and the fold of iPhone
+        Duo.
+      </p>
       <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {apps.map((app) => (
           <li key={app.slug}>
@@ -45,6 +49,17 @@ export default function AppsPage() {
             </Link>
           </li>
         ))}
+        {/* Keeps the grid from looking like the shelf is empty. */}
+        <li>
+          <div className="flex h-full flex-col justify-center gap-2 rounded-3xl border-2 border-zinc-200 border-dashed p-6 dark:border-gray-700">
+            <h2 className="font-bold font-serif text-2xl text-zinc-900 dark:text-gray-100">
+              More coming soon
+            </h2>
+            <p className="text-sm text-zinc-500 leading-relaxed dark:text-gray-400">
+              Another one is in the works. New apps land here as they ship.
+            </p>
+          </div>
+        </li>
       </ul>
     </div>
   )

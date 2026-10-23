@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import readingTime from "reading-time"
 import AdBlock from "@/app/_components/ad-block"
+import AppAdBlock from "@/app/_components/app-ad-block"
 import IosDailyCta from "@/app/_components/ios-daily-cta"
 import PostActions from "@/app/_components/post-actions"
 import PostAnalytics from "@/app/_components/post-analytics"
@@ -15,6 +16,7 @@ import {
   getPostModifiedDate,
   getRelatedPosts,
 } from "@/lib/api"
+import { appStoreUrl, promotedApp } from "@/lib/apps"
 import { name } from "@/lib/const"
 import { buildBlogPostingJsonLd, JsonLd } from "@/lib/json-ld"
 import markdownToHtml from "@/lib/markdownToHtml"
@@ -31,7 +33,11 @@ export default async function BlogPost(props: Params) {
   // Completion rate is only comparable across posts once it is normalised by
   // length, so the size of the post travels with every read-depth event.
   const stats = readingTime(post.content || "")
+  // A booked sponsor owns the slot. With none, it goes to one of the author's
+  // apps, and only when there is no app left to show does the house ad run.
+  const app = promotedApp(post.slug)
   const ad = sponsorshipConfig.isVisible ? sponsorshipConfig : houseAdConfig
+  const isAppSlot = !sponsorshipConfig.isVisible && app !== undefined
 
   return (
     <div>
@@ -41,14 +47,29 @@ export default async function BlogPost(props: Params) {
           <div className="mt-4 mb-6">
             <PostHeader post={post} />
           </div>
-          <AdBlock
-            title={ad.title}
-            description={ad.description}
-            url={ad.url}
-            isVisible={ad.isVisible}
-            slot="post_header"
-            isHouse={ad === houseAdConfig}
-          />
+          {isAppSlot && app ? (
+            <AppAdBlock
+              app={{
+                slug: app.slug,
+                name: app.name,
+                tagline: app.tagline,
+                description: app.description,
+                icon: app.icon,
+                storeUrl: appStoreUrl(app),
+              }}
+              slug={post.slug}
+              placement="post_header"
+            />
+          ) : (
+            <AdBlock
+              title={ad.title}
+              description={ad.description}
+              url={ad.url}
+              isVisible={ad.isVisible}
+              slot="post_header"
+              isHouse={ad === houseAdConfig}
+            />
+          )}
         </div>
         <div className="relative left-1/2 w-screen -translate-x-1/2 px-4 sm:px-0">
           <PostTableOfContents className="absolute top-0 bottom-0 left-[max(1rem,calc(50%-36.5rem))] w-52" />

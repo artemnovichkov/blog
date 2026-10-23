@@ -371,3 +371,16 @@ export function getAllAppPages(): { app: string; page: string }[] {
     getAppPageSlugs(app.slug).map((page) => ({ app: app.slug, page }))
   )
 }
+
+/**
+ * The app promoted in a post. Picked from the slug so the same post always
+ * shows the same app, while posts spread evenly over the released ones.
+ */
+export function promotedApp(postSlug: string): App | undefined {
+  if (apps.length === 0) return undefined
+  let hash = 0
+  for (const char of postSlug) {
+    hash = (hash * 31 + char.charCodeAt(0)) % 100003
+  }
+  return apps[hash % apps.length]
+}

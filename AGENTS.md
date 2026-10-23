@@ -75,7 +75,10 @@ MDX components available in post bodies (registered in
 `<FileTree>` / `<FileTree.File>` / `<FileTree.Folder>`, `<AudioPlayer src="...">`,
 `<Tweet id="...">`, and `<OpenInXcode repo="owner/name">`. `<AdBlock>` is
 injected automatically on post pages from `src/lib/sponsorship-config.ts` and
-doesn't need to be authored inline.
+doesn't need to be authored inline. With no sponsor booked, that slot shows
+the app promo block (`AppAdBlock`) instead; the app is picked from the post
+slug by `promotedApp` in `src/lib/apps.ts`, and the house ad only runs when
+no app is live.
 
 `<OpenInXcode>` renders a "Clone in Xcode" card (`xcode://clone?repo=...`) on
 macOS only. Place it right after the paragraph that links the post's example

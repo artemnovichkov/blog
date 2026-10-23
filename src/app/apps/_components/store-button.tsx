@@ -1,4 +1,5 @@
 import { FaApple } from "react-icons/fa"
+import AppStoreButton from "@/app/_components/app-store-button"
 import { type App, appStoreUrl } from "@/lib/apps"
 
 /**
@@ -6,29 +7,14 @@ import { type App, appStoreUrl } from "@/lib/apps"
  * is on its way instead of pointing anywhere.
  */
 export default function StoreButton({ app }: { app: App }) {
-  const className =
-    "inline-flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-3 font-medium text-sm sm:text-base"
-
   if (!app.isLive) {
     return (
-      <span
-        className={`${className} bg-zinc-200 text-zinc-700 dark:bg-gray-800 dark:text-gray-300`}
-      >
+      <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-zinc-200 px-5 py-3 font-medium text-sm text-zinc-700 sm:text-base dark:bg-gray-800 dark:text-gray-300">
         <FaApple aria-hidden="true" className="size-5" />
         Coming soon to the App Store
       </span>
     )
   }
 
-  return (
-    <a
-      href={appStoreUrl(app)}
-      className={`${className} bg-black text-white transition-[opacity,transform] duration-100 ease-out hover:opacity-80 active:scale-[0.97] dark:bg-white dark:text-black`}
-      data-analytics-event="app_store_clicked"
-      data-analytics-prop-app={app.slug}
-    >
-      <FaApple aria-hidden="true" className="size-5" />
-      Download on the App Store
-    </a>
-  )
+  return <AppStoreButton href={appStoreUrl(app)} app={app.slug} />
 }
