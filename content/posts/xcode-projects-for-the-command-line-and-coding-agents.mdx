@@ -3,7 +3,7 @@ title: Xcode Projects for the Command Line and Coding Agents
 description: Edit Xcode projects from the terminal with xcodeproj, xcprojformatter, and the new JSON format
 cover: /images/xcode-projects-for-the-command-line-and-coding-agents/cover.png
 date: '2026-10-15'
-updated: '2026-10-17'
+updated: '2026-10-27'
 categories:
   - xcode
   - developer-tools
@@ -29,7 +29,8 @@ Xcode also ships two command-line tools for the new format:
   terminal: targets, build phases, groups, build settings, xcconfig files,
   and Swift packages.
 
-Neither is on your `PATH`, so run them with `xcrun`.
+Neither is on your `PATH`, so run them with `xcrun`. Everything below is
+checked on the Xcode 27.2 RC (27B48).
 
 <Callout type="warning" emoji="⚠️">
   If you use CocoaPods, a plain `xcodeproj` in the terminal may run the
@@ -296,8 +297,7 @@ xcodebuild -project Weather.xcodeproj -convert-project pbxproj
 The new file replaces the old one, so commit before converting.
 
 Projects in the JSON format also open in Xcode 27.0 and 27.1, so the whole
-team doesn't have to be on the beta. The command-line tools ship only with
-27.2.
+team doesn't have to be on 27.2. The command-line tools ship only with 27.2.
 
 The new format pays off in diffs. Here's the same `pkg add` of
 `swift-collections` in both formats. The property list gets 24 new lines in
@@ -537,7 +537,8 @@ and checks the result with `xcprojformatter` afterwards.
 Xcode also gives agents an MCP server through `xcrun mcpbridge`, and some of
 its tools overlap with `xcodeproj`. `XcodeNewProject` and
 `XcodeNewTarget` create projects and targets from Xcode's templates,
-`XcodeMakeDir` creates synchronized folders, and `GetTargetBuildSettings` and
+`XcodeMakeDir` creates synchronized folders (or classic groups with
+`directoryKind: "group"` since the 27.2 RC), and `GetTargetBuildSettings` and
 `UpdateTargetBuildSetting` read and change target build settings.
 
 The MCP tools go through a running Xcode with the project open, or through
@@ -652,7 +653,7 @@ for target in project.targets {
 }
 ```
 
-The format and both tools are still in beta and have rough edges, as the
+The format and both tools are still new and have rough edges, as the
 gotchas above show. [Tuist](https://tuist.dev) and
 [XcodeGen](https://github.com/yonaskolb/XcodeGen) remain an option, but for
 many projects a readable project file and a CLI from Apple may be enough.
