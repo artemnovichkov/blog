@@ -251,7 +251,7 @@ const catalog: App[] = [
     description:
       "An accordion for iPhone. On iPhone Duo the hinge is the bellows: fold and unfold to play.",
     appStoreId: "6816177737",
-    isLive: false,
+    isLive: true,
     icon: "/apps/accorduon/icon.png",
     hero: {
       src: "/apps/accorduon/duo-folded.webp",
