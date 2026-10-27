@@ -3,7 +3,7 @@ title: Using Claude with Apple Foundation Models
 description: Bringing frontier models to LanguageModelSession with model selection and BYOK
 cover: /images/using-claude-with-apple-foundation-models/cover.png
 date: '2026-06-12'
-updated: '2026-09-14'
+updated: '2026-10-27'
 categories:
   - foundation-models
   - ai
@@ -19,7 +19,7 @@ In this post, we'll build GiftGenie — a small app that generates gift ideas �
 
 - Xcode 27;
 - iOS 27 (macOS, visionOS, and watchOS 27 are supported as well);
-- A Claude API key from [Claude Console](https://platform.claude.com).
+- A Claude API key from [Claude Console](https://platform.claude.com) for development — see [Authentication](#authentication) for production options.
 
 Requests go directly from the app to the Claude API — Apple is not in the request path and doesn't see prompts or responses. Usage is billed to your Anthropic account at standard API pricing.
 
@@ -53,13 +53,30 @@ print(response.content)
 
 That's the whole integration. Everything else — instructions, transcripts, structured output — works like with `SystemLanguageModel`.
 
-<Callout>
-A key bundled into an app is extractable from the shipping binary. The package provides three auth modes:
+## Authentication
 
-- `.apiKey("...")` — development only. Never ship this in production.
-- `.proxied(headers:)` + `baseURL` — production. Your backend adds the credential; the app ships no key. Pass any headers the proxy needs to authorize the caller (or `[:]` if none).
-- `.appAttest(clientID:)` — production without your own backend. Each install authenticates via App Attest and usage is billed to your Anthropic workspace. Add the App Attest capability, register the app in Claude Console under **App integrations**, and pass the `clid_...` client ID. Requires a physical device, so keep `.apiKey` for the Simulator.
+GiftGenie is a BYOK app: the user pastes their own key, it goes into the Keychain, and requests are billed to them. Nothing secret ships in the binary. If you want to pay for all users with your own key, don't bundle it — a key in an app bundle is extractable from the shipping binary, and whoever pulls it out spends your credits. The package has three auth modes for that reason:
+
+- `.apiKey("...")` — development, or BYOK where the user supplies the key. Never ship your own key this way.
+- `.proxied(headers:)` + `baseURL` — your backend attaches the credential and forwards plain Messages API requests; the app ships no key. The `headers` go on every request so the proxy can authorize the caller — pass `[:]` if it needs none.
+- `.appAttest(clientID:)` — production without a backend. Each install proves it's a genuine, unmodified build of your app via [App Attest](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity), Anthropic issues it a short-lived token, and usage is billed to your workspace.
+
+App Attest setup is three steps: add the **App Attest** capability under **Signing & Capabilities**, create an app integration in [Claude Console](https://platform.claude.com/settings/workspaces/default/app-integrations) with your Apple Developer Team ID and bundle IDs, and pass the `clid_...` client ID to `ClaudeLanguageModel`:
+
+```swift
+let model = ClaudeLanguageModel(
+    name: .sonnet5,
+    auth: .appAttest(clientID: "clid_...")
+)
+```
+
+The challenge, the attestation, and the token exchange all run inside the package, and tokens are refreshed as they expire — there's no attestation code to write. Tokens live an hour, are scoped to the workspace, and authorize Messages API calls only. They identify the app, not the person using it, so per-user limits stay your job. If a build leaks, revoke the integration and its devices stop getting tokens.
+
+<Callout type="warning">
+App Attest needs a Secure Enclave, so keep `.apiKey` for the Simulator. It also works only when the app calls the Claude API directly — not through Amazon Bedrock, Google Cloud, or Microsoft Foundry.
 </Callout>
+
+The full reference is [Authentication](https://platform.claude.com/docs/en/cli-sdks-libraries/libraries/apple-foundation-models#authentication) in the package docs.
 
 ## Generating gift ideas
 
@@ -259,3 +276,4 @@ I created [GiftGenieExample](https://github.com/artemnovichkov/GiftGenieExample)
 
 - [Composing dynamic sessions with instructions and profiles](https://developer.apple.com/documentation/FoundationModels/composing-dynamic-sessions-with-instructions-and-profiles) — Apple Documentation
 - [What's new in the Foundation Models framework](https://developer.apple.com/videos/play/wwdc2026/241/) — WWDC26 session
+- [Apple Foundation Models](https://platform.claude.com/docs/en/cli-sdks-libraries/libraries/apple-foundation-models) — Claude Docs
