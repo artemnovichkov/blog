@@ -16,5 +16,7 @@ export default function StoreButton({ app }: { app: App }) {
     )
   }
 
-  return <AppStoreButton href={appStoreUrl(app)} app={app.slug} />
+  return (
+    <AppStoreButton href={appStoreUrl(app, "site-app-page")} app={app.slug} />
+  )
 }

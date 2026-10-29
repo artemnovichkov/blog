@@ -55,7 +55,7 @@ export default async function BlogPost(props: Params) {
                 tagline: app.tagline,
                 description: app.description,
                 icon: app.icon,
-                storeUrl: appStoreUrl(app),
+                storeUrl: appStoreUrl(app, "site-blog-ad"),
               }}
               slug={post.slug}
               placement="post_header"

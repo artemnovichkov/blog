@@ -362,8 +362,24 @@ export function getApp(slug: string): App | undefined {
   return apps.find((app) => app.slug === slug)
 }
 
-export function appStoreUrl(app: App): string {
-  return `https://apps.apple.com/app/id${app.appStoreId}`
+/**
+ * The team's App Analytics provider token. Together with a campaign token it
+ * makes App Store Connect count a link's page views and downloads under
+ * Campaigns, instead of folding them into one web referrer.
+ */
+const providerToken = "117136308"
+
+/** Where on the site a store link sits, as its App Analytics campaign. */
+export type StoreCampaign = "site-blog-ad" | "site-app-page" | "site-banner"
+
+function campaignQuery(campaign: StoreCampaign): string {
+  return `pt=${providerToken}&ct=${campaign}`
+}
+
+/** Without a campaign the link stays bare, for crawlers and JSON-LD. */
+export function appStoreUrl(app: App, campaign?: StoreCampaign): string {
+  const url = `https://apps.apple.com/app/id${app.appStoreId}`
+  return campaign ? `${url}?${campaignQuery(campaign)}&mt=8` : url
 }
 
 /**
@@ -372,7 +388,9 @@ export function appStoreUrl(app: App): string {
  */
 export function smartAppBanner(app: App): Record<string, string> | undefined {
   if (!app.isLive) return undefined
-  return { "apple-itunes-app": `app-id=${app.appStoreId}` }
+  return {
+    "apple-itunes-app": `app-id=${app.appStoreId}, affiliate-data=${campaignQuery("site-banner")}`,
+  }
 }
 
 /** Support, privacy and similar pages, one MDX file each per app. */
