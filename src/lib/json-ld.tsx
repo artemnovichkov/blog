@@ -1,6 +1,6 @@
 import type { Post } from "@/interfaces/post"
 import { getPostModifiedDate } from "@/lib/api"
-import { type App, appStoreUrl } from "@/lib/apps"
+import { type App, type AppVideo, appStoreUrl } from "@/lib/apps"
 import { about, name } from "@/lib/const"
 
 const SITE_URL = "https://artemnovichkov.com"
@@ -60,6 +60,21 @@ export function buildHomeJsonLd() {
   }
 }
 
+export function buildVideoJsonLd(video: AppVideo) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: video.title,
+    description: video.description,
+    thumbnailUrl: `${SITE_URL}${video.poster}`,
+    uploadDate: video.uploadDate,
+    duration: video.duration,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${video.youtubeId}`,
+    url: `https://www.youtube.com/watch?v=${video.youtubeId}`,
+    author,
+  }
+}
+
 export function JsonLd({ data }: { data: object }) {
   return (
     <script
@@ -80,7 +95,7 @@ export function buildAppJsonLd(app: App) {
     url: `${SITE_URL}/apps/${app.slug}`,
     image: `${SITE_URL}${app.icon}`,
     operatingSystem: "iOS",
-    applicationCategory: "GameApplication",
+    applicationCategory: app.applicationCategory,
     offers: { "@type": "Offer", price: 0, priceCurrency: "USD" },
     ...(app.isLive && { installUrl: appStoreUrl(app) }),
     author,

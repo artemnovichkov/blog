@@ -10,6 +10,11 @@ export type App = {
   /** App Store Connect app ID; the store link is built from it. */
   appStoreId: string
   /**
+   * The JSON-LD `applicationCategory`, one of the values Google lists:
+   * developers.google.com/search/docs/appearance/structured-data/software-app
+   */
+  applicationCategory: "GameApplication" | "MultimediaApplication"
+  /**
    * Whether the app is out. An app that is not out has no store page to
    * send anyone to, so it stays off the site entirely: `apps` leaves it
    * out and its routes are never generated. Flip it on release.
@@ -20,7 +25,21 @@ export type App = {
   hero: AppImage
   /** Short facts under the hero, e.g. price model or platform. */
   facts: string[]
+  /** A promo video on YouTube, played under the hero. */
+  video?: AppVideo
   sections: AppSection[]
+}
+
+export type AppVideo = {
+  youtubeId: string
+  /** As on YouTube. */
+  title: string
+  description: string
+  /** 16:9, also the video's thumbnail in search results. */
+  poster: string
+  /** ISO 8601 date and duration, for the video's JSON-LD. */
+  uploadDate: string
+  duration: string
 }
 
 export type AppImage = {
@@ -94,6 +113,7 @@ const catalog: App[] = [
     description:
       "Long Narde and classic backgammon for iPhone. Play a friend or a chatty AI, and on iPhone Duo the fold becomes the bar.",
     appStoreId: "6815637296",
+    applicationCategory: "GameApplication",
     isLive: true,
     icon: "/apps/nardy/icon.png",
     hero: {
@@ -251,6 +271,7 @@ const catalog: App[] = [
     description:
       "An accordion for iPhone. On iPhone Duo the hinge is the bellows: fold and unfold to play.",
     appStoreId: "6816177737",
+    applicationCategory: "MultimediaApplication",
     isLive: true,
     icon: "/apps/accorduon/icon.png",
     hero: {
@@ -266,6 +287,15 @@ const catalog: App[] = [
       "No ads",
       "7 languages",
     ],
+    video: {
+      youtubeId: "15li2uofoqo",
+      title: "Jingle Bells on iPhone Duo: the hinge is the bellows | Accorduon",
+      description:
+        "Accorduon plays Jingle Bells by itself: the hinge works the bellows, the song guide lights up the next key, and the registers switch from Master to Clarinet to Musette.",
+      poster: "/apps/accorduon/video.jpg",
+      uploadDate: "2026-10-29",
+      duration: "PT21S",
+    },
     sections: [
       {
         title: "Your foldable is an accordion",

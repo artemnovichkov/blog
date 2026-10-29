@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import DuoUnfold from "@/app/apps/_components/duo-unfold"
 import StoreButton from "@/app/apps/_components/store-button"
 import ThemesScene from "@/app/apps/_components/themes-scene"
+import YouTubeVideo from "@/app/apps/_components/youtube-video"
 import {
   type AppSection,
   apps,
@@ -12,7 +13,7 @@ import {
   getAppPageSlugs,
   smartAppBanner,
 } from "@/lib/apps"
-import { buildAppJsonLd, JsonLd } from "@/lib/json-ld"
+import { buildAppJsonLd, buildVideoJsonLd, JsonLd } from "@/lib/json-ld"
 import { buildMetadata } from "@/lib/metadata"
 
 type Params = {
@@ -131,6 +132,7 @@ export default async function AppPromoPage({ params }: Params) {
   return (
     <div className="promo flex flex-col gap-20 py-10 md:gap-28 md:py-16">
       <JsonLd data={buildAppJsonLd(app)} />
+      {app.video && <JsonLd data={buildVideoJsonLd(app.video)} />}
 
       <section className="grid items-center gap-10 md:grid-cols-[2fr_3fr]">
         <div>
@@ -192,6 +194,8 @@ export default async function AppPromoPage({ params }: Params) {
           />
         </div>
       </section>
+
+      {app.video && <YouTubeVideo video={app.video} />}
 
       {groupSections(app.sections).map((group) =>
         group[0].images.length === 0 ? (
