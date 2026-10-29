@@ -3,7 +3,7 @@ title: Creating MCP Servers in Swift
 description: Learn how to create a Model Context Protocol server in Swift
 cover: /images/creating-mcp-servers-in-swift/cover.png
 date: '2025-04-17'
-updated: '2025-05-18'
+updated: '2026-10-30'
 categories:
   - mcp
   - ai
@@ -42,7 +42,7 @@ let package = Package(
         .executable(name: "swift-version-mcp", targets: ["SwiftVersionMCP"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/modelcontextprotocol/swift-sdk", from: "0.7.1"),
+        .package(url: "https://github.com/modelcontextprotocol/swift-sdk", from: "0.12.1"),
     ],
     targets: [
         .executableTarget(name: "SwiftVersionMCP", dependencies: [
@@ -55,8 +55,8 @@ let package = Package(
 Open `main.swift` and add the following code:
 
 ```swift showLineNumbers title="main.swift"
-import Foundation
 import MCP
+import Foundation
 
 let server = Server(
     name: "Swift Version Server",
@@ -74,31 +74,35 @@ Next, we need to implement the tools. The server will have one tool that returns
 
 ```swift showLineNumbers{13} title="main.swift"
 let tool = Tool(name: "swift_version",
-                description: "Returns the current Swift version")
+                description: "Returns the current Swift version",
+                inputSchema: .object([
+                    "type": .string("object"),
+                    "additionalProperties": .bool(false)
+                ]))
 
 await server.withMethodHandler(ListTools.self) { params in
     ListTools.Result(tools: [tool])
 }
 ```
 
-During the experiments with the SDK, I found that the tool name should be in snake case format. Otherwise, you may face errors during the tool call. Tools also may have input schema for input parameters, it's optional by specification. But experimenting with different clients, I found that some of them don't see the tool if it doesn't have input schema. This quick fix helps to make the tool visible:
+`inputSchema` is not optional. The specification requires a valid JSON Schema
+object, and since SDK 0.10.0 the parameter has no default value, so the code
+doesn't compile without it. Our tool takes no parameters, so the schema is an
+object that accepts nothing else.
 
-```swift {3-5} showLineNumbers{13} title="main.swift"
-let tool = Tool(name: "swift_version",
-                description: "Returns the current Swift version",
-                inputSchema: .object([
-                    "type": .string("object")
-                ]))
-```
+Tool names are case-sensitive and should contain only letters, digits, `_`, `-`,
+and `.` — no spaces or other special characters. Both `swift_version` and
+`swiftVersion` are valid; the snake case here is a habit from other servers.
 
 To make the server respond to the tool, we need to implement the `withMethodHandler(CallTool.self)` function. It will be called when the client requests the tool. The method should return a `Result` object with the result of the tool:
 
-```swift showLineNumbers{23} title="main.swift"
+```swift showLineNumbers{24} title="main.swift"
 await server.withMethodHandler(CallTool.self) { params in
     guard params.name == tool.name else {
         throw MCPError.invalidParams("Wrong tool name: \(params.name)")
     }
-    return CallTool.Result(content: [.text(swiftVersion() ?? "No version")])
+    let version = swiftVersion() ?? "No version"
+    return CallTool.Result(content: [.text(text: version, annotations: nil, _meta: nil)])
 }
 
 func swiftVersion() -> String? {
@@ -121,11 +125,13 @@ func swiftVersion() -> String? {
 }
 ```
 
-Because the server may contain several tools, we check the tool name here.
+Because the server may contain several tools, we check the tool name here. The
+shorter `.text("...")` helper still works, but it's deprecated since 0.12.0 and
+warns on build.
 
 In the end of the file, add a call to `waitUntilCompleted()` to keep the server running:
 
-```swift showLineNumbers{49} title="main.swift"
+```swift showLineNumbers{51} title="main.swift"
 await server.waitUntilCompleted()
 ```
 
@@ -137,45 +143,51 @@ swift build
 
 Interfaces in the SDK look a bit strange, because it was highly inspired by TypeScript implementation. It uses the same naming conventions and patterns. Sometimes you need to use dictionaries without strong types, but it is not a big deal. But hopefully it supports structured concurrency, so you can use async/await syntax.
 
-Now, we are ready to test the server. With a new Agent mode available in last releases of Visual Studio Code, you can use any MCP server in the editor. Let's configure it.
+Since this post was written, the SDK covers the
+[2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25)
+specification, ships `StatelessHTTPServerTransport` and
+`StatefulHTTPServerTransport` for servers that aren't local subprocesses,
+supports OAuth authentication, and adds tool titles, icons, `outputSchema` and
+structured content. Stdio is still the simplest way to start, though.
+
+Now, we are ready to test the server. Agent mode in Visual Studio Code works
+with any MCP server, so let's configure it.
 
 ## Using MCP servers in Visual Studio Code
 
  Here is how to add the server. Make sure you install [Github Copilot extension](https://marketplace.visualstudio.com/items/?itemName=GitHub.copilot) first.
 
-1. Open *Command Palette...* via ⌘+⇧+P shortcut and search for *MCP: List Servers*
-2. Click on *Add Server*
-3. There are two options:
-- Command (Stdio)
-- HTTP (server-sent events)
-
-Select the first one because we are using Stdio transport.
-
-4. Add a path to the executable:
+1. Open *Command Palette...* via ⌘+⇧+P shortcut and run *MCP: Add Server*
+2. Select a type. For a local executable it's *Command (stdio)*; the other
+option is *HTTP (HTTP or Server-Sent Events)*
+3. Add a path to the executable:
 
 ```bash
 /Users/artemnovichkov/Developer/swift-version-mcp/.build/arm64-apple-macosx/debug/swift-version-mcp
 ```
 
-5. Select a server name, for example, `swift-version-server`
-6. Select settings to save the server:
-- User settings (available in all workspaces). The server will be added to `settings.json`.
-- workspace settings (available in this workspace). The server will be added to `.vscode/mcp.json` in workspace folder.
+4. Enter a server ID, for example, `swift-version-server`
+5. Select where to save it. *Copilot Global* writes to
+`~/.copilot/mcp-config.json` and is available everywhere; the workspace-root
+`.mcp.json` is shared with the team. The older destinations, workspace
+`.vscode/mcp.json` and user-profile `mcp.json`, still work, but the guided flow
+marks them as deprecated.
 
 After finishing the setup, you will see the server in the list:
 ```json
 {
-    "mcp": {
-        "servers": {
-            "swift-version-server": {
-                "type": "stdio",
-                "command": "/Users/artemnovichkov/Developer/swift-version-mcp/.build/arm64-apple-macosx/debug/swift-version-mcp",
-                "args": []
-            }
+    "mcpServers": {
+        "swift-version-server": {
+            "type": "stdio",
+            "command": "/Users/artemnovichkov/Developer/swift-version-mcp/.build/arm64-apple-macosx/debug/swift-version-mcp",
+            "args": []
         }
-    },
+    }
 }
 ```
+
+That's the `mcpServers` format, the same one Cursor and Claude Desktop use. If
+you picked one of the VS Code files instead, the top-level key is `servers`.
 
 Above the server name you will see a `Start` button. Click on it to start the server:
 ```
@@ -231,13 +243,21 @@ Make sure to restart Claude Desktop after adding the server.
 
 ## Conclusion
 
-During the development of the server, I learned a lot about Model Context Protocol. I'm sure it will evolve over time and will become more powerful. Who knows, maybe this year we will see MCP integration in Xcode 😏.
+During the development of the server, I learned a lot about Model Context
+Protocol. I used to joke here about MCP integration in Xcode. It arrived in
+Xcode 26.3, and Xcode 27 moved external agents behind External Agent Access in
+Settings → Intelligence, so the tools stay reachable with Xcode closed. I wrote
+about that in
+[Headless Xcode: From Prompt to Simulator with MCP](https://artemnovichkov.com/blog/headless-xcode-from-prompt-to-simulator-with-mcp).
 
 The final code is available on [Github](https://github.com/artemnovichkov/swift-version-mcp).
+
+<OpenInXcode repo="artemnovichkov/swift-version-mcp" />
 
 ## References
 
 - [Model Context Protocol. Introduction](https://modelcontextprotocol.io/introduction)
+- [MCP Swift SDK](https://github.com/modelcontextprotocol/swift-sdk)
 - [Agent mode: available to all users and supports MCP](https://code.visualstudio.com/blogs/2025/04/07/agentMode) by VS Code Team
 - [Model Context Protocol](https://docs.cursor.com/context/model-context-protocol) by Cursor Team
 - [Awesome MCP Servers](https://mcpservers.org)

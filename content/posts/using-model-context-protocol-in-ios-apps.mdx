@@ -3,6 +3,7 @@ title: Using Model Context Protocol in iOS apps
 description: Learn how to implement MCP client with SwiftUI and Anthropic API
 cover: /images/using-model-context-protocol-in-ios-apps/cover.png
 date: '2025-05-11'
+updated: '2026-10-30'
 categories:
   - mcp
   - ai
@@ -14,6 +15,15 @@ categories:
 In a previous post, we discussed how to [create an MCP server in Swift](https://artemnovichkov.com/blog/creating-mcp-servers-in-swift). If you're new to MCP, I recommend reading it first.
 
 There are plenty of MCP clients out there, but most of them are desktop apps. As an iOS developer, I wondered how to use MCP in an iOS app. In this post, we'll implement a simple chat with Claude LLM. As an example of MCP server, we'll get blood pressure data from HealthKit.
+
+<Callout type="info" emoji="️ℹ️">
+    The app below speaks Anthropic's tool use format, and the "server" is a
+    local Swift type, not a process on the other end of a transport. For a real
+    client, the official
+    [Swift SDK](https://github.com/modelcontextprotocol/swift-sdk) supports
+    iOS 16+ and ships `HTTPClientTransport` for remote servers. The Messages API
+    can also call remote MCP servers on its own via the MCP connector.
+</Callout>
 
 ## Implementing MCP Server for HealthKit
 
@@ -140,8 +150,9 @@ final class AnthropicService {
         request.httpMethod = "POST"
         request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
         request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
+        request.setValue("application/json", forHTTPHeaderField: "content-type")
         
-        let body = Request(model: "claude-3-opus-20240229", messages: messages, max_tokens: 1024, tools: tools)
+        let body = Request(model: "claude-opus-5-5", messages: messages, max_tokens: 4096, tools: tools)
         let encoder = JSONEncoder()
         request.httpBody = try encoder.encode(body)
         
@@ -153,6 +164,12 @@ final class AnthropicService {
 ```
 
 For initializing the `AnthropicService`, we need to provide an API key and a list of tools. You can get an API key from [Anthropic Dashboard](https://console.anthropic.com/settings/keys). The `tools` array will be used to register the tools available to the assistant during the chat.
+
+<Callout type="warning" emoji="⚠️">
+    Anyone can extract a key from the app bundle, and it's billed to you.
+    That's fine for a sample project, but anything you ship needs a backend
+    between the app and the API.
+</Callout>
 
 Here is the `Request` struct that will be used to send messages to the Anthropic API:
 
@@ -192,11 +209,13 @@ You may notice a `Content` object in both `Request` and `Response` structs. It r
 ```swift
 enum Content: Codable {
     case text(text: String)
+    case thinking(thinking: String, signature: String)
+    case redactedThinking(data: String)
     case toolUse(id: String, name: String, input: [String: String])
     case toolResult(toolUseId: String, content: String)
 
     private enum CodingKeys: String, CodingKey {
-        case type, text, id, name, input, tool_use_id, content
+        case type, text, thinking, signature, data, id, name, input, tool_use_id, content
     }
 
     init(from decoder: Decoder) throws {
@@ -212,6 +231,8 @@ enum Content: Codable {
 To simplify usage, we'll use an enum to represent the content:
 
 - `text` — a regular text message
+- `thinking` — the model's reasoning
+- `redactedThinking` — the same reasoning, safety-redacted
 - `toolUse` — a tool call by the assistant
 - `toolResult` — a tool result by the MCP client
 
@@ -267,10 +288,12 @@ struct ChatMessage: Identifiable {
 
     var content: String {
         message.content
-            .map { content in
+            .compactMap { content -> String? in
                 switch content {
                 case .text(let text):
                     text
+                case .thinking, .redactedThinking:
+                    nil
                 case .toolUse(_, let name, _):
                     "Called MCP Tool: \(name)"
                 case .toolResult(_, let content):
@@ -358,8 +381,8 @@ Now we're ready to send a message to the assistant. Let's run the app and send a
       "role": "user"
     }
   ],
-  "max_tokens": 1024,
-  "model": "claude-3-opus-20240229",
+  "max_tokens": 4096,
+  "model": "claude-opus-5-5",
   "tools": [
     {
       "description": "Get the latest blood pressure (systolic and diastolic) from Apple Health.",
@@ -379,11 +402,11 @@ Let's see the response from the assistant. It may look like this:
   "id": "msg_01Jf3zsSaK4nGVASwx8Qqk34",
   "type": "message",
   "role": "assistant",
-  "model": "claude-3-opus-20240229",
+  "model": "claude-opus-5-5",
   "content": [
     {
       "type": "text",
-      "text": "<thinking>\nThe `blood_pressure` function from the Apple Health API is directly relevant to answering the user's request for their last blood pressure reading. This function does not require any parameters, so we have all the necessary information to make the API call.\n</thinking>"
+      "text": "Let me check your latest reading from Apple Health."
     },
     {
       "type": "tool_use",
@@ -403,6 +426,15 @@ Let's see the response from the assistant. It may look like this:
 }
 ```
 
+<Callout type="warning" emoji="⚠️">
+    Current models think by default, so the response also contains `thinking`
+    blocks. Their text is usually empty, since the summary is off unless you
+    ask for it. The `signature` field must come back unchanged with the next
+    request. Editing it throws away the model's reasoning, and accounts created
+    on or after August 31, 2026 get an error. Safety-redacted reasoning arrives
+    as `redacted_thinking` and follows the same rules.
+</Callout>
+
 When the assistant responds, the app will display a new message from the assistant:
 
 ![First response](/images/using-model-context-protocol-in-ios-apps/first-response.png)
@@ -415,7 +447,7 @@ for content in response.content {
     switch content {
     case .toolUse(let id, let name, _):
         try await useTool(withID: id, name: name)
-    case .text, .toolResult:
+    case .text, .thinking, .redactedThinking, .toolResult:
         continue
     }
 }
@@ -456,6 +488,8 @@ Every tool result must have a `tool_use_id` that matches the `id` of the tool us
 Model Context Protocol is a powerful way to integrate LLM into your app. In context of iOS development, it also may be useful for accessing local and remote data and enriching the user experience.
 
 The full code of the app is available on [GitHub](https://github.com/artemnovichkov/mcp-client-example).
+
+<OpenInXcode repo="artemnovichkov/mcp-client-example" />
 
 ## References
 
