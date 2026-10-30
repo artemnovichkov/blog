@@ -3,7 +3,7 @@ title: Xcode Projects for the Command Line and Coding Agents
 description: Edit Xcode projects from the terminal with xcodeproj, xcprojformatter, and the new JSON format
 cover: /images/xcode-projects-for-the-command-line-and-coding-agents/cover.png
 date: '2026-10-15'
-updated: '2026-10-27'
+updated: '2026-10-30'
 categories:
   - xcode
   - developer-tools
@@ -30,7 +30,7 @@ Xcode also ships two command-line tools for the new format:
   and Swift packages.
 
 Neither is on your `PATH`, so run them with `xcrun`. Everything below is
-checked on the Xcode 27.2 RC (27B48).
+checked on Xcode 27.2 (27B52).
 
 <Callout type="warning" emoji="⚠️">
   If you use CocoaPods, a plain `xcodeproj` in the terminal may run the
@@ -538,7 +538,7 @@ Xcode also gives agents an MCP server through `xcrun mcpbridge`, and some of
 its tools overlap with `xcodeproj`. `XcodeNewProject` and
 `XcodeNewTarget` create projects and targets from Xcode's templates,
 `XcodeMakeDir` creates synchronized folders (or classic groups with
-`directoryKind: "group"` since the 27.2 RC), and `GetTargetBuildSettings` and
+`directoryKind: "group"` since 27.2), and `GetTargetBuildSettings` and
 `UpdateTargetBuildSetting` read and change target build settings.
 
 The MCP tools go through a running Xcode with the project open, or through
